@@ -53,12 +53,12 @@ Notice that the mechanization includes a lot of details that are omitted in the 
 
 | Paper | Coq code |
 |---|---|
-|Sec. III.B, III.C | `Examples/simple_auth/SimpleAuth.v`|
-|Sec. III.D, Replacing A with B in the ciphertext | `Examples/simple_auth/SimpleAuthWithB.v`|
-|Sec. III.D, A flawed version of the protocol | `Examples/simple_auth/SimpleAuthFlawed.v`|
-|Sec. III.D, Relaxing the term typing | `Examples/simple_auth/SimpleAuthUntyped.v`|
-|Sec. III.E | `Examples/simple_auth/SimpleAuthDual.v` and `Examples/simple_auth/SimpleAuthDualB.v`|
-|Sec. III.F | `Examples/simple_auth/SimpleAuthMaximalEnc*.v` |
+|Sec. B, C | `Examples/simple_auth/SimpleAuth.v`|
+|Sec. D, Replacing A with B in the ciphertext | `Examples/simple_auth/SimpleAuthWithB.v`|
+|Sec. D, A flawed version of the protocol | `Examples/simple_auth/SimpleAuthFlawed.v`|
+|Sec. D, Relaxing the term typing | `Examples/simple_auth/SimpleAuthUntyped.v`|
+|Sec. E | `Examples/simple_auth/SimpleAuthDual.v` and `Examples/simple_auth/SimpleAuthDualBProtected.v`|
+|Sec. F | `Examples/simple_auth/SimpleAuthMaximalEnc*.v` |
 
 ## Section V.A: Needham-Schroeder-Lowe Protocol (NSL)
 
