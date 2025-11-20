@@ -1,7 +1,9 @@
-# StrandsRocq
+![StrandsRocq](assets/logo.png)
 
 This repository contains the Rocq mechanization of strand spaces.
-It includes the full mechanization of the strand framework, new general results about strands and three case studies with a number of variants, as detailed in the paper "Strands Rocq: Why is a Security Protocol Correct, Mechanically?" by Matteo Busi, Riccardo Focardi, and Flaminia Luccio ([published version](https://ieeexplore.ieee.org/document/11097857), [arXiv version](https://arxiv.org/abs/2502.12848)).
+It includes the full mechanization of the strand framework, new general results about strands and three case studies with a number of variants, as detailed in the paper:
+
+> ["Strands Rocq: Why is a Security Protocol Correct, Mechanically?"](https://ieeexplore.ieee.org/document/11097857) by Matteo Busi, Riccardo Focardi, and Flaminia Luccio ([arXiv version](https://arxiv.org/abs/2502.12848))
 
 # Installation and proof checking
 > ⚠️ We are currently migrating StrandsRocq to Rocq 9.x, at the moment it is recommended sticking to Coq<=8.20, e.g., by pinning it using ``opam``
