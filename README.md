@@ -1,7 +1,46 @@
 # StrandsRocq
 
-This repository contains the Coq/Rocq mechanization of strand spaces.
-It includes the full mechanization of the strand framework, new general results about strands and three case studies with a number of variants, as detailed in our paper "Strands Rocq: Why is a Security Protocol Correct, Mechanically?".
+This repository contains the Rocq mechanization of strand spaces.
+It includes the full mechanization of the strand framework, new general results about strands and three case studies with a number of variants, as detailed in the paper "Strands Rocq: Why is a Security Protocol Correct, Mechanically?" by Matteo Busi, Riccardo Focardi, and Flaminia Luccio ([published version](https://ieeexplore.ieee.org/document/11097857), [arXiv version](https://arxiv.org/abs/2502.12848)).
+
+# Installation and proof checking
+> ⚠️ We are currently migrating StrandsRocq to Rocq 9.x, at the moment it is recommended sticking to Coq<=8.20, e.g., by pinning it using ``opam``
+
+> 📣 Now you can run [StrandsRocq directly in your browser]((https://strandsrocq.vercel.app/)), without installing anything!
+
+📄 You can of course inspect StrandsRocq in your editor and check the proofs interactively from there.
+You can also check the proofs in batch mode using `dune` and `coq` (tested and developed on `dune` 3.14 and `coq` 8.17.0):
+```
+$ dune clean
+$ dune build
+```
+in the root of this repository.
+The process requires about 20 seconds on a machine with an Apple M2 processor.
+
+
+# Documentation
+
+- Our [paper](https://arxiv.org/abs/2502.12848) explains the ideas and design principles behind StrandsRocq, and includes some examples;
+- For a more hands-on introduction you may also want to consider our [online tutorial](https://strandsrocq.vercel.app/);
+- If you are interested in StrandsRocq's internals there's an [AI-generated wiki](https://deepwiki.com/strandsrocq/strandsrocq) (⚠️ May include errors! ⚠️)
+
+# Citing our work
+
+If you plan citing our work, you can use the following bib entry:
+```
+@inproceedings{strandsrocq,
+  author       = {Matteo Busi and
+                  Riccardo Focardi and
+                  Flaminia L. Luccio},
+  title        = {Strands Rocq: Why is a Security Protocol Correct, Mechanically?},
+  booktitle    = {38th {IEEE} Computer Security Foundations Symposium, {CSF} 2025, Santa
+                  Cruz, CA, USA, June 16-20, 2025},
+  pages        = {33--48},
+  publisher    = {{IEEE}},
+  year         = {2025},
+  doi          = {10.1109/CSF64896.2025.00022}
+}
+```
 
 # Structure of the project
 
@@ -22,16 +61,6 @@ The project is structured as follows:
     + `simple_auth` is the full development of Section III of the paper
     + `nsl` and `ns_original` correspond to the development of Needham-Schroeder and Needham-Schroeder-Lowe protocols;
     + `kmp` is for the key management policies case study.
-
-# Checking the proof
-
-The proof can of course be inspected with your favorite editor.
-If you wish to check the proof in batch mode you need `dune` and `coq` (tested and developed on `dune` 3.14 and `coq` 8.17.0) and you can run:
-```
-$ dune clean
-$ dune build
-```
-in this directory. The process requires about 20 seconds on a machine with an Apple M2 processor.
 
 # The Rosetta stone: paper <-> Coq code
 
