@@ -42,6 +42,10 @@ If you plan citing our work, you can use the following bib entry:
 }
 ```
 
+# Contributing
+
+Thanks for your interest in contributing, you can get started [here](CONTRIBUTING.md).
+
 # Structure of the project
 
 The project is structured as follows:
