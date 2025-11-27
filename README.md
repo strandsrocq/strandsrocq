@@ -6,19 +6,17 @@ It includes the full mechanization of the strand framework, new general results 
 > ["Strands Rocq: Why is a Security Protocol Correct, Mechanically?"](https://ieeexplore.ieee.org/document/11097857) by Matteo Busi, Riccardo Focardi, and Flaminia Luccio ([arXiv version](https://arxiv.org/abs/2502.12848))
 
 # Installation and proof checking
-> ⚠️ We are currently migrating StrandsRocq to Rocq 9.x, at the moment it is recommended sticking to Coq<=8.20, e.g., by pinning it using ``opam``
 
-> 📣 Now you can run [StrandsRocq directly in your browser]((https://strandsrocq.vercel.app/)), without installing anything!
+> 📣 You can run [StrandsRocq directly in your browser]((https://strandsrocq.vercel.app/)), without installing anything!
 
-📄 You can of course inspect StrandsRocq in your editor and check the proofs interactively from there.
-You can also check the proofs in batch mode using `dune` and `coq` (tested and developed on `dune` 3.14 and `coq` 8.17.0):
+📄 If you wish, you can download StrandsRocq locally and use your favorite editor to check the proofs interactively.
+For a complete build of StrandsRocq, you can simply run:
 ```
 $ dune clean
 $ dune build
 ```
-in the root of this repository.
+A successful build requires `dune>=3.20`, Rocq 9.1.0, and the compatibility package `coq-core` that can be installed with `opam install coq-core`.
 The process requires about 20 seconds on a machine with an Apple M2 processor.
-
 
 # Documentation
 
