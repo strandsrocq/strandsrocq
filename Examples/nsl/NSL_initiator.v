@@ -1,6 +1,6 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
 
 Require Import DefaultInstances.
 Require Import Penetrator.
@@ -13,7 +13,7 @@ Section initiator_guarantees.
   Variable s : Σ.
   Variables A B Na Nb : T.
   Variable Tname : T -> Prop.
-  
+
   Hypothesis s_is_NSL_init : NSL_initiator_strand Tname A B Na Nb s.
 
   (* A few easy/trivial facts *)

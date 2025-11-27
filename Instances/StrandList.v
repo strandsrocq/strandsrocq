@@ -1,8 +1,8 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Require Import Coq.Arith.PeanoNat.
-Require Import String.
-Import Coq.Lists.List.ListNotations.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+From Stdlib Require Import Arith.PeanoNat.
+From Stdlib Require String.
+Import Stdlib.Lists.List.ListNotations.
 
 (* From Common: *)
 Require Import Strands.

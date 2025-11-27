@@ -1,6 +1,6 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
 
 Require Import LogicalFacts.
 Require Import DefaultInstances.
@@ -8,7 +8,7 @@ Require Import Penetrator.
 
 Set Implicit Arguments.
 
-Require Import Coq.Logic.Decidable.
+From Stdlib Require Import Logic.Decidable.
 
 Section SimpleAuthSpec.
   (** * Example: A Simple Unilateral Authentication Protocol

@@ -1,8 +1,8 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
-Require Import ListSet.
-Require Import Coq.Logic.Decidable.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
+From Stdlib Require Import ListSet.
+From Stdlib Require Import Logic.Decidable.
 
 Require Import DefaultInstances.
 Require Import Penetrator.
@@ -47,5 +47,5 @@ Section kmp_policies.
 End kmp_policies.
 
 (* Membership notation for policies *)
-Notation "π '⊢' K '-[' ℓ ']->' J" := (set_In (K, ℓ, J) π) (at level 40).
+Notation "π '⊢' K '-[' ℓ ']->' J" := (set_In (K, ℓ, J) π) (at level 70).
 #[global] Hint Resolve dec_setIn_policy__t : Terms_decidability.

@@ -1,7 +1,7 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
-Require Import ListSet.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
+From Stdlib Require Import ListSet.
 
 Require Import DefaultInstances.
 Require Import Penetrator.
@@ -39,8 +39,8 @@ Section kmp_closure_improved.
 
   (* (Local) Notation for closure inclusion and belonging *)
   Notation "C1 '⊴' C2" := (closure__t_leq C1 C2) (at level 40).
-  Notation "C '⊢' K '=[' ℓ ']=>' J" := (set_In (K, ℓ, J) (fst C)) (at level 40).
-  Notation "C '⊢' K '∈' Z" := (set_In (K, Z) (snd C)) (at level 40).
+  Notation "C '⊢' K '=[' ℓ ']=>' J" := (set_In (K, ℓ, J) (fst C)) (at level 70).
+  Notation "C '⊢' K '∈' Z" := (set_In (K, Z) (snd C)) (at level 70).
 
   Definition is_closure (π : policy__t) (Π : closure__t) : Prop :=
     (* 1. Π includes fst Π *) (forall KT ℓ JT, π ⊢ KT -[ℓ]-> JT -> Π ⊢ (KDn KT) =[ℓ]=> JT) /\
@@ -53,5 +53,5 @@ Section kmp_closure_improved.
 End kmp_closure_improved.
 
 Notation "C1 '⊴' C2" := (closure__t_leq C1 C2) (at level 40).
-Notation "C '⊢' K '=[' ℓ ']=>' J" := (set_In (K, ℓ, J) (fst C)) (at level 40).
-Notation "C '⊢' K '∈' Z" := (set_In (K, Z) (snd C)) (at level 40).
+Notation "C '⊢' K '=[' ℓ ']=>' J" := (set_In (K, ℓ, J) (fst C)) (at level 70).
+Notation "C '⊢' K '∈' Z" := (set_In (K, Z) (snd C)) (at level 70).

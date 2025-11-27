@@ -1,13 +1,13 @@
-Require Import Coq.Logic.Decidable.
-Require Import Setoid.
-Require Import Coq.Lists.List.
-Require Import Coq.Lists.ListSet.
-Require Import Coq.Lists.SetoidList.
+From Stdlib Require Import Logic.Decidable.
+From Stdlib Require Import Setoid.
+From Stdlib Require Import Lists.List.
+From Stdlib Require Import Lists.ListSet.
+(* From Stdlib Require Import Lists.SetoidList. *)
 
 (** Logical facts
 
 This is a subset of [FSetLogicalFacs] module from [FSetDecide.v]
-that we slightly adapted to our setting. 
+that we slightly adapted to our setting.
 *)
 
 Tactic Notation "fold" "any" "not" "in" ident(H) :=
@@ -83,7 +83,7 @@ Tactic Notation
     | context [?P -> ?Q] => reverse_or_not_l_iff_in P Q H dec
     end
   ).
-  
+
 Tactic Notation
   "push" "not" "in" ident(H) "using" ident(db) :=
   let dec := solve_decidable using db in

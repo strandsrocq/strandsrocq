@@ -1,4 +1,4 @@
-Require Import Lia.
+From Stdlib Require Import Lia.
 
 Require Import Strands.
 Require Import LogicalFacts.

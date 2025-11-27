@@ -1,8 +1,9 @@
 
-Require Import Coq.Lists.ListSet.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
-Require Import Relations.
+From Stdlib Require Import Lists.ListSet.
+From Stdlib Require Import Lists.List.
+From Stdlib Require Import Relations.
+
+Import Stdlib.Lists.List.ListNotations.
 
 Set Implicit Arguments.
 

@@ -1,11 +1,11 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
 
 Require Import DefaultInstances.
 Require Import Penetrator.
 
-Require Import Coq.Logic.Decidable.
+From Stdlib Require Import Logic.Decidable.
 Require Import LogicalFacts.
 
 Require Import NS_orig_protocol.

@@ -2,4 +2,5 @@
 (coq.theory
  (name strandsrocq)
  (package strandsrocq)
+ (theories Stdlib)
 )

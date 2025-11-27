@@ -1,11 +1,11 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
 
 Require Import DefaultInstances.
 Require Import Penetrator.
 
-Require Import Coq.Logic.Decidable.
+From Stdlib Require Import Logic.Decidable.
 Require Import LogicalFacts.
 
 Require Import NSL_protocol.
@@ -185,7 +185,7 @@ Section auth_responder_guarantee.
       simplify_prop in Hand using decidability.
       intuition idtac.
       simplify_prop in H4 using decidability.
-      
+
       specialize (mpti_then_originates ($ Nb) m) as Horig1.
       simplify_term_in Horig1. st_implication Horig1. intuition.
       specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NSL_resp diff_nonces Nb_uniquely_originates) as Horigs.
@@ -196,7 +196,7 @@ Section auth_responder_guarantee.
 
   (* Proposition 4.8 -  injective agreement as in the original strand spaces paper **)
   Proposition injective_agreement_orig :
-    $Na <> $Nb -> 
+    $Na <> $Nb ->
     uniquely_originates $Nb ->
     uniquely_originates $Na ->
       exists !s : Σ,

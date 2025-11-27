@@ -1,17 +1,17 @@
-Require Import Coq.Init.Datatypes.
-Require Import Arith.
-Require Import ListSet.
-Require Import Coq.Lists.List Coq.Lists.ListSet Coq.Bool.Bool Coq.Bool.Sumbool.
-Require Import Lia.
-Require Import Relations.
-Require Import Relations.Relation_Operators.
+From Stdlib Require Import Init.Datatypes.
+From Stdlib Require Import Arith.
+From Stdlib Require Import ListSet.
+(* From Stdlib Require Import Lists.List Stdlib.Lists.ListSet Stdlib.Bool.Bool Stdlib.Bool.Sumbool. *)
+From Stdlib Require Import Lia.
+From Stdlib Require Import Relations.
+From Stdlib Require Import Relations.Relation_Operators.
 Require Import RelMinimal.
 Import Nat.
 
 Require Import Strands.
 Require Import BundleRelations.
 
-Import Coq.Lists.List.ListNotations.
+Import Stdlib.Lists.List.ListNotations.
 
 Open Scope list_scope.
 

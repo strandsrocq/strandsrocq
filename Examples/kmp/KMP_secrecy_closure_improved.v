@@ -3,10 +3,10 @@
     "Secure Key Management Policies in Strand Spaces" by Focardi and Luccio
   using our improved closure.
 *)
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
-Require Import ListSet.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
+From Stdlib Require Import ListSet.
 
 Require Import DefaultInstances.
 Require Import Penetrator.

@@ -1,7 +1,7 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
-Require Import Coq.Arith.PeanoNat.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
+From Stdlib Require Import Arith.PeanoNat.
 Import Nat.
 
 Require Import DefaultInstances.
@@ -124,7 +124,7 @@ Section auth_initiator_guarantee.
 
   (* injective agreement as done in the original strand spaces paper for the responder **)
   Proposition injective_agreement_orig :
-    $Na <> $Nb -> 
+    $Na <> $Nb ->
     uniquely_originates $Na ->
     uniquely_originates $Nb ->
       exists !s : Σ,

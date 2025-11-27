@@ -1,6 +1,6 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
 
 Require Import DefaultInstances.
 Require Import Penetrator.
@@ -201,7 +201,7 @@ Section auth_responder_guarantee.
 
   (* Proposition 4.8 - injective agreement as in the original strand spaces paper **)
   Proposition injective_agreement_original :
-    $Na <> $Nb -> 
+    $Na <> $Nb ->
       uniquely_originates $Nb ->
       uniquely_originates $Na ->
       exists !s : Σ,
@@ -232,7 +232,7 @@ Section auth_responder_guarantee.
   (* We now prove standard injective agreement with no extra assumptions
      with respect to non-injective agreement *)
   Proposition injectivity :
-    $Na <> $Nb -> 
+    $Na <> $Nb ->
     uniquely_originates $Nb ->
       forall U U' s',
         NSL_responder_strand Tname U U' Na Nb s' ->
@@ -260,7 +260,7 @@ Section auth_responder_guarantee.
     specialize (Horigx _ Horig); specialize (Horigx' _ Horig'); subst.
     now inversion Horigx'.
   Qed.
- 
+
   Corollary injective_agreement :
     $Na <> $Nb -> uniquely_originates $Nb ->
     (
@@ -279,5 +279,5 @@ Section auth_responder_guarantee.
    - now apply noninjective_agreement.
    - now apply injectivity.
   Qed.
- 
+
 End auth_responder_guarantee.

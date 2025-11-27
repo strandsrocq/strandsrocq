@@ -1,6 +1,6 @@
-Require Import Lia.
-Require Import Coq.Lists.List.
-Import Coq.Lists.List.ListNotations.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Lists.List.
+Import Stdlib.Lists.List.ListNotations.
 
 Require Import DefaultInstances.
 Require Import Penetrator.
@@ -63,7 +63,7 @@ Section NS.
 
   (* We also prove here general facts about private keys *)
   Lemma inv_PK_U_never_originates_regular :
-    C_is_SS C (NS_StrandSpace K__P) -> 
+    C_is_SS C (NS_StrandSpace K__P) ->
       forall U, never_originates_regular K__P (inv (PK U)) C.
   Proof.
     intros His_NS U n Hnodeof Horig.

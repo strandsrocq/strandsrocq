@@ -1,13 +1,13 @@
-Require Import Coq.Init.Datatypes.
-Require Import Arith.
-Require Import Coq.Lists.List.
-Require Import Coq.Lists.ListSet.
-Require Import Coq.Lists.SetoidList.
-Require Import Lia.
-Require Import Relations.
-Require Import Bool.
+From Stdlib Require Import Init.Datatypes.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Lists.List.
+From Stdlib Require Import Lists.ListSet.
+(* From Stdlib Require Import Lists.SetoidList. *)
+From Stdlib Require Import Lia.
+From Stdlib Require Import Relations.
+From Stdlib Require Import Bool.
 
-Import Coq.Lists.List.ListNotations.
+Import Stdlib.Lists.List.ListNotations.
 Import Nat.
 Open Scope list_scope.
 
