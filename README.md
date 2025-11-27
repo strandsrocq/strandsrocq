@@ -49,13 +49,13 @@ Thanks for your interest in contributing, you can get started [here](CONTRIBUTIN
 # Structure of the project
 
 The project is structured as follows:
-* `Common` this folder contains the Coq mechanization of the common abstract structures of strand spaces:
+* `Common` this folder contains the Rocq mechanization of the common abstract structures of strand spaces:
     + `Strands.v` is the entry point of the strands formalization, with all the basic definitions;
     + `StrandTactics.v` include the tactics that help in automating the proofs;
     + `Bundles.v` and `BundleRelations.v` include definitions and facts about bundles;
     + `MinimalMPT.v` generalization of concepts ideas from the paper about minimal elements of sets of terms;
     + `RelMinimal.v` small helper library with facts about minimal elements of sets
-    + `LogicalFacts.v` subset of `FSetLogicalFacs` module from `FSetDecide.v` in the standard Coq library.
+    + `LogicalFacts.v` subset of `FSetLogicalFacs` module from `FSetDecide.v` in the standard Rocq library.
 * `Instances` this folder includes the part of the development that concretely instantiates various modules from the `Common`folder:
     + `StrandList.v` instantiates strands as pairs `(nat * list sT)`. The first element serves as a strand identifies, the second represents the actual  trace of the strand.
     + `UTerms.v` and `Penetrator.v` actual instances of Strand's terms and Dolev-Yao intruder, building on top of `StrandsList`;
@@ -66,13 +66,13 @@ The project is structured as follows:
     + `nsl` and `ns_original` correspond to the development of Needham-Schroeder and Needham-Schroeder-Lowe protocols;
     + `kmp` is for the key management policies case study.
 
-# The Rosetta stone: paper <-> Coq code
+# The Rosetta stone: paper <-> Rocq code
 
 Here we reconstruct the correspondence between the concepts presented in the paper and those mechanized here.
 Notice that the mechanization includes a lot of details that are omitted in the paper, hence we encourage the interested reader to inspect the proof with their favorite editor.
 
 ## Section III (and other general Strand spaces concepts)
-| Paper | Coq code |
+| Paper | Rocq code |
 |---|---|
 | Strand spaces and bundles  | `Common/Strands.v` and `Common/Bundles.v` |
 | Terms  | `𝔸` in `Instances/UTerms.v` |
@@ -84,7 +84,7 @@ Notice that the mechanization includes a lot of details that are omitted in the 
 
 ## Section IV
 
-| Paper | Coq code |
+| Paper | Rocq code |
 |---|---|
 |Sec. B, C | `Examples/simple_auth/SimpleAuth.v`|
 |Sec. D, Replacing A with B in the ciphertext | `Examples/simple_auth/SimpleAuthWithB.v`|
@@ -95,7 +95,7 @@ Notice that the mechanization includes a lot of details that are omitted in the 
 
 ## Section V.A: Needham-Schroeder-Lowe Protocol (NSL)
 
-| Paper | Coq code |
+| Paper | Rocq code |
 |---|---|
 | Protocol definitions | `Examples/nsl/NSL_protocol.v`, `Examples/nsl/NSL_initiator.v`, and `Examples/nsl/NSL_responder.v`|
 | Responder authentication guarantees (classical and new proof technique) | `Examples/nsl/NSL_auth_responder.v` and `Examples/nsl/NSL_auth_responder_simple.v` |
@@ -106,7 +106,7 @@ Notice that the mechanization includes a lot of details that are omitted in the 
 
 ## Section V.B: Key Management Policies (KMP)
 
-| Paper | Coq code |
+| Paper | Rocq code |
 |---|---|
 | Basic definition | `Examples/kmp/KMP_protocol.v` |
 | Typed key management policies | `Examples/kmp/KMP_policies.v` |
