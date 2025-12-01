@@ -7,7 +7,7 @@ It includes the full mechanization of the strand framework, new general results 
 
 # Installation and proof checking
 
-> 📣 You can run [StrandsRocq directly in your browser]((https://strandsrocq.vercel.app/)), without installing anything!
+> 📣 You can run [StrandsRocq directly in your browser](https://strandsrocq.vercel.app/), without installing anything!
 
 📄 If you wish, you can download StrandsRocq locally and use your favorite editor to check the proofs interactively.
 For a complete build of StrandsRocq, you can simply run:
