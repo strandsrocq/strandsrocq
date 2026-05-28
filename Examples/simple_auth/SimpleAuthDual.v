@@ -56,7 +56,7 @@ End SimpleAuthDualSpec.
 
 Section SimpleAuthDualSecurity.
   Variable s : Σ.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
 
   Variable A B : T.
   Variable Na : T.
@@ -169,7 +169,7 @@ Section SimpleAuthDualSecurity.
       + (* pair case h *)
         assert ((⟨ $Na ⋅ $A ⟩_(SK A B)) ⊏ h) as Hinh. { destruct (A_subterm_dec (⟨ $Na ⋅ $A ⟩_(SK A B)) h);
           try easy. st_implication Hand. }
-        specialize (penetrator_pair_not_minimal_g (C:=C) (C_is_bundle:=C_is_bundle) Ncp_dec Hpen Htrace) as Hpen_g.
+        specialize (penetrator_pair_not_minimal_g (B:=C) (B_is_bundle:=C_is_bundle) Ncp_dec Hpen Htrace) as Hpen_g.
         specialize (pair_not_regular_Ncp_r) as [Hnotreh _].
         rewrite <-Hand2 in Hpen_g. rewrite <-(node_as_pair) in Hpen_g.
         st_implication Hpen_g.
@@ -177,7 +177,7 @@ Section SimpleAuthDualSecurity.
       + (* pair case g *)
         assert ((⟨ $Na ⋅ $A ⟩_(SK A B)) ⊏ g) as Hinh. { destruct (A_subterm_dec (⟨ $Na ⋅ $A ⟩_(SK A B)) g);
           try easy. st_implication Hand. }
-        specialize (penetrator_pair_not_minimal_h (C:=C) (C_is_bundle:=C_is_bundle) Ncp_dec Hpen Htrace) as Hpen_h.
+        specialize (penetrator_pair_not_minimal_h (B:=C) (B_is_bundle:=C_is_bundle) Ncp_dec Hpen Htrace) as Hpen_h.
         specialize (pair_not_regular_Ncp_r) as [_ Hnotreh].
         rewrite <-Hand3 in Hpen_h. rewrite <-(node_as_pair) in Hpen_h.
         st_implication Hpen_h.

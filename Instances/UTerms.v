@@ -11,24 +11,11 @@ Import Nat.
 
 Require Import Strands.
 Require Import Bundles.
+Require Import Universe.
 
 Open Scope list_scope.
 
 Set Implicit Arguments.
-
-(* The UniverseSig module type defines the atomic terms and keys, and their basic properties *)
-Module Type UniverseSig.
-  (* Universe of atomic terms and keys *)
-  Parameter U : Set.
-  Parameter U_leb : U -> U -> bool.
-
-  Axiom U_leb_total :
-    forall a b, U_leb a b = true \/ U_leb b a = true.
-  Axiom U_leb_antisymmetric :
-    forall a b, U_leb a b = true -> U_leb b a = true -> a = b.
-  Axiom U_eq_dec :
-    forall a a' : U, { a = a' } + { a <> a'}.
-End UniverseSig.
 
 Module Type UTermSig (Import Un : UniverseSig) <: TermSig.
   (** *
@@ -47,8 +34,9 @@ Module Type UTermSig (Import Un : UniverseSig) <: TermSig.
   Lemma T_leb_antisymmetric :
     forall a b, T_leb a b = true -> T_leb b a = true -> a = b.
   Proof.
-    intros. destruct a, b. unfold T_leb in *.
-    specialize (U_leb_antisymmetric H H0) as Heq; now subst.
+    intros [ua] [ub]. unfold T_leb.
+    intros H H0.
+    specialize (U_leb_antisymmetric ua ub H H0) as Heq; now subst.
   Qed.
 
   Lemma T_leb_total :

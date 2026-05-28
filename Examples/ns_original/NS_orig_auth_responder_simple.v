@@ -20,14 +20,15 @@ Section auth_responder_guarantee.
   Variable s : Σ.
   Variables A B Na Nb : T.
   Variable Tname : T -> Prop.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
+  Local Notation E := (edges C).
 
   Definition K__P_A (k : K) := k <> inv (PK A).
 
   Hypothesis s_is_NS_resp : NS_responder_strand Tname A B Na Nb s.
   Hypothesis s_strand_of_C : is_strand_of s C.
   Hypothesis C_is_bundle : is_bundle C.
-  Hypothesis C_is_NS : C_is_SS C (NS_StrandSpace Tname K__P_A).
+  Hypothesis C_is_NS : bundle_in_SS C (NS_StrandSpace Tname K__P_A).
 
   (*
     We define set NS in term of a characteristic NSp Prop. This set corresponds
@@ -108,7 +109,7 @@ Section auth_responder_guarantee.
     intros Heq. rewrite Heq in Hin. intuition.
   Qed.
 
-  Definition NS_has_minimal := exists_minimal eq_node__t_dec (bundle_le_dec C) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (C:=C)) (NS_non_empty).
+  Definition NS_has_minimal := exists_minimal eq_node__t_dec (bundle_le_dec E) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (E:=E)) (NS_non_empty).
 
   (* Proposition 4.2: Here [B] cannot be bound to the actual responder. This is
      the issue found by Gavin Lowe and then fixed in the NS protocol. A and B do

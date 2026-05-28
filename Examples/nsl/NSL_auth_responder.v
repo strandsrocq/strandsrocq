@@ -16,14 +16,15 @@ Section auth_responder_guarantee.
   Variable s : Σ.
   Variables A B Na Nb : T.
   Variable Tname : T -> Prop.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
+  Local Notation E := (edges C).
 
   Definition K__P_A (k : K) := k <> inv (PK A).
 
   Hypothesis s_is_NSL_resp : NSL_responder_strand Tname A B Na Nb s.
   Hypothesis s_strand_of_C : is_strand_of s C.
   Hypothesis C_is_bundle : is_bundle C.
-  Hypothesis C_is_NSL : C_is_SS C (NSL_StrandSpace Tname K__P_A).
+  Hypothesis C_is_NSL : bundle_in_SS C (NSL_StrandSpace Tname K__P_A).
 
   (*
     We define set NS in term of a characteristic NSp Prop. This set corresponds
@@ -82,7 +83,7 @@ Section auth_responder_guarantee.
     intros Heq. rewrite Heq in Hin. intuition.
   Qed.
 
-  Definition NS_has_minimal := exists_minimal eq_node__t_dec (bundle_le_dec C) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (C:=C)) (NS_non_empty).
+  Definition NS_has_minimal := exists_minimal eq_node__t_dec (bundle_le_dec E) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (E:=E)) (NS_non_empty).
 
   (* lemma for the g ⋅ h case *)
   Lemma pair_not_regular_NSp_r :
@@ -133,7 +134,7 @@ Section auth_responder_guarantee.
       + (* Case S of lemma 4.4: [⊖ g ⋅ h; ⊕ g; ⊕ h], and ⊕ g is the minimal element *)
         assert (c ⊏ h) as Hinh. { destruct (A_subterm_dec c h); try easy.
         st_implication Hand. }
-        specialize (penetrator_pair_not_minimal_g (C:=C) (C_is_bundle:=C_is_bundle) NSp_dec Hpen Htrace) as Hpen_g.
+        specialize (penetrator_pair_not_minimal_g (B:=C) (B_is_bundle:=C_is_bundle) NSp_dec Hpen Htrace) as Hpen_g.
         specialize pair_not_regular_NSp_r as [Hnotreh _].
         rewrite <-Hand2 in Hpen_g. rewrite <-(node_as_pair) in Hpen_g.
         now st_implication Hpen_g.
@@ -141,7 +142,7 @@ Section auth_responder_guarantee.
       + (* Case S of lemma 4.4: [⊖ g ⋅ h; ⊕ g; ⊕ h], and ⊕ h is the minimal element *)
         assert (c ⊏ g) as Hinh. { destruct (A_subterm_dec c g); try easy.
         st_implication Hand. }
-        specialize (penetrator_pair_not_minimal_h (C:=C) (C_is_bundle:=C_is_bundle) NSp_dec Hpen Htrace) as Hpen_h.
+        specialize (penetrator_pair_not_minimal_h (B:=C) (B_is_bundle:=C_is_bundle) NSp_dec Hpen Htrace) as Hpen_h.
         specialize (pair_not_regular_NSp_r) as [_ Hnotreh].
         rewrite <-Hand3 in Hpen_h. rewrite <-(node_as_pair) in Hpen_h.
         now st_implication Hpen_h.

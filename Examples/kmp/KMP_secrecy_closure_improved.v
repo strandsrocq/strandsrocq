@@ -23,10 +23,11 @@ Section secrecy_guarantee.
 
   (* Assume a given policy π and its induced strand space Σ *)
   Variable π : policy__t.
-  Variable C : edge_set__t.
+  Variable B : bundle_graph.
+  Local Notation E := (edges B).
 
-  Hypothesis C_is_bundle : is_bundle C.
-  Hypothesis C_is_KMP : C_is_SS C (KMP_StrandSpace π).
+  Hypothesis B_is_bundle : is_bundle B.
+  Hypothesis B_is_KMP : bundle_in_SS B (KMP_StrandSpace π).
 
   (*
     Terms have initial type.
@@ -47,14 +48,14 @@ Section secrecy_guarantee.
                       end
     | _, _ => D
     end.
-  Definition initial_type := initial_type_rec (nodes_of C).
+  Definition initial_type := initial_type_rec (nodes B).
 
   Lemma initial_type_char :
     forall m,
       match m with
       | #k =>
         (K_d k ->
-          forall n (KT : KEY_T) mk, K_m mk -> is_node_of n C -> [⊕ ⟨ #k ⋅ $KT ⟩_(mk)] = tr (strand n) ->
+          forall n (KT : KEY_T) mk, K_m mk -> is_node_of n B -> [⊕ ⟨ #k ⋅ $KT ⟩_(mk)] = tr (strand n) ->
             initial_type m = (KDn KT)
         ) /\
         (~K_d k -> initial_type m = D)
@@ -63,13 +64,13 @@ Section secrecy_guarantee.
   Proof.
     intros m.
     destruct m eqn:Hm; unfold initial_type, is_node_of in *;
-    unfold C_is_SS, is_node_of in C_is_KMP;
-    induction (nodes_of C) as [|n' nl IHnl] ; try easy.
-    assert (forall n : node__t, set_In n nl -> KMP_StrandSpace π (strand n)) as C_is_KMP' by (st_implication C_is_KMP).
+    unfold bundle_in_SS, is_node_of in B_is_KMP;
+    induction (nodes B) as [|n' nl IHnl] ; try easy.
+    assert (forall n : node__t, set_In n nl -> KMP_StrandSpace π (strand n)) as B_is_KMP' by (st_implication B_is_KMP).
     split.
     - intros Hd n KT mk Hmk Hin Htr. destruct Hin as [Hneq | Hin].
       + subst. unfold initial_type_rec. rewrite <- Htr. destruct (K_eq_dec k k) as [? | ?]; destruct (K_d_dec k) as [_ | Hnk]; destruct (K_m_dec mk) as [_ | Hnmk]; try easy.
-      + destruct (IHnl C_is_KMP') as [IHnld _]. specialize (IHnld Hd n KT mk Hmk Hin Htr) as IHnldn. simpl.
+      + destruct (IHnl B_is_KMP') as [IHnld _]. specialize (IHnld Hd n KT mk Hmk Hin Htr) as IHnldn. simpl.
         destruct (tr (strand n')) as [|s0 sl] eqn:Htrn'; try easy.
         destruct s0 as [a|a]; try easy.
         destruct a; try easy.
@@ -78,7 +79,7 @@ Section secrecy_guarantee.
         destruct sl; try easy.
         destruct (K_eq_dec k k1) as [? | ?]; destruct (K_d_dec k1) as [Hk1 | ?]; destruct (K_d_dec k) as [Hk | ?]; destruct (K_m_dec k0) as [Hk0 | ?]; try inversion e as [e']; try rewrite <- e' in *; try easy.
         (* This last case is a contradiction *)
-        specialize (C_is_KMP n) as Hn_kmp; specialize (C_is_KMP n') as Hn'_kmp. symmetry in Ha1, e'.
+        specialize (B_is_KMP n) as Hn_kmp; specialize (B_is_KMP n') as Hn'_kmp. symmetry in Ha1, e'.
         st_implication Hn_kmp; st_implication Hn'_kmp.
         inversion Hn_kmp as [s0 Hreg |s1 Hpen].
         * inversion Hn'_kmp as [s0' Hreg' |s1' Hpen'].
@@ -112,7 +113,7 @@ Section secrecy_guarantee.
           -- inversion Hpen' as [t0 i Htrace|g i Htrace|g i Htrace|g h i Htrace|g h i Htrace|k' i Hpenkey Htrace|k' h i Htrace|k' h i Htrace]; apply (f_equal tr) in Htrace; simpl in Htrace; now rewrite <- Htrace in Htrn'.
         * inversion Hpen as [t0 i Htrace|g i Htrace|g i Htrace|g h i Htrace|g h i Htrace|k' i Hpenkey Htrace|k' h i Htrace|k' h i Htrace]; apply (f_equal tr) in Htrace; simpl in Htrace; now rewrite <- Htrace in Htr.
     - intros Hnk.
-      destruct (IHnl C_is_KMP') as [_ IHnlnd]. specialize (IHnlnd Hnk). simpl.
+      destruct (IHnl B_is_KMP') as [_ IHnlnd]. specialize (IHnlnd Hnk). simpl.
       destruct (tr (strand n')) as [|s0 sl] eqn:Htrn'; try easy.
       destruct s0 as [a|a]; try easy.
       destruct a; try easy.
@@ -147,7 +148,7 @@ Section secrecy_guarantee.
 
   Lemma create_implies_initial_type :
       forall k (KT : KEY_T) mk m,
-        K_m mk -> K_d k -> is_node_of m C ->
+        K_m mk -> K_d k -> is_node_of m B ->
           [⊕ ⟨ #k ⋅ $KT ⟩_(mk)] = tr (strand m) ->
             initial_type #k = (KDn KT).
   Proof.
@@ -276,14 +277,14 @@ Section secrecy_guarantee.
     intuition.
   Qed.
 
-  Definition N_KMP := N KMP_p C KMP_p_dec.
-  Definition N_iff_inC_p_KMP := N_iff_inC_p KMP_p C KMP_p_dec.
-  Definition minimal_N_KMP_then_mpt := minimal_N_then_mpt KMP_p C_is_bundle KMP_p_dec.
+  Definition N_KMP := N KMP_p B KMP_p_dec.
+  Definition N_iff_inC_p_KMP := N_iff_inC_p KMP_p B KMP_p_dec.
+  Definition minimal_N_KMP_then_mpt := minimal_N_then_mpt KMP_p B_is_bundle KMP_p_dec.
 
   Lemma no_minimal_is_regular :
     ϕ_ℜ_closes_π ->
       forall m,
-        set_In m N_KMP -> is_minimal (bundle_le C) m N_KMP -> ~KMP_strand π (strand m).
+        set_In m N_KMP -> is_minimal (bundle_le E) m N_KMP -> ~KMP_strand π (strand m).
   Proof.
     intros ϕ_ℜ_closes_π m Hin Hmin Hreg.
     specialize initial_type_char as Hit.
@@ -322,12 +323,12 @@ Section secrecy_guarantee.
   Qed.
 
   Lemma KMP_never_originates_mk :
-    forall k, K_m k -> never_originates_regular K__P_md k C.
+    forall k, K_m k -> never_originates_regular K__P_md k B.
   Proof.
     intros k0 Hkm n Hnodeof Horig.
     unfold not.
     unfold isMK in *.
-    specialize (C_is_KMP n Hnodeof) as Hn_kmp.
+    specialize (B_is_KMP n Hnodeof) as Hn_kmp.
     inversion Hn_kmp as [s Hreg|s Hpen]; try easy.
     (* unfold KMP_strand in Hreg; *)
     inversion Hreg as [k mk KT [Hk Hmk] i Htr | k mk KT m' [Hk Hmk] i Htr | k mk KT m' [Hk Hmk] i Htr| k1 k2 mk KT1 KT2 [Hk Hmk] i Htr | k1 k2 mk KT1 KT2 [Hk Hmk] i Htr]; apply (f_equal tr) in Htr; simpl in Htr;
@@ -339,11 +340,11 @@ Section secrecy_guarantee.
   Lemma no_minimal_is_penetrator :
     ϕ_ℜ_closes_π ->
       forall m,
-        set_In m N_KMP -> is_minimal (bundle_le C) m N_KMP -> ~penetrator_node K__P_md m.
+        set_In m N_KMP -> is_minimal (bundle_le E) m N_KMP -> ~penetrator_node K__P_md m.
   Proof.
     intros ϕ_ℜ_closes_π m Hin Hmin Hpen.
     (* specialize trace_of_s as Hstr.
-    specialize C_is_bundle as Hbundle. *)
+    specialize B_is_bundle as Hbundle. *)
     specialize initial_type_char as Hit.
     assert (Hin':=Hin); apply N_iff_inC_p_KMP in Hin' as [Hinm HpKMP].
     specialize ϕ_ℜ_closes_π as Hub_clos. destruct Hub_clos as [Hcl Hub].
@@ -369,10 +370,10 @@ Section secrecy_guarantee.
         destruct h2 as [|KT'|?|?|?]; try easy.
         apply Hand0; clear Hand0; repeat split; try easy.
         * intros Hkm.
-          specialize (index_lt_strand_implies_is_node_of C_is_bundle (strand m, 0) m) as Hisnode; st_implication Hisnode.
+          specialize (index_lt_strand_implies_is_node_of B_is_bundle (strand m, 0) m) as Hisnode; st_implication Hisnode.
           unfold K__P_md in Hkm.
           apply K_m_then_not_K__P_md in Hkm as Hknkp.
-          specialize (penetrator_bound C_is_bundle Hknkp (KMP_never_originates_mk Hkm) Hisnode) as Hnsub. st_implication Hnsub.
+          specialize (penetrator_bound B_is_bundle Hknkp (KMP_never_originates_mk Hkm) Hisnode) as Hnsub. st_implication Hnsub.
           (* simplify_term_in Hnsub. *)
         * intros. exists D, D. repeat split; try easy.
           destruct h1 eqn:Heqh1.
@@ -399,9 +400,9 @@ Section secrecy_guarantee.
         * (* h1 = k0;  h2 = $_ *)
           (* apply H0; intros [HKmk_in Hp5]. destruct (K_m_dec k). *)
           destruct (K_m_dec k) as [Hkm | Hnkm].
-          -- specialize (index_lt_strand_implies_is_node_of C_is_bundle (strand m, 0) m) as Hisnode; st_implication Hisnode.
+          -- specialize (index_lt_strand_implies_is_node_of B_is_bundle (strand m, 0) m) as Hisnode; st_implication Hisnode.
              specialize (K_m_then_not_K__P_md Hkm) as Hknkp.
-             specialize (penetrator_bound C_is_bundle Hknkp (KMP_never_originates_mk Hkm) Hisnode) as Hnsub. st_implication Hnsub.
+             specialize (penetrator_bound B_is_bundle Hknkp (KMP_never_originates_mk Hkm) Hisnode) as Hnsub. st_implication Hnsub.
              simplify_term_in Hnsub. inversion Hkm. now rewrite <-H in Hnsub.
           -- simplify_prop in Hand1.
              st_implication Hand1.
@@ -436,10 +437,10 @@ Section secrecy_guarantee.
   (* Put everything together: the set N_KMP has no minimal element *)
   Lemma N_KMP_no_minimal :
     ϕ_ℜ_closes_π ->
-      forall m, set_In m N_KMP -> ~is_minimal (bundle_le C) m N_KMP.
+      forall m, set_In m N_KMP -> ~is_minimal (bundle_le E) m N_KMP.
   Proof.
     intros ϕ_ℜ_closes_π m Hin Hmin.
-    specialize (C_is_KMP m) as Hn_kmp.
+    specialize (B_is_KMP m) as Hn_kmp.
     assert (Hin':=Hin);
     apply (N_iff_inC_p_KMP) in Hin'.
     st_implication Hn_kmp.
@@ -451,7 +452,7 @@ Section secrecy_guarantee.
   (* This is Theorem 1 from the paper *)
   Theorem device_key_secrecy:
     ϕ_ℜ_closes_π ->
-      forall m, is_node_of m C -> protected (uns_term m).
+      forall m, is_node_of m B -> protected (uns_term m).
   Proof.
     intros ϕ_ℜ_closes_π m Hm_in_C.
     destruct (protected_dec (uns_term m)) as [Hprot | Hnprot]; try easy.
@@ -461,7 +462,7 @@ Section secrecy_guarantee.
     destruct N_KMP_empty_dec as [Hemp | Hnemp].
     - (* empty *) now rewrite Hemp in H.
     - (* nonempty *)
-      specialize (RelMinimal.exists_minimal eq_node__t_dec (bundle_le_dec C) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (C:=C)) Hnemp) as [m' [Hin Hmin]].
+      specialize (RelMinimal.exists_minimal eq_node__t_dec (bundle_le_dec E) (bundle_le_antisymm B_is_bundle) (bundle_le_trans (E:=E)) Hnemp) as [m' [Hin Hmin]].
       now specialize (Hnomin ϕ_ℜ_closes_π m' Hin).
   Qed.
 
@@ -471,7 +472,7 @@ Section secrecy_guarantee.
   *)
   Corollary secrecy:
     ϕ_ℜ_closes_π ->
-      forall k m, is_node_of m C ->
+      forall k m, is_node_of m B ->
           K_d k ->
             ~ (ϕ, ℜ) ⊢ D ∈ (initial_type #k) ->
               #k <> uns_term m.

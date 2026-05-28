@@ -3,17 +3,16 @@ From Stdlib Require Import Lia.
 Require Import Strands.
 Require Import LogicalFacts.
 
-(* StrandsTactics depends on actual Terms *)
-Require Import UTerms.
-Require Import UTermsTactics.
+Module Type TermTacticsSig.
+  Ltac term_tactic_in X Y H := idtac.
+  Ltac term_tactic X Y := idtac.
+End TermTacticsSig.
 
-Module StrandsTactics
-  (Import U : UniverseSig)
-  (Import T : UTermSig U)
+Module MakeStrandsTactics
+  (Import T : TermSig)
   (Import St : StrandSig T)
-  (Import SSp : StrandSpaceSig T St).
-
-  Module Import TT := UTermsTactics U T.
+  (Import SSp : StrandSpaceSig T St)
+  (Import TT : TermTacticsSig).
 
   (* A simple tactic to reduce hypotheses/goals including term/uns_term and the like *)
   Ltac simplify_term :=
@@ -97,7 +96,7 @@ Lemma notFalse:
 Proof. easy. Qed.
 
 
-(** Note this tactic depends on [TermTactic X Y in H] which is term dependent and is defined in [Terms.v]. In case terms are modified it is only required to adapt that part of the tactics.*)
+(** Note this tactic depends on [TermTactic X Y in H] which is term dependent and is defined in term tactic modules. In case terms are modified it is only required to adapt that part of the tactics.*)
 Ltac simplify_prop_inner H dec :=
   simpl in H;
   unfold not in H;
@@ -121,7 +120,7 @@ Ltac simplify_prop_inner H dec :=
         clear H1
     | context [?X = ?Y]  =>
       (* idtac "123: inequality" X Y H; *)
-      TermTactic X Y in H
+      term_tactic_in X Y H
       (* idtac "125: returned term" X Y H *)
     | True => clear H
     | False => contradiction
@@ -204,7 +203,7 @@ Tactic Notation "simplify_prop" "in" "*" "|-" :=
           clear H1
       | |- context [?X = ?Y] =>
         (* idtac "inequality" X Y H; *)
-        TermTactic X Y
+        term_tactic X Y
       | |- context [False \/ ?X] =>
         rewrite or_False_l
       | |- context [?X \/ False] =>
@@ -255,4 +254,4 @@ Ltac st_implication H :=
     st_implication H)
   | _ => idtac
   end).
-End StrandsTactics.
+End MakeStrandsTactics.

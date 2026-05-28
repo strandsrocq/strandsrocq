@@ -1,6 +1,7 @@
 From Stdlib Require Import Init.Datatypes.
 From Stdlib Require Import Arith.
 From Stdlib Require Import ListSet.
+From Stdlib Require Import Lists.List.
 (* From Stdlib Require Import Lists.List Stdlib.Lists.ListSet Stdlib.Bool.Bool Stdlib.Bool.Sumbool. *)
 From Stdlib Require Import Lia.
 From Stdlib Require Import Relations.
@@ -24,38 +25,62 @@ Module Type BundleSig
 
   Module Export BR := BundleRelations T St SSp.
 
-  Definition is_bundle (C : edge_set__t) :=
-    (* 0. C is a subset of ⟶ U ⟹ *)
-    is_sub C /\
-    (* 1. C is finite *)
-    (* comes for free, set is defined inductively *)
-    (* 2. if n1 ∈ N_C and term(n1) is negative, then there is a unique n2 s.t. n2 ⟶ n1 in C *)
-    (forall n1, is_node_of n1 C -> is_negative n1 -> exists! n2, is_edge_of n2 n1 C /\ interstrand n2 n1) /\
-    (* 3. if n1 in N_C and n2 ⟹ n1, then n2 ⟹ n1 in C *)
-    (forall n1 n2, is_node_of n1 C -> intrastrand n2 n1 -> is_edge_of n2 n1 C) /\
-    (* 4. C is acyclic, i.e., the transitive closure is *not* reflexive! *)
-    (forall n, not (C ⊢ n ≺ n)).
+  Record bundle_graph := {
+    nodes : set node__t;
+    intra : edge_set__t;   (* corresponds to n1 ==> n2 *)
+    inter : edge_set__t    (* corresponds to n1 --> n2 *)
+  }.
 
-  Definition C_is_SS (C : edge_set__t) (SSp : Σ -> Prop) :=
-    forall n, is_node_of n C -> SSp (strand n).
-  Definition strandspace_bundle (C : edge_set__t) (SSp : Σ -> Prop) :=
-    is_bundle C /\ C_is_SS C SSp.
+  Definition is_node_of n (B : bundle_graph) := set_In n (nodes B).
+  Definition is_strand_of s (B : bundle_graph) := forall n,
+    strand n = s ->
+    index n < length (tr (strand n)) ->
+    is_node_of n B.
+  Definition edges (B : bundle_graph) := set_union eq_edge__t_dec (intra B) (inter B).
+  Definition node_subset_of (N : set node__t) (B : bundle_graph) := 
+    forall n, set_In n N -> is_node_of n B.
+
+  Definition is_sub (B : bundle_graph) : Prop :=
+    (** 0. edges are resp. subsets of [⟶] and [⟹] *)
+    (forall n1 n2, is_edge_of n1 n2 (intra B) -> n1 ⟹ n2) /\
+    (forall n1 n2, is_edge_of n1 n2 (inter B) -> n1 ⟶ n2) /\
+    (** 0. edges should only relate nodes in [nodes B] *)
+    (forall n1 n2, is_edge_of n1 n2 (intra B) -> set_In n1 (nodes B) /\ set_In n2 (nodes B)) /\
+    (forall n1 n2, is_edge_of n1 n2 (inter B) -> set_In n1 (nodes B) /\ set_In n2 (nodes B)).
+
+  Definition is_bundle (B : bundle_graph) :=
+    (** 1. [B] is finite *)
+    (** comes for free, set is defined inductively *)
+    is_sub B /\
+    (** 2. if [n1 ∈ nodes B] and [term(n1)] is negative, then there is a unique [n2 ∈ nodes B] s.t. n2 ⟶ n1 in [inter B]
+    _NOTE_: we omit the [set_In n2 (nodes B)] part since it is implied by [is_edge_of n2 n1 (inter B)] (see above).*)
+    (forall n1, set_In n1 (nodes B) -> is_negative n1 -> exists! n2, is_edge_of n2 n1 (inter B)) /\
+    (** 3. if [n1] in [nodes B] and [n2 ⟹ n1], then [(n2, n1)] is in [intra B] *)
+    (forall n1 n2, set_In n1 (nodes B) -> n2 ⟹ n1 -> is_edge_of n2 n1 (intra B)) /\
+    (** 4. the graph is acyclic, i.e., the transitive closure of [edges B] is *not* reflexive! *)
+    (forall n, not (edges B ⊢ n ≺ n)).
+
+  Definition bundle_in_SS (B : bundle_graph) (SSp : Σ -> Prop) :=
+    forall n, is_node_of n B -> SSp (strand n).
+  Definition strandspace_bundle (B : bundle_graph) (SSp : Σ -> Prop) :=
+    is_bundle B /\ bundle_in_SS B SSp.
 
   Section BundleProperties.
-    Variable C : edge_set__t.
-    Hypothesis C_is_bundle : is_bundle C.
+    Variable B : bundle_graph.
+    Hypothesis B_is_bundle : is_bundle B.
 
     Lemma bundle_intrastrand_prefix_closed :
     forall n n',
-      is_node_of n' C ->
+      is_node_of n' B ->
       n ⟹+ n' ->
-      is_node_of n C.
+      is_node_of n B.
     Proof.
     intros n n' Hisnode Hplus.
-    destruct C_is_bundle as [_ [_ [Hintrab _]]].
+    destruct B_is_bundle as [[_ [_ [Hintranode _]]] [_ [Hintrab _]]].
+    
     induction Hplus as [n n' Hintra|n n' n'' Hplus1 IHHplus1 Hplus2 IHHplus2].
     - specialize (Hintrab n' n Hisnode Hintra).
-      unfold is_edge_of in Hintrab. specialize (is_edge_of_implies_is_node_of _ _ _ Hintrab) as [Hn Hn']. assumption.
+      unfold is_edge_of in Hintrab. specialize (Hintranode _ _ Hintrab) as [Hn Hn']. assumption.
     - apply IHHplus2 in Hisnode. apply IHHplus1. assumption.
     Qed.
 
@@ -63,8 +88,8 @@ Module Type BundleSig
       forall n n',
         index n < index n' ->
         strand n = strand n' ->
-        is_node_of n' C ->
-        is_node_of n C.
+        is_node_of n' B ->
+        is_node_of n B.
     Proof.
       intros n n' Hind Hstrand Hin.
       apply (bundle_intrastrand_prefix_closed (n':=n') Hin).
@@ -73,8 +98,8 @@ Module Type BundleSig
 
     Corollary last_node_implies_is_strand_of:
       forall n, index n = length (tr (strand n))-1 ->
-        is_node_of n C ->
-        is_strand_of (strand n) C.
+        is_node_of n B ->
+        is_strand_of (strand n) B.
       Proof.
       intros n Hindex1 Hnodeof.
       unfold is_strand_of. intros m Hstrand Hindex.
@@ -86,7 +111,7 @@ Module Type BundleSig
         now apply (index_lt_strand_implies_is_node_of _ _ H Hstrand).
     Qed.
 
-    Lemma bundle_dec: forall n n' C, { is_edge_of n n' C } + { ~ is_edge_of n n' C }.
+    Lemma bundle_dec: forall n n' B, { is_edge_of n n' B } + { ~ is_edge_of n n' B }.
     Proof.
       intros.
       unfold is_edge_of.
@@ -95,16 +120,19 @@ Module Type BundleSig
   End BundleProperties.
 
   Section BundleRelationProperties.
-    Variable C : edge_set__t.
-    Hypothesis C_is_bundle : is_bundle C.
-    (* Under the assumption that C is acyclic, the decidability of bundle_lt can be proved
+    Variable B : bundle_graph.
+    Hypothesis B_is_bundle : is_bundle B.
+
+    Local Notation E := (edges B).
+
+    (* Under the assumption that E is acyclic, the decidability of bundle_lt can be proved
       using the decidability of bundle_le *)
     Lemma bundle_lt_dec :
-      forall n1 n2, { C ⊢ n1 ≺ n2 } + { ~ C ⊢ n1 ≺ n2 }.
+      forall n1 n2, { E ⊢ n1 ≺ n2 } + { ~ E ⊢ n1 ≺ n2 }.
     Proof.
       intros n1 n2.
-      destruct C_is_bundle as [_ [_ [_ Hacyclic]]].
-      destruct (bundle_le_dec C n1 n2) as [Hle|Hnotle].
+      destruct B_is_bundle as [_ [_ [_ Hacyclic]]].
+      destruct (bundle_le_dec E n1 n2) as [Hle|Hnotle].
       - apply bundle_le_then_lt in Hle.
         destruct (eq_node__t_dec n1 n2). subst.
         + right. apply Hacyclic.
@@ -117,7 +145,7 @@ Module Type BundleSig
 
     Lemma bundle_ltb_iff_bundle_lt :
       forall n n',
-      C ⊢ n ≺ n' <-> bundle_ltb n n' = true.
+      E ⊢ n ≺ n' <-> bundle_ltb n n' = true.
     Proof.
       intros n n'.
       unfold bundle_ltb.
@@ -127,10 +155,10 @@ Module Type BundleSig
     (* We can now prove Lemma 2.6 in two parts. First, the bundle_le relation is a partial order, i.e., it is a reflexive, antisymmetric and transitive.
     *)
     Lemma bundle_le_antisymm :
-      antisymmetric node__t (bundle_le C).
+      antisymmetric node__t (bundle_le E).
     Proof.
       intros n n' Hlt1 Hlt2.
-      destruct C_is_bundle as [_ [_ [_ Hacyclic]]].
+      destruct B_is_bundle as [_ [_ [_ Hacyclic]]].
       destruct (eq_node__t_dec n n') as [Heq | Hneq].
       - (* n = n' *) assumption.
       - (* n <> n' *)
@@ -146,7 +174,7 @@ Module Type BundleSig
     Definition partialorder T R := reflexive T R /\ antisymmetric T R /\ transitive T R.
 
     (* First part of Lemma 2.6 of the S&P paper. *)
-    Lemma bundle_le_po : partialorder (bundle_le C).
+    Lemma bundle_le_po : partialorder (bundle_le E).
     Proof.
       unfold partialorder.
       split.
@@ -159,17 +187,18 @@ Module Type BundleSig
     (** intrastrand and bundle_le facts **)
     Lemma intrastrand_implies_bundle_le :
       forall n0 n1,
-        is_node_of n1 C ->
+        is_node_of n1 B ->
         n0 ⟹+ n1 ->
-        C ⊢ n0 ⪯ n1.
+        E ⊢ n0 ⪯ n1.
     Proof.
       intros n0 n1 Hnode2 Hintra.
-      destruct (C_is_bundle) as [_ [_ [Hintrab _]]].
+      unfold E, edges.
+      destruct (B_is_bundle) as [_ [_ [Hintrab _]]].
       induction Hintra as [n0 n1 Hintra|n0 n1 n2 Hintra1 IH1 Hintra2 IH2] .
       - specialize (Hintrab _ _ Hnode2 Hintra).
         unfold is_edge_of in Hintrab.
-        now apply bundle_le_one.
-      - specialize (bundle_intrastrand_prefix_closed C_is_bundle Hnode2 Hintra2) as Hnode1.
+        apply bundle_le_one. apply set_union_intro1; auto.
+      - specialize (bundle_intrastrand_prefix_closed B_is_bundle Hnode2 Hintra2) as Hnode1.
         specialize (IH1 Hnode1).
         specialize (IH2 Hnode2).
         now apply (bundle_le_multi (n'':=n1)).
@@ -179,8 +208,8 @@ Module Type BundleSig
       forall n0 n1,
         index n0 <= index n1 ->
         strand n0 = strand n1 ->
-        is_node_of n1 C ->
-        C ⊢ n0 ⪯ n1.
+        is_node_of n1 B ->
+        E ⊢ n0 ⪯ n1.
     Proof.
       intros n0 n1 Hind Hstrand Hin.
       destruct (eq_dec (index n0) (index n1)) as [Heqind|Hneqind].
@@ -193,17 +222,18 @@ Module Type BundleSig
 
     Lemma intrastrand_implies_bundle_lt :
       forall n0 n1,
-        is_node_of n1 C ->
+        is_node_of n1 B ->
         n0 ⟹+ n1 ->
-        C ⊢ n0 ≺ n1.
+        E ⊢ n0 ≺ n1.
     Proof.
       intros n0 n1 Hnode2 Hintra.
-      destruct (C_is_bundle) as [_ [_ [Hintrab _]]].
+      destruct (B_is_bundle) as [_ [_ [Hintrab _]]].
       induction Hintra as [n0 n1 Hintra|n0 n1 n2 Hintra1 IH1 Hintra2 IH2] .
       - specialize (Hintrab _ _ Hnode2 Hintra).
         unfold is_edge_of in Hintrab.
-        now apply bundle_lt_one.
-      - specialize (bundle_intrastrand_prefix_closed C_is_bundle Hnode2 Hintra2) as Hnode1.
+        apply bundle_lt_one.
+        apply set_union_intro1; auto.
+      - specialize (bundle_intrastrand_prefix_closed B_is_bundle Hnode2 Hintra2) as Hnode1.
         specialize (IH1 Hnode1).
         specialize (IH2 Hnode2).
         now apply (bundle_lt_multi (n':=n1)).
@@ -213,8 +243,8 @@ Module Type BundleSig
       forall n0 n1,
         index n0 < index n1 ->
         strand n0 = strand n1 ->
-        is_node_of n1 C ->
-        C ⊢ n0 ≺ n1.
+        is_node_of n1 B ->
+        E ⊢ n0 ≺ n1.
     Proof.
       intros n0 n1 Hind Hstrand Hin.
       apply (intrastrand_implies_bundle_lt Hin).
@@ -224,29 +254,30 @@ Module Type BundleSig
   End BundleRelationProperties.
 
   Section BundleMinimal.
-    Variable C : edge_set__t.
-    Hypothesis C_is_bundle : is_bundle C.
-
+    Variable B : bundle_graph.
+    Hypothesis B_is_bundle : is_bundle B.
+    Local Notation E := (edges B).
+    
     (* Second part of Lemma 2.6 of S&P paper *)
     Definition sign_closed (N : set node__t) :=
-      node_subset_of N C ->
+      node_subset_of N B ->
       forall m m',
-        is_node_of m C ->
-        is_node_of m' C ->
+        is_node_of m B ->
+        is_node_of m' B ->
         uns_term m = uns_term m' ->
         (set_In m N <-> set_In m' N).
 
     (* Lemma 2.7: the minimal element of a sign-closed set of nodes is positive *)
     Lemma minimal_is_positive :
       forall (N : set node__t),
-        node_subset_of N C ->
+        node_subset_of N B ->
         sign_closed N ->
         forall m, set_In m N ->
-            is_minimal (bundle_le C) m N ->
+            is_minimal (bundle_le E) m N ->
             is_positive m.
     Proof.
       intros N Hsubset Hsign m Hin Hisminimal.
-      destruct (C_is_bundle) as [_ [Hb2 _]].
+      destruct (B_is_bundle) as [[_ [Hclose [_ Hinter]]] [Hb2 _]].
       unfold is_positive.
       destruct (term m) as [tplus|tminus] eqn:Ht.
       - trivial.
@@ -255,29 +286,30 @@ Module Type BundleSig
         specialize (Hsubset m Hin).
         assert (is_negative m) as Hnegative. { unfold is_negative. rewrite Ht. trivial. }
         specialize (Hb2 m Hsubset Hnegative).
-        destruct Hb2 as [n2 [[Hcontra Hintra] _]].
+        destruct Hb2 as [n2 [Hcontra _]].
         unfold is_edge_of in Hcontra.
         specialize (bundle_le_one _ _ _ Hcontra) as Hcontra'.
-        unfold interstrand in Hintra.
+        specialize (Hclose _ _ Hcontra).
+        unfold interstrand in Hclose.
         destruct (term n2) as [n2plus|n2minus] eqn:Hn2. all: auto.
-        rewrite Ht in Hintra.
+        rewrite Ht in Hclose.
         unfold sign_closed in Hsign.
         specialize (Hsign Hsubset' n2 m).
-        unfold uns_term in Hsign. rewrite Hn2 in Hsign. rewrite Ht in Hsign. apply Hsign in Hintra. destruct Hintra as [_ Hintra]. apply Hintra in Hin as Hin2.
+        unfold uns_term in Hsign. rewrite Hn2 in Hsign. rewrite Ht in Hsign. apply Hsign in Hclose. destruct Hclose as [_ Hintra]. apply Hintra in Hin as Hin2.
         unfold is_minimal in Hisminimal.
         specialize (Hisminimal Hin n2 Hin2).
         destruct (eq_node__t_dec n2 m) as [Heq|Hneq].
-        all: try (apply is_edge_of_implies_is_node_of in Hcontra; destruct Hcontra; assumption).
+        all: try (apply Hinter in Hcontra as [Hcontra _]; auto).
         + subst. rewrite Hn2 in Ht. discriminate Ht.
-        + apply Hisminimal in Hneq. contradiction.
+        + apply Hisminimal in Hneq. apply Hneq. now apply bundle_le_union.
     Qed.
 
     (* This property is necessary to prove the S&P results. Authors of the original paper missed it *)
     Definition sign_closed_weak (N : set node__t) :=
-      node_subset_of N C ->
+      node_subset_of N B ->
       forall m,
         set_In m N -> is_negative m ->
-        exists m', set_In m' N /\ is_positive m' /\ C ⊢ m' ≺ m.
+        exists m', set_In m' N /\ is_positive m' /\ E ⊢ m' ≺ m.
 
     (*
       Any negative node is preceded (≺) by a positive node with the same uns_term.
@@ -285,22 +317,23 @@ Module Type BundleSig
     *)
     Lemma interstrand_exists_prec_positive_lt_uns:
       forall m,
-        is_node_of m C -> is_negative m ->
+        is_node_of m B -> is_negative m ->
         exists m',
-          is_node_of m' C /\ is_positive m' /\ C ⊢ m' ≺ m /\ uns_term m = uns_term m'.
+          is_node_of m' B /\ is_positive m' /\ E ⊢ m' ≺ m /\ uns_term m = uns_term m'.
     Proof.
       intros m HinC Hneg.
-      destruct (C_is_bundle) as [_ [Hinter _]].
+      destruct (B_is_bundle) as [[_ [Hclose [_ Hintersub]]] [Hinter _]].
       specialize (Hinter _ HinC Hneg).
-      destruct Hinter as [m' [[Hedge Hinter] _]].
+      destruct Hinter as [m' [Hedge _]].
       exists m'.
-      unfold interstrand in Hinter.
+      specialize (Hclose _ _ Hedge).
+      unfold interstrand in Hclose.
       destruct (term m') as [t'|t'] eqn:Hm'; try contradiction.
       destruct (term m) as [t|t] eqn:Hm; try contradiction.
       repeat split.
-      - apply (is_edge_of_implies_is_node_of _ _ _ Hedge).
+      - apply Hintersub in Hedge as [Hedge _]; auto.
       - unfold is_positive. now rewrite Hm'.
-      - apply (bundle_lt_one _ _ _ Hedge).
+      - apply (bundle_lt_one). apply set_union_intro; auto.
       - unfold uns_term. now rewrite Hm', Hm.
     Qed.
 
@@ -324,10 +357,10 @@ Module Type BundleSig
     (* Lemma 2.7 new: the minimal element of a sign-closed-weak set of nodes is positive *)
     Lemma minimal_is_positive_weak :
       forall (N : set node__t),
-        node_subset_of N C ->
+        node_subset_of N B ->
         sign_closed_weak N ->
         forall m, set_In m N ->
-            is_minimal (bundle_le C) m N ->
+            is_minimal (bundle_le E) m N ->
             is_positive m.
     Proof.
       intros N Hsubset Hsign m Hin Hisminimal.
@@ -349,7 +382,7 @@ Module Type BundleSig
 
     (* We partially instantiate has_minimal from RelMinimal with bundle stuff *)
     Definition exists_minimal_bundle :=
-      exists_minimal eq_node__t_dec (bundle_le_dec C) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (C:=C)).
+      exists_minimal eq_node__t_dec (bundle_le_dec E) (bundle_le_antisymm B_is_bundle) (bundle_le_trans (E:=E)).
 
   End BundleMinimal.
 

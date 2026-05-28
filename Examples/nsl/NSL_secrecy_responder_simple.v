@@ -20,14 +20,15 @@ Section secrecy_responder_guarantee.
   Variable s : Σ.
   Variables A B Na Nb : T.
   Variable Tname : T -> Prop.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
+  Local Notation E := (edges C).
 
   Definition K__P_AB (k : K) := k <> inv (PK A) /\ k <> inv (PK B).
 
   Hypothesis s_is_NSL_resp : NSL_responder_strand Tname A B Na Nb s.
   Hypothesis s_strand_of_C : is_strand_of s C.
   Hypothesis C_is_bundle : is_bundle C.
-  Hypothesis C_is_NSL : C_is_SS C (NSL_StrandSpace Tname K__P_AB).
+  Hypothesis C_is_NSL : bundle_in_SS C (NSL_StrandSpace Tname K__P_AB).
 
   Fixpoint protected a :=
     match a with
@@ -119,7 +120,7 @@ Section secrecy_responder_guarantee.
 
   Lemma NS_no_minimal :
     $Na <> $Nb -> uniquely_originates $Nb ->
-      forall m, In m NS -> ~is_minimal (bundle_le C) m NS.
+      forall m, In m NS -> ~is_minimal (bundle_le E) m NS.
   Proof.
     intros diff_nonces Nb_uniquely_originates m Hin Hmin.
     assert (Hin':=Hin).
@@ -206,7 +207,7 @@ Section secrecy_responder_guarantee.
     destruct NS_empty_dec as [Hemp | Hnemp].
     - (* empty *) now rewrite Hemp in H.
     - (* nonempty *)
-      specialize (RelMinimal.exists_minimal eq_node__t_dec (bundle_le_dec C) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (C:=C)) Hnemp) as [m' [Hin' Hmin']].
+      specialize (RelMinimal.exists_minimal eq_node__t_dec (bundle_le_dec E) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (E:=E)) Hnemp) as [m' [Hin' Hmin']].
       now specialize (Hnomin diff_nonces Nb_uniquely_originates m' Hin').
   Qed.
 

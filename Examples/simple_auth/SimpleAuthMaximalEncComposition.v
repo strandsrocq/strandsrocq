@@ -69,7 +69,7 @@ Section CompositionalSecurityProtocol1.
     Local assumptions to make the rest more easily readable.
   *)
   Variable s : Σ.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
 
   Variable A B : T.
   Variable Na : T.
@@ -83,7 +83,7 @@ Section CompositionalSecurityProtocol1.
   Hypothesis s_is_SA_init : SimpleAuthMaximalEnc.SA_initiator_strand A B Na s.
   Hypothesis s_strand_of_C : is_strand_of s C.
   Hypothesis C_is_bundle : is_bundle C.
-  Hypothesis C_is_SA_bundle : C_is_SS C (SA_StrandSpace p1_1 p1_2 A B).
+  Hypothesis C_is_SA_bundle : bundle_in_SS C (SA_StrandSpace p1_1 p1_2 A B).
 
   (** * Proof of Security
   We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
@@ -94,10 +94,10 @@ Section CompositionalSecurityProtocol1.
   (* The composition is the same as protocol 1. This results is due to the fact that the maximal
      penetrator is able to simulate protocol 2 *)
   Lemma comp_is_protocol1:
-    C_is_SS C (SA_StrandSpace p1_1 p1_2 A B) ->
-    C_is_SS C (SimpleAuthMaximalEnc.SA_StrandSpace A B).
+    bundle_in_SS C (SA_StrandSpace p1_1 p1_2 A B) ->
+    bundle_in_SS C (SimpleAuthMaximalEnc.SA_StrandSpace A B).
   Proof.
-    intros His_SS. unfold C_is_SS. intros n HinC.
+    intros His_SS. unfold bundle_in_SS. intros n HinC.
     specialize (His_SS n HinC).
     inversion His_SS as [s' Hpen|A' B' Na' s' Hp1 Hini|A' B' Na' s' Hp1 Hres|A' B' Na' s' Hp1 Hini|A' B' Na' s' Hp1 Hres]; try now constructor.
     - now apply ((SASS_Init1 A B) A' B' Na').
@@ -141,7 +141,7 @@ Section CompositionalSecurityProtocol2.
     Local assumptions to make the rest more easily readable.
   *)
   Variable s : Σ.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
 
   Variable A B : T.
   Variable Na : T.
@@ -156,7 +156,7 @@ Section CompositionalSecurityProtocol2.
   Hypothesis s_is_SA_init : SimpleAuthMaximalEncWithB.SA_initiator_strand A B Na s.
   Hypothesis s_strand_of_C : is_strand_of s C.
   Hypothesis C_is_bundle : is_bundle C.
-  Hypothesis C_is_SA_bundle : C_is_SS C (SA_StrandSpace p2_1 p2_2 A B).
+  Hypothesis C_is_SA_bundle : bundle_in_SS C (SA_StrandSpace p2_1 p2_2 A B).
 
   (** * Proof of Security
   We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
@@ -167,10 +167,10 @@ Section CompositionalSecurityProtocol2.
    (* The composition is the same as protocol 2. This results is due to the fact that the maximal
      penetrator is able to simulate protocol 1 *)
   Lemma comp_is_protocol2:
-    C_is_SS C (SA_StrandSpace p2_1 p2_2 A B) ->
-    C_is_SS C (SimpleAuthMaximalEncWithB.SA_StrandSpace A B).
+    bundle_in_SS C (SA_StrandSpace p2_1 p2_2 A B) ->
+    bundle_in_SS C (SimpleAuthMaximalEncWithB.SA_StrandSpace A B).
   Proof.
-    intros His_SS. unfold C_is_SS. intros n HinC.
+    intros His_SS. unfold bundle_in_SS. intros n HinC.
     specialize (His_SS n HinC).
     inversion His_SS as [s' Hpen|A' B' Na' s' Hp1 Hini|A' B' Na' s' Hp1 Hres|A' B' Na' s' Hp1 Hini|A' B' Na' s' Hp1 Hres]; try now constructor.
     - apply (SimpleAuthMaximalEnc.ini_penetrator A B) in Hini. try now constructor.

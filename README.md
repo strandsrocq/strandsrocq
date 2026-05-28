@@ -1,13 +1,13 @@
 ![StrandsRocq](assets/logo.png)
 
-This repository contains the Rocq mechanization of strand spaces.
-It includes the full mechanization of the strand framework, new general results about strands and three case studies with a number of variants, as detailed in the paper:
+This repository contains a Rocq mechanization of strand spaces.
+It includes the full mechanization of the strand framework, new general results about strands and three case studies with a number of variants. StrandsRocq originally appeared in:
 
 > ["Strands Rocq: Why is a Security Protocol Correct, Mechanically?"](https://ieeexplore.ieee.org/document/11097857) by Matteo Busi, Riccardo Focardi, and Flaminia Luccio ([arXiv version](https://arxiv.org/abs/2502.12848))
 
 # Installation and proof checking
 
-> 📣 You can run [StrandsRocq directly in your browser](https://strandsrocq.vercel.app/), without installing anything!
+> 📣 You can now try [StrandsRocq directly in your browser](https://strandsrocq.vercel.app/) without installing anything!
 
 📄 If you wish, you can download StrandsRocq locally and use your favorite editor to check the proofs interactively.
 For a complete build of StrandsRocq, you can simply run:
@@ -15,7 +15,7 @@ For a complete build of StrandsRocq, you can simply run:
 $ dune clean
 $ dune build
 ```
-A successful build requires `dune>=3.20`, Rocq 9.1.0, and the compatibility package `coq-core` that can be installed with `opam install coq-core`.
+A successful build requires `dune>=3.20` and Rocq 9.1.0.
 The process requires about 20 seconds on a machine with an Apple M2 processor.
 
 # Documentation

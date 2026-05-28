@@ -208,42 +208,9 @@ Module Type StrandSpaceSig (Import T : TermSig) (Import St : StrandSig T).
     Definition edge__t : Set := node__t * node__t.
     Definition edge_set__t := set edge__t.
 
-    Fixpoint nodes_of (C : edge_set__t) : set node__t :=
-      match C with
-      | [] => []
-      | (n, n')::C' => n::n'::(nodes_of C')
-      end.
-    Definition is_node_of (n : node__t) (C : edge_set__t) :=
-      set_In n (nodes_of C).
-    Definition node_subset_of (N : set node__t) (C : edge_set__t) :=
-      forall n, set_In n N -> is_node_of n C.
     Definition is_edge_of (n1 : node__t) (n2 : node__t) (C : edge_set__t) :=
       set_In (n1, n2) C.
-    Definition is_sub C :=
-      forall n1 n2, is_edge_of n1 n2 C -> n1 ⟶ n2 \/ n1 ⟹ n2.
-    Definition is_strand_of s C := forall n,
-      strand n = s ->
-      index n < length (tr (strand n)) ->
-      is_node_of n C.
 
-    (* relating edges and nodes *)
-    Lemma is_edge_of_implies_is_node_of :
-      forall C n n',
-        is_edge_of n n' C ->
-        is_node_of n C /\ is_node_of n' C.
-    Proof.
-      induction C as [|(n'', n''') C' IHC].
-      - intros n n' Hin. auto.
-      - intros n n' Hin. apply in_inv in Hin. destruct Hin as [Heq | Hin].
-        + inversion Heq. subst. unfold is_node_of. unfold nodes_of. destruct C'.
-          * split. all: (simpl; auto).
-          * fold nodes_of. simpl. auto.
-        + apply IHC in Hin.
-          destruct Hin as [Hnode Hnode'].
-          destruct C'.
-          * contradiction.
-          * unfold is_node_of in *. simpl in *. auto.
-    Qed.
   End Edges.
 
   (* Exporting notations *)

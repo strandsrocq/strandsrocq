@@ -9,7 +9,7 @@ From Stdlib Require Import Logic.Decidable.
 Import Stdlib.Lists.List.ListNotations.
 Import Nat.
 
-Require Import Strands.
+Require Import Universe.
 Require Import UTerms.
 
 Module UTermsTactics (U : UniverseSig) (Import UT : UTermSig U).
@@ -51,7 +51,7 @@ Module UTermsTactics (U : UniverseSig) (Import UT : UTermSig U).
 
   (* This tactic is term-dependent. It is invoked when X <> Y to deconstruct
   X and Y if possible or prove their inequality *)
-  Tactic Notation "TermTactic" constr(X) constr(Y) "in" ident(H) :=
+  Ltac term_tactic_in X Y H :=
     (* idtac "UTermTactic" X Y H; *)
     match X with
     | #?Z => match Y with #?W => rewrite A_K_iff in H end (* keys K *)
@@ -72,7 +72,10 @@ Module UTermsTactics (U : UniverseSig) (Import UT : UTermSig U).
       end
     end.
 
-  Tactic Notation "TermTactic" constr(X) constr(Y) :=
+  Tactic Notation "TermTactic" constr(X) constr(Y) "in" ident(H) :=
+    term_tactic_in X Y H.
+
+  Ltac term_tactic X Y :=
     (* idtac "termTactic" X Y; *)
     (* deconstructs *)
     match X with
@@ -93,4 +96,7 @@ Module UTermsTactics (U : UniverseSig) (Import UT : UTermSig U).
       (* | _ => fail 1 *)
       end
     end.
+
+  Tactic Notation "TermTactic" constr(X) constr(Y) :=
+    term_tactic X Y.
 End UTermsTactics.

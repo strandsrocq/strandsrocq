@@ -13,16 +13,12 @@ Open Scope list_scope.
 
 Require Import RelMinimal.
 Require Import Strands.
-Require Import StrandsTactics.
 Require Import Bundles.
-
-Require Import UTerms.
 
 Set Implicit Arguments.
 
 Module MPT
-  (Import U : UniverseSig)
-  (Import T : UTermSig U)
+  (Import T : TermSig)
   (Import St : StrandSig T)
   (Import SSp : StrandSpaceSig T St)
   (Import B : BundleSig T St SSp).
@@ -35,8 +31,6 @@ Module MPT
     - mpti: minimal positive in trace with index
     - mpt:  minimal positive in trace
   *)
-
-  Module Import StT := StrandsTactics U T St SSp.
 
   Section MPT.
     Definition is_mpti n i j α p :=
@@ -302,22 +296,23 @@ Module MPT
   Section MinimalMPT.
     Import B.
     Variable p : A -> Prop.
-    Variable C : edge_set__t.
+    Variable B : bundle_graph.
 
-    Hypothesis C_is_bundle : is_bundle C.
+    Hypothesis B_is_bundle : is_bundle B.
+    Local Notation E := (edges B).
     Hypothesis p_dec : forall t, { p t } + { ~ p t }.
 
-    Definition N := filter (fun n => if (p_dec (uns_term n)) then true else false) (nodes_of C).
+    Definition N := filter (fun n => if (p_dec (uns_term n)) then true else false) (nodes B).
 
     Lemma N_iff_inC_p :
-      forall n, In n N <-> In n (nodes_of C) /\ p (uns_term n).
+      forall n, In n N <-> In n (nodes B) /\ p (uns_term n).
     Proof.
       intros n.
       unfold N. rewrite (filter_In).
       now destruct (p_dec).
     Qed.
 
-    Lemma N_is_sign_closed : sign_closed C N.
+    Lemma N_is_sign_closed : sign_closed B N.
     Proof.
       intros Hsub m m' Hinm Hinm' Huns.
       repeat rewrite N_iff_inC_p.
@@ -325,23 +320,23 @@ Module MPT
     Qed.
 
     Hypothesis np : node__t.
-    Definition NW := filter (fun n => if (p_dec (uns_term n)) then if (bundle_ltb C_is_bundle n np) then true else false else false) (nodes_of C).
+    Definition NW := filter (fun n => if (p_dec (uns_term n)) then if (bundle_ltb B_is_bundle n np) then true else false else false) (nodes B).
     Lemma NW_iff_inC_p :
-      forall n, In n NW <-> In n (nodes_of C) /\ p (uns_term n) /\ C ⊢ n ≺ np.
+      forall n, In n NW <-> In n (nodes B) /\ p (uns_term n) /\ E ⊢ n ≺ np.
     Proof.
       intros n.
       unfold NW. rewrite (filter_In).
-      destruct (p_dec); destruct (bundle_ltb C_is_bundle n np) eqn:Hltb; try rewrite <-(bundle_ltb_iff_bundle_lt) in Hltb; try easy.
+      destruct (p_dec); destruct (bundle_ltb B_is_bundle n np) eqn:Hltb; try rewrite <-(bundle_ltb_iff_bundle_lt) in Hltb; try easy.
       rewrite (bundle_ltb_iff_bundle_lt). rewrite Hltb. easy.
     Qed.
-    Lemma NW_is_weak_sign_closed : sign_closed_weak C NW.
+    Lemma NW_is_weak_sign_closed : sign_closed_weak B NW.
     Proof.
       unfold sign_closed_weak.
       intros Hsub m Hinm Hnegm.
       (* rewrite (NW_iff_inC_p) in Hinm. *)
       specialize (Hsub _ Hinm).
-      specialize (interstrand_exists_prec_positive_lt_uns C_is_bundle m) as Hexists.
-      st_implication Hexists.
+      specialize (interstrand_exists_prec_positive_lt_uns B_is_bundle m) as Hexists.
+      specialize (Hexists Hsub Hnegm).
       destruct Hexists as [m' [Hnode [Hpos [Hect Huns]]]].
       exists m'.
       unfold set_In in Hinm. rewrite (NW_iff_inC_p) in Hinm.
@@ -356,7 +351,7 @@ Module MPT
     Lemma minimal_N_then_is_mpti :
       forall α n,
       α = tr (strand n) ->
-      set_In n N -> is_minimal (bundle_le C) n N ->
+      set_In n N -> is_minimal (bundle_le E) n N ->
       is_mpti n 0 (index n) (α) p.
     Proof.
       intros α n Htrace Hin Hmin.
@@ -366,32 +361,33 @@ Module MPT
       rewrite sub_0_r.
       assert (Hmin':=Hmin).
       unfold is_minimal in Hmin.
-      specialize (C_is_bundle) as Hbundle.
+      specialize (B_is_bundle) as Hbundle.
       rewrite Htrace.
       repeat split; try lia; try easy.
       - intros w Hindex.
         (* Search (index ?X < index ?Y).
         Search (?X ⟹+ ?Y). *)
-        specialize (index_lt_strand_implies_is_node_of C_is_bundle ((strand n), w) n) as Hin. simpl in Hin.
-        st_implication Hin.
+        specialize (index_lt_strand_implies_is_node_of B_is_bundle ((strand n), w) n) as Hin. simpl in Hin.
+        specialize (Hin Hindex (@Logic.eq_refl _ (strand n)) HinC).
         specialize (Hmin Hin' (strand n, w) ).
         destruct (p_dec (uns_term ((strand n),w))); try easy.
         specialize (N_iff_inC_p ((strand n),w)) as [_ HinN].
-        st_implication HinN.
+        specialize (HinN (conj Hin p0)).
         assert ((strand n, w) <> n). { unfold not. intros H. rewrite <-H in Hindex. simpl in Hindex. lia. }
-        st_implication Hmin.
-        specialize (index_le_strand_implies_bundle_le C_is_bundle ((strand n), w) n) as Hintra.
-        now st_implication Hintra.
-      - assert (node_subset_of N C) as Hsubset by
+        specialize (Hmin HinN H).
+        specialize (index_le_strand_implies_bundle_le B_is_bundle ((strand n), w) n) as Hintra.
+        specialize (Hintra (Nat.lt_le_incl _ _ Hindex) (@Logic.eq_refl _ (strand n)) HinC).
+        exfalso. now apply Hmin.
+      - assert (node_subset_of N B) as Hsubset by
           (intros ? Hin; now apply N_iff_inC_p in Hin).
         specialize (N_is_sign_closed) as Hclosed.
-        now specialize (minimal_is_positive C_is_bundle Hsubset Hclosed Hin' Hmin') as Hpos.
+        now specialize (minimal_is_positive B_is_bundle Hsubset Hclosed Hin' Hmin') as Hpos.
     Qed.
 
     Corollary minimal_N_then_mpti :
       forall α n,
       α = tr (strand n) ->
-      set_In n N -> is_minimal (bundle_le C) n N ->
+      set_In n N -> is_minimal (bundle_le E) n N ->
       mpti n 0 (index n) (α) p.
     Proof.
       intros. rewrite <-is_mpti_iff_mpti.
@@ -401,7 +397,7 @@ Module MPT
     Corollary minimal_N_then_is_mpt :
       forall α n,
       α = tr (strand n) ->
-      set_In n N -> is_minimal (bundle_le C) n N ->
+      set_In n N -> is_minimal (bundle_le E) n N ->
       is_mpt n (length α) α p.
     Proof.
       intros. apply is_mpti_then_is_mpt. now apply minimal_N_then_is_mpti.
@@ -410,7 +406,7 @@ Module MPT
     Corollary minimal_N_then_mpt :
       forall α n,
       α = tr (strand n) ->
-      set_In n N -> is_minimal (bundle_le C) n N ->
+      set_In n N -> is_minimal (bundle_le E) n N ->
       mpt n (length α) α p.
     Proof.
       intros. apply is_mpt_then_mpt. now apply minimal_N_then_is_mpt.
@@ -419,7 +415,7 @@ Module MPT
     Lemma minimal_NW_then_is_mpti :
       forall α n,
       α = tr (strand n) ->
-      set_In n NW -> is_minimal (bundle_le C) n NW ->
+      set_In n NW -> is_minimal (bundle_le E) n NW ->
       is_mpti n 0 (index n) (α) p.
     Proof.
       intros α n Htrace Hin Hmin.
@@ -429,26 +425,27 @@ Module MPT
       rewrite sub_0_r.
       assert (Hmin':=Hmin).
       unfold is_minimal in Hmin.
-      specialize (C_is_bundle) as Hbundle.
+      specialize (B_is_bundle) as Hbundle.
       rewrite Htrace.
       repeat split; try lia; try easy.
       - intros w Hindex.
         (* Search (index ?X < index ?Y).
         Search (?X ⟹+ ?Y). *)
-        specialize (index_lt_strand_implies_is_node_of C_is_bundle ((strand n), w) n) as Hin. simpl in Hin.
-        st_implication Hin.
+        specialize (index_lt_strand_implies_is_node_of B_is_bundle ((strand n), w) n) as Hin. simpl in Hin.
+        specialize (Hin Hindex (@Logic.eq_refl _ (strand n)) HinC).
         specialize (Hmin Hin' (strand n, w) ).
         destruct (p_dec (uns_term ((strand n),w))); try easy.
         specialize (NW_iff_inC_p ((strand n),w)) as [_ HinN].
-        specialize (index_lt_strand_implies_bundle_lt C_is_bundle (strand n, w) n) as Hect.
-        st_implication Hect.
+        specialize (index_lt_strand_implies_bundle_lt B_is_bundle (strand n, w) n) as Hect.
+        specialize (Hect Hindex (@Logic.eq_refl _ (strand n)) HinC).
         specialize (bundle_lt_multi Hect Hectn) as Hectnp.
-        st_implication HinN.
+        specialize (HinN (conj Hin (conj p0 Hectnp))).
         assert ((strand n, w) <> n). { unfold not. intros H. rewrite <-H in Hindex. simpl in Hindex. lia. }
-        st_implication Hmin.
-        specialize (index_le_strand_implies_bundle_le C_is_bundle ((strand n), w) n) as Hintra.
-        now st_implication Hintra.
-      - assert (node_subset_of NW C) as Hsubset by
+        specialize (Hmin HinN H).
+        specialize (index_le_strand_implies_bundle_le B_is_bundle ((strand n), w) n) as Hintra.
+        specialize (Hintra (Nat.lt_le_incl _ _ Hindex) (@Logic.eq_refl _ (strand n)) HinC).
+        exfalso. now apply Hmin.
+      - assert (node_subset_of NW B) as Hsubset by
           (intros ? Hin; now apply NW_iff_inC_p in Hin).
         specialize (NW_is_weak_sign_closed) as Hclosed.
         now specialize (minimal_is_positive_weak Hsubset Hclosed Hin' Hmin') as Hpos.
@@ -457,7 +454,7 @@ Module MPT
     Corollary minimal_NW_then_mpti :
       forall α n,
       α = tr (strand n) ->
-      set_In n NW -> is_minimal (bundle_le C) n NW ->
+      set_In n NW -> is_minimal (bundle_le E) n NW ->
       mpti n 0 (index n) (α) p.
     Proof.
       intros. rewrite <-is_mpti_iff_mpti.
@@ -467,7 +464,7 @@ Module MPT
     Corollary minimal_NW_then_is_mpt :
       forall α n,
       α = tr (strand n) ->
-      set_In n NW -> is_minimal (bundle_le C) n NW ->
+      set_In n NW -> is_minimal (bundle_le E) n NW ->
       is_mpt n (length α) α p.
     Proof.
       intros. apply is_mpti_then_is_mpt. now apply minimal_NW_then_is_mpti.
@@ -476,7 +473,7 @@ Module MPT
     Corollary minimal_NW_then_mpt :
       forall α n,
       α = tr (strand n) ->
-      set_In n NW -> is_minimal (bundle_le C) n NW ->
+      set_In n NW -> is_minimal (bundle_le E) n NW ->
       mpt n (length α) α p.
     Proof.
       intros. apply is_mpt_then_mpt. now apply minimal_NW_then_is_mpt.
@@ -486,28 +483,29 @@ Module MPT
   Section MinimalOriginatesMPT.
     Import B.
 
-    Variable C : edge_set__t.
-    Hypothesis C_is_bundle : is_bundle C.
+    Variable B : bundle_graph.
+    Hypothesis B_is_bundle : is_bundle B.
+    Local Notation E := (edges B).
 
     Definition p t x := t ⊏ x.
     Lemma p_dec : forall t x : A, { p t x } + { ~ p t x }.
     Proof.
       intros t x. unfold p. destruct (A_subterm_dec t x); auto.
     Qed.
-    Definition Nsubt t := N (p t) C (p_dec t).
-    Definition Nsubtiff_inC_p t := N_iff_inC_p (p t) C (p_dec t).
-    Definition minimal_Nsubt_then_mpt t := minimal_N_then_mpt (p t) C_is_bundle (p_dec t).
-    Definition minimal_Nsubt_then_is_mpti t := minimal_N_then_is_mpti (p t) C_is_bundle (p_dec t).
+    Definition Nsubt t := N (p t) B (p_dec t).
+    Definition Nsubtiff_inC_p t := N_iff_inC_p (p t) B (p_dec t).
+    Definition minimal_Nsubt_then_mpt t := minimal_N_then_mpt (p t) B_is_bundle (p_dec t).
+    Definition minimal_Nsubt_then_is_mpti t := minimal_N_then_is_mpti (p t) B_is_bundle (p_dec t).
 
     Corollary minimal_then_originates :
       forall n t,
         In n (Nsubt t) ->
-        is_minimal (bundle_le C) n (Nsubt t) ->
+        is_minimal (bundle_le E) n (Nsubt t) ->
         originates t n.
     Proof.
       intros n t Hin Hmin.
       apply mpti_then_originates.
-      apply (minimal_N_then_mpti (p t) C_is_bundle (p_dec t)); try easy.
+      apply (minimal_N_then_mpti (p t) B_is_bundle (p_dec t)); try easy.
     Qed.
 
   End MinimalOriginatesMPT.

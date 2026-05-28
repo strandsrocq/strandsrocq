@@ -55,7 +55,7 @@ Section SimpleAuthSecurity.
     Local assumptions to make the rest more easily readable.
   *)
   Variable s : Σ.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
 
   Variable A B : T.
   Variable Na : T.

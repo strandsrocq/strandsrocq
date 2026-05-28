@@ -18,26 +18,25 @@ Module BundleRelations
   (Import SSp : StrandSpaceSig T St).
 
   (*
-    In this section, we define the ≺ and ⪯ among nodes, for any set of edges C.
-    In particular, here we are not assuming that C is a bundle.
-
-    Also, we *do not* need the definition of bundles here!
+    In this section, we define the ≺ and ⪯ among nodes, for any set of edges E.
+    In particular, here we are not assuming that E are edges of a bundle.
+    Thus, we *do not* need the definition of bundles here!
   *)
 
-  (* ≺ relation: transitive closure of C *)
-  Inductive bundle_lt (C:edge_set__t) : node__t -> node__t -> Prop :=
-  | bundle_lt_one   : forall n n', set_In (n, n') C -> bundle_lt C n n'
-  | bundle_lt_multi : forall n n'' n', bundle_lt C n n' -> bundle_lt C n' n'' -> bundle_lt C n n''.
+  (* ≺ relation: transitive closure of E *)
+  Inductive bundle_lt (E : edge_set__t) : node__t -> node__t -> Prop :=
+  | bundle_lt_one   : forall n n', set_In (n, n') E -> bundle_lt E n n'
+  | bundle_lt_multi : forall n n'' n', bundle_lt E n n' -> bundle_lt E n' n'' -> bundle_lt E n n''.
 
-  Notation "C '⊢' n1 '≺' n2" := (bundle_lt C n1 n2) (at level 70).
+  Notation "E '⊢' n1 '≺' n2" := (bundle_lt E n1 n2) (at level 70).
 
-  (* ⪯ relation: transitive and reflexive closure of C *)
-  Inductive bundle_le (C:edge_set__t) (n:node__t): node__t -> Prop :=
-  | bundle_le_zero : bundle_le C n n
-  | bundle_le_one (n':node__t) : set_In (n, n') C -> bundle_le C n n'
-  | bundle_le_multi (n':node__t) : forall n'', bundle_le C n n'' ->  bundle_le C n'' n' -> bundle_le C n n'.
+  (* ⪯ relation: transitive and reflexive closure of E *)
+  Inductive bundle_le (E : edge_set__t) (n : node__t): node__t -> Prop :=
+  | bundle_le_zero : bundle_le E n n
+  | bundle_le_one (n':node__t) : set_In (n, n') E -> bundle_le E n n'
+  | bundle_le_multi (n':node__t) : forall n'', bundle_le E n n'' ->  bundle_le E n'' n' -> bundle_le E n n'.
 
-  Notation "C '⊢' n1 '⪯' n2" := (bundle_le C n1 n2) (at level 70).
+  Notation "E '⊢' n1 '⪯' n2" := (bundle_le E n1 n2) (at level 70).
 
   Lemma bundle_le_inv_empty :
     forall n1 n2,
@@ -49,34 +48,54 @@ Module BundleRelations
   Qed.
 
   Lemma bundle_le_cons:
-    forall e m1 m2 C,
-      C ⊢ m1 ⪯ m2 -> (e :: C) ⊢ m1 ⪯ m2.
+    forall e m1 m2 E,
+      E ⊢ m1 ⪯ m2 -> (e :: E) ⊢ m1 ⪯ m2.
   Proof.
-    intros e m1 m2 C Hecrt. induction Hecrt as [|n n' Hone|n n' n'' Hmulti1 IHmulti1 Hmulti2 IHmulti2].
+    intros e m1 m2 E Hecrt. induction Hecrt as [|n n' Hone|n n' n'' Hmulti1 IHmulti1 Hmulti2 IHmulti2].
     - apply bundle_le_zero.
-    - specialize (in_cons e (n,n') C Hone) as Hinind. apply bundle_le_one. assumption.
+    - specialize (in_cons e (n,n') E Hone) as Hinind. apply bundle_le_one. assumption.
     - apply (bundle_le_multi IHmulti1 IHmulti2).
   Qed.
 
-  Lemma bundle_lt_cons:
-    forall e m1 m2 C,
-      C ⊢ m1 ≺ m2 -> (e :: C) ⊢ m1 ≺ m2.
+  Lemma bundle_le_sub:
+    forall m1 m2 E D,
+    (forall x, set_In x E -> set_In x D) ->
+    E ⊢ m1 ⪯ m2 -> D ⊢ m1 ⪯ m2.
   Proof.
-    intros e m1 m2 C Hecrt. induction Hecrt as [n n' Hone|n n' n'' Hmulti1 IHmulti1 Hmulti2 IHmulti2].
-    - specialize (in_cons e (n,n') C Hone) as Hinind. apply bundle_lt_one. assumption.
+    intros m1 m2 E D Hsub Hle.
+    induction Hle; try now constructor.
+    - apply bundle_le_one; now apply Hsub.
+    - eapply bundle_le_multi. apply IHHle1. apply IHHle2.
+  Qed.
+
+  Lemma bundle_le_union:
+    forall m1 m2 E D,
+      D ⊢ m1 ⪯ m2 -> (set_union eq_edge__t_dec E D) ⊢ m1 ⪯ m2.
+  Proof.
+    intros m1 m2 E D Hle.
+    eapply bundle_le_sub.
+    intros ?. apply set_union_intro2. easy.
+  Qed.  
+
+  Lemma bundle_lt_cons:
+    forall e m1 m2 E,
+      E ⊢ m1 ≺ m2 -> (e :: E) ⊢ m1 ≺ m2.
+  Proof.
+    intros e m1 m2 E Hecrt. induction Hecrt as [n n' Hone|n n' n'' Hmulti1 IHmulti1 Hmulti2 IHmulti2].
+    - specialize (in_cons e (n,n') E Hone) as Hinind. apply bundle_lt_one. assumption.
     - apply (bundle_lt_multi IHmulti1 IHmulti2).
   Qed.
 
-  Lemma bundle_le_iff: forall m1 m2 n1 n2 C,
-      (n1,n2)::C ⊢ m1 ⪯ m2 <->
-       C ⊢ m1 ⪯ m2 \/
-          (C ⊢ m1 ⪯ n1 /\ C ⊢ n2 ⪯ m2).
+  Lemma bundle_le_iff: forall m1 m2 n1 n2 E,
+      (n1,n2)::E ⊢ m1 ⪯ m2 <->
+       E ⊢ m1 ⪯ m2 \/
+          (E ⊢ m1 ⪯ n1 /\ E ⊢ n2 ⪯ m2).
   Proof with (right; split; assumption).
     split.
     - intro Hecrt. induction Hecrt as [| | m1 m2 n'' Hmulti1 IH1 Hmulti2 IH2].
-      + specialize (bundle_le_zero C n) as Hyes. left. assumption.
+      + specialize (bundle_le_zero E n) as Hyes. left. assumption.
       + simpl in H. destruct H.
-        * injection H as Heq1 Heq2. subst. right. split. all: apply (bundle_le_zero C _).
+        * injection H as Heq1 Heq2. subst. right. split. all: apply (bundle_le_zero E _).
         * left. apply bundle_le_one. assumption.
       + destruct (eq_node__t_dec m1 n'') as [Heq1|Hneq1].
         all: destruct (eq_node__t_dec n'' m2) as [Heq2|Hneq2].
@@ -94,26 +113,26 @@ Module BundleRelations
       + apply bundle_le_cons. assumption.
       + apply (bundle_le_cons (n1, n2)) in Hand1.
         apply (bundle_le_cons (n1, n2)) in Hand2.
-        assert (bundle_le ((n1,n2) :: C) n1 n2) as Hin. { apply bundle_le_one. apply in_eq. }
+        assert (bundle_le ((n1,n2) :: E) n1 n2) as Hin. { apply bundle_le_one. apply in_eq. }
         specialize (bundle_le_multi Hand1 Hin) as Hin2.
         apply (bundle_le_multi Hin2 Hand2).
   Qed.
 
-  Lemma bundle_le_dec : forall C m1 m2, { C ⊢ m1 ⪯ m2 } + { ~ C ⊢ m1 ⪯ m2 }.
+  Lemma bundle_le_dec : forall E m1 m2, { E ⊢ m1 ⪯ m2 } + { ~ E ⊢ m1 ⪯ m2 }.
   Proof.
-    intros C.
-    induction C as [ | (n1, n2) C IHC].
-    - (* Base case: C = [] *)
+    intros E.
+    induction E as [ | (n1, n2) E IHC].
+    - (* Base case: E = [] *)
       intros m1 m2.
       destruct (eq_node__t_dec m1 m2).
       + left. subst. apply bundle_le_zero.
       + right. unfold not; intros Hle. now apply bundle_le_inv_empty in Hle.
-    - (* Ind. case: C is of the form (n1, n2)::C *)
+    - (* Ind. case: E is of the form (n1, n2)::E *)
       intros m1 m2.
       destruct (IHC m1 m2) as [HindL | HindR].
       + left.
         apply bundle_le_cons. assumption.
-      + specialize (bundle_le_iff m1 m2 n1 n2 C) as [Hl Hr].
+      + specialize (bundle_le_iff m1 m2 n1 n2 E) as [Hl Hr].
         destruct (IHC n2 m2) as [Handeq2 | Handneq2].
         * destruct (IHC m1 n1) as [Handeq1 | Handneq1].
           -- left. apply Hr. right. split. all: assumption.
@@ -121,19 +140,19 @@ Module BundleRelations
         * right. intro Hcontra. specialize (Hl Hcontra) as [? | [? ?]]. all: contradiction.
   Qed.
 
-  Lemma bundle_lt_then_le : forall C n1 n2, C ⊢ n1 ≺ n2 -> C ⊢ n1 ⪯ n2.
+  Lemma bundle_lt_then_le : forall E n1 n2, E ⊢ n1 ≺ n2 -> E ⊢ n1 ⪯ n2.
   Proof.
-    intros C n1 n2 Hlt.
+    intros E n1 n2 Hlt.
     induction Hlt.
     - apply bundle_le_one. assumption.
     - apply (bundle_le_multi IHHlt1 IHHlt2).
   Qed.
 
   Lemma bundle_le_then_lt :
-    forall C n1 n2, C ⊢ n1 ⪯ n2 ->
-      n1 = n2 \/ C ⊢ n1 ≺ n2.
+    forall E n1 n2, E ⊢ n1 ⪯ n2 ->
+      n1 = n2 \/ E ⊢ n1 ≺ n2.
   Proof.
-    intros C n1 n2 Hlt.
+    intros E n1 n2 Hlt.
     induction Hlt.
     - left. trivial.
     - right. apply bundle_lt_one. assumption.
@@ -145,16 +164,16 @@ Module BundleRelations
   Qed.
 
   Lemma bundle_le_refl :
-    forall C, reflexive node__t (bundle_le C).
+    forall E, reflexive node__t (bundle_le E).
   Proof.
-    intro C. unfold reflexive. intro x. apply bundle_le_zero.
+    intro E. unfold reflexive. intro x. apply bundle_le_zero.
   Qed.
 
   Lemma bundle_le_trans :
-    forall C, transitive node__t (bundle_le C).
+    forall E, transitive node__t (bundle_le E).
   Proof.
     unfold transitive.
-    intros C n n' n'' Hlt1 Hlt2.
+    intros E n n' n'' Hlt1 Hlt2.
     apply (bundle_le_multi Hlt1 Hlt2).
   Qed.
 

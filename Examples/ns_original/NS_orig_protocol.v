@@ -44,7 +44,7 @@ Section NS.
   Variable A B Na Nb : T.
   Variable s : Σ.
   Variable K__P : K -> Prop.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
 
   Lemma disjoint_regular_strands :
     ~ (NS_initiator_strand A B Na Nb s /\ NS_responder_strand A B Na Nb s).
@@ -63,7 +63,7 @@ Section NS.
 
   (* We also prove here general facts about private keys *)
   Lemma inv_PK_U_never_originates_regular :
-    C_is_SS C (NS_StrandSpace K__P) ->
+    bundle_in_SS C (NS_StrandSpace K__P) ->
       forall U, never_originates_regular K__P (inv (PK U)) C.
   Proof.
     intros His_NS U n Hnodeof Horig.

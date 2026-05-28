@@ -1,13 +1,6 @@
-Require Import StrandList.
-Require Import StrandsTactics.
-Require Import UTerms.
+Require Import DefaultInstances.
 
 (* Create a concrete instance of Terms *)
-Import TermNat.
-Import StrandList.
-Import StrandSpaceList.
-
-Module Import StT := StrandsTactics UniverseNat TermNat StrandList StrandSpaceList.
 
 Lemma test :
   forall (t t':T) (k k':K ) (a a' b b':𝔸),

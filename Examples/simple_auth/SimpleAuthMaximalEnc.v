@@ -123,7 +123,7 @@ Section SimpleAuthSpec.
 
   (* ============================================================ *)
   Lemma SK_AB_never_originates :
-    forall C A B n, C_is_SS C (SA_StrandSpace A B) ->
+    forall C A B n, bundle_in_SS C (SA_StrandSpace A B) ->
       is_node_of n C ->
       ~originates #(SK A B) n.
   Proof.
@@ -141,7 +141,7 @@ Section SimpleAuthSecurity.
     Local assumptions to make the rest more easily readable.
   *)
   Variable s : Σ.
-  Variable C : edge_set__t.
+  Variable C : bundle_graph.
 
   Variable A B : T.
   Variable Na : T.
@@ -149,7 +149,7 @@ Section SimpleAuthSecurity.
   Hypothesis s_is_SA_init : SA_initiator_strand A B Na s.
   Hypothesis s_strand_of_C : is_strand_of s C.
   Hypothesis C_is_bundle : is_bundle C.
-  Hypothesis C_is_SA_bundle : C_is_SS C (SA_StrandSpace A B).
+  Hypothesis C_is_SA_bundle : bundle_in_SS C (SA_StrandSpace A B).
 
   (*
       NoForgeCipher is sufficient to prove that the attacker dees not originate the
