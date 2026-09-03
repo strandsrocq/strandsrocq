@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.PenetratorProtocol</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">List</span> <span class="id" title="var">String</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">RoleSyntax</span> <span class="id" title="var">ChoiceRoles</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab17"></a><h1 class="section">CPSA penetrator protocol</h1>
+
+
+<div class="paragraph"> </div>
+
+    This file gives a CPSA-role presentation of the usual penetrator traces.
+    The older <span class="inlinecode"><span class="id" title="var">penetrator_strand</span></span> predicate in <span class="inlinecode"><span class="id" title="var">CPSA.Instances.Penetrator</span></span>
+    carries a side condition <span class="inlinecode"><span class="id" title="var">K__P</span></span> <span class="inlinecode"><span class="id" title="var">m</span></span> for initially known atoms.  Plain
+    <span class="inlinecode"><span class="id" title="var">RoleSyntax.protocol</span></span> has no role-side premises, so the atom roles below
+    model the unconstrained schema where every basic atom may be generated.
+
+<div class="paragraph"> </div>
+
+    Message variables are used only for values that have already been received
+    before they are sent.  Consequently the protocol satisfies
+    <span class="inlinecode"><span class="id" title="var">wf_protocol_no_mesg_origination</span></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="var">PenetratorProtocol</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Direct_Syntax</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">ChoiceRoles</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pn</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "pn".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pt</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "pt".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pd</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Data</span> := <span class="id" title="var">mkTVar</span> "pd".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">ptag</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Tag</span> := <span class="id" title="var">mkTVar</span> "ptag".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pskey</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Skey</span> := <span class="id" title="var">mkTVar</span> "pskey".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pakey</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Akey</span> := <span class="id" title="var">mkTVar</span> "pakey".<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pg</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Mesg</span> := <span class="id" title="var">mkTVar</span> "pg".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">ph</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Mesg</span> := <span class="id" title="var">mkTVar</span> "ph".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pk</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Mesg</span> := <span class="id" title="var">mkTVar</span> "pk".<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_name_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-name"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">pn</span>)]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_text_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-text"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pt</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">pt</span>)]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_data_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-data"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pd</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Data</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">pd</span>)]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_tag_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-tag"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">ptag</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Tag</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">ptag</span>)]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_skey_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-skey"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pskey</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">pskey</span>)]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_akey_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-akey"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pakey</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Akey</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">pakey</span>)]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_pair_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-pair"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pg</span>; <span class="id" title="var">ph</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Mesg</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">pg</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">ph</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">pg</span>; <span class="id" title="var">ph</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_separate_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-separate"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pg</span>; <span class="id" title="var">ph</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Mesg</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">pg</span>; <span class="id" title="var">ph</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">pg</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">ph</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_encrypt_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-encrypt"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pk</span>; <span class="id" title="var">ph</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Mesg</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">pk</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">ph</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">ph</span>}<span class="id" title="var">_pk</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_decrypt_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-decrypt"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pk</span>; <span class="id" title="var">ph</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Mesg</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">invk</span> <span class="id" title="var">pk</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">ph</span>}<span class="id" title="var">_pk</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">ph</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">pen_hash_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "pen-hash"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [[<span class="id" title="var">pg</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Mesg</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">pg</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> (<span class="id" title="var">hash</span> <span class="id" title="var">pg</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">penetrator_roles</span> : <span class="id" title="var">list</span> <span class="id" title="var">role</span> := [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_name_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_text_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_data_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_tag_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_skey_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_akey_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_pair_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_separate_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_encrypt_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_decrypt_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pen_hash_role</span><br/>
+&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">penetrator_protocol</span> : <span class="id" title="var">protocol</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">mkProtocol</span> <span class="id" title="var">penetrator_roles</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">penetrator_protocol_wf_no_mesg_origination</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">penetrator_protocol</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">PenetratorProtocol</span>.<br/>
+</div>
+</main>
+</body>
+</html>

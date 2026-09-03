@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.PaperExamples</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">List</span> <span class="id" title="var">String</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">RoleSyntax</span> <span class="id" title="var">ChoiceRoles</span> <span class="id" title="var">Semantics</span> <span class="id" title="var">ProtocolExamples</span> <span class="id" title="var">ComputableSemantics</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">LabelledSemantics</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">DefaultInstances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab10"></a><h1 class="section">Paper examples</h1>
+
+
+<div class="paragraph"> </div>
+
+This file collects the Rocq artifacts that are referenced by the paper.  It is
+intended as a small proof index: each item below points to, or packages, the
+corresponding development theorem used in the text.
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="var">PaperExamples</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Direct_Syntax</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">ChoiceRoles</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Semantics</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Computable_Semantics</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Labelled_Semantics</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Name</span> : <span class="id" title="var">Name</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Text</span> : <span class="id" title="var">Text</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Akey</span> : <span class="id" title="var">Akey</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Tag</span> : <span class="id" title="var">Tag</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">TTag</span> : <span class="id" title="var">Tag</span> &gt;-&gt; <span class="id" title="var">cpsa_term</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Separate scopes keep protocol-local paper names unambiguous: for
+      instance <span class="inlinecode"><span class="id" title="var">MkText</span></span> <span class="inlinecode">0</span> is <span class="inlinecode"><span class="id" title="var">Q</span></span> in Section 4, but <span class="inlinecode"><span class="id" title="var">Na</span></span> in the worked
+      Yahalom example. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Declare Scope</span> <span class="id" title="var">paper_yes_no_scope</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Declare Scope</span> <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Parameter</span> <span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab11"></a><h2 class="section">Paper Section 4: yes-or-no protocol and choice</h2>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <span class="id" title="var">YesOrNoProtocol</span>.<br/>
+</div>
+
+<div class="doc">
+The symbolic variables used by the yes-or-no roles in
+        Section 4 of the paper.  They are section-local so the roles can use
+        the paper names <span class="inlinecode"><span class="id" title="var">A</span></span>, <span class="inlinecode"><span class="id" title="var">Q</span></span>, <span class="inlinecode"><span class="id" title="var">y</span></span>, and <span class="inlinecode"><span class="id" title="var">n</span></span> without polluting the rest of
+        the file. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">a</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "A".<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">q</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "Q".<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">y</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "y".<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">n</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "n".<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The questioner branches are written out explicitly so that the
+        desugaring theorem below has concrete roles to compare against.  The
+        protocol itself uses the <span class="inlinecode"><span class="id" title="var">CHOICE</span></span> form <span class="inlinecode"><span class="id" title="var">yes_no_questioner_roles</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_questioner_yes_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "questioner-yes"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">a</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">y</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_questioner_no_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "questioner-no"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">a</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">n</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Paper Section 4 presents choice as a trace-tree abbreviation.  This is
+        the questioner behavior using that abbreviation directly. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_questioner_roles</span> : <span class="id" title="var">list</span> <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">CHOICE</span> "questioner"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACES</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [ <span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">a</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">THEN</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "yes" [ <span class="id" title="var">recv</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">y</span>) ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "no" [ <span class="id" title="var">recv</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">n</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_answerer_yes_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "answerer-yes"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">a</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">y</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_answerer_no_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "answerer-no"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">a</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">n</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The answerer roles are kept both as explicit roles and as a <span class="inlinecode"><span class="id" title="var">CHOICE</span></span>
+        expression.  This mirrors the paper: the expanded roles are useful for
+        the small reachability proofs, while the <span class="inlinecode"><span class="id" title="var">CHOICE</span></span> expression records
+        the intended source syntax. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_answerer_roles</span> : <span class="id" title="var">list</span> <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">CHOICE</span> "answerer"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACES</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [ <span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">q</span>; <span class="id" title="var">y</span>; <span class="id" title="var">n</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">a</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">THEN</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "yes" [ <span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">y</span>) ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "no" [ <span class="id" title="var">send</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">n</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The questioner choice elaborates to the two ordinary roles above. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_questioner_choice_desugars</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_questioner_roles</span> = [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_questioner_yes_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_questioner_no_role</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+This is the desugaring lemma cited for the answerer choice in
+        Section 4. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_choice_desugars</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_answerer_roles</span> = [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_answerer_yes_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_answerer_no_role</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The yes-or-no protocol used for the operational examples in
+        Section 4.3.  Choice has disappeared by this point: the protocol is
+        just a list of ordinary roles. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_protocol</span> : <span class="id" title="var">protocol</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">mkProtocol</span> (<span class="id" title="var">yes_no_questioner_roles</span> ++ <span class="id" title="var">yes_no_answerer_roles</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The paper-level examples only use regular trace generation, so this
+        well-formedness check establishes that no message-level origination
+        assumptions are hidden in the protocol. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_protocol_well_formed</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">yes_no_protocol</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Concrete ground values for the yes-or-no run.  The associated
+        <span class="inlinecode"><span class="id" title="var">paper_yes_no_scope</span></span> lets the concrete atoms below be written
+        and printed as <span class="inlinecode"><span class="id" title="var">A</span></span>, <span class="inlinecode"><span class="id" title="var">Q</span></span>, <span class="inlinecode"><span class="id" title="var">Y</span></span>, and <span class="inlinecode"><span class="id" title="var">N</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'A'" := (<span class="id" title="var">MkName</span> 0)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yes_no_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'Q'" := (<span class="id" title="var">MkText</span> 0)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yes_no_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'Y'" := (<span class="id" title="var">MkText</span> 1)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yes_no_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'N'" := (<span class="id" title="var">MkText</span> 2)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yes_no_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Local Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">paper_yes_no_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_valuation</span> : <span class="id" title="var">valuation</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">eta</span> {{ <span class="id" title="var">a</span> := <span class="id" title="var">A</span> }}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ <span class="id" title="var">q</span> := <span class="id" title="var">Q</span> }}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ <span class="id" title="var">y</span> := <span class="id" title="var">Y</span> }}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ <span class="id" title="var">n</span> := <span class="id" title="var">N</span> }}.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_question</span> : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟨ <span class="id" title="var">Q</span> ⋅ <span class="id" title="var">Y</span> ⋅ <span class="id" title="var">N</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">A</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The pool <span class="inlinecode"><span class="id" title="var">T2</span></span> in Section 4.3: the question has been sent by the
+        questioner and received by the answerer, but the answerer has not yet
+        committed to yes or no. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_T2</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">yes_no_question</span>]] ⋈ [⊖ <span class="id" title="var">yes_no_question</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_yes_pool</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">yes_no_question</span>; ⊖ <span class="id" title="var">Y</span>]] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊖ <span class="id" title="var">yes_no_question</span>; ⊕ <span class="id" title="var">Y</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_no_pool</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">yes_no_question</span>; ⊖ <span class="id" title="var">N</span>]] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊖ <span class="id" title="var">yes_no_question</span>; ⊕ <span class="id" title="var">N</span>].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Prefix witnesses used by the operational rules.  Each one says that a
+        ground trace prefix is compatible with one instantiated role in
+        <span class="inlinecode"><span class="id" title="var">yes_no_protocol</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_yes_no_prefix_questioner_yes_send</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ▷ [⊕ <span class="id" title="var">yes_no_question</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_yes_no_prefix_answerer_common</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ▷ [⊖ <span class="id" title="var">yes_no_question</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_yes_no_prefix_answerer_yes</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ▷ [⊖ <span class="id" title="var">yes_no_question</span>; ⊕ <span class="id" title="var">Y</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_yes_no_prefix_questioner_yes</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ▷ [⊕ <span class="id" title="var">yes_no_question</span>; ⊖ <span class="id" title="var">Y</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_yes_no_prefix_answerer_no</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ▷ [⊖ <span class="id" title="var">yes_no_question</span>; ⊕ <span class="id" title="var">N</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_yes_no_prefix_questioner_no</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ▷ [⊕ <span class="id" title="var">yes_no_question</span>; ⊖ <span class="id" title="var">N</span>].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The concrete execution prefix <span class="inlinecode"><span class="id" title="var">T2</span></span> from the paper: spawn the
+        questioner send, then spawn an answerer receive justified by that
+        send. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_T2_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ⊨ <span class="id" title="var">yes_no_T2</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_yes_pool_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ⊨ <span class="id" title="var">yes_no_yes_pool</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_no_pool_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ⊨ <span class="id" title="var">yes_no_no_pool</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+From the same uncommitted pool <span class="inlinecode"><span class="id" title="var">T2</span></span>, the answerer may take the yes
+        branch.  This is the formal counterpart of the left branch in the
+        Section 4.3 discussion. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_yes_pool_reachable_from_T2</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ⊨ᶠ <span class="id" title="var">yes_no_T2</span> →* <span class="id" title="var">yes_no_yes_pool</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_no_pool_reachable_from_T2</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ⊨ᶠ <span class="id" title="var">yes_no_T2</span> →* <span class="id" title="var">yes_no_no_pool</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Composing reachability of <span class="inlinecode"><span class="id" title="var">T2</span></span> with the yes continuation gives the full
+        yes-answer execution from the empty pool. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_yes_pool_reachable_via_T2</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ⊨ <span class="id" title="var">yes_no_yes_pool</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_no_pool_reachable_via_T2</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ⊨ <span class="id" title="var">yes_no_no_pool</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Soundness witnesses for the two yes-or-no executions.  These are
+        instances of the paper theorem that reachable pools generate bundles
+        representing their executed prefixes. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_yes_soundness_witness</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">G</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">yes_no_yes_pool</span> <span class="id" title="var">full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">yes_no_yes_pool</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_no_soundness_witness</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">G</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">yes_no_no_pool</span> <span class="id" title="var">full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">yes_no_no_pool</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_yes_computable_witness</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inhabited</span> (<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">yes_no_protocol</span> <span class="id" title="var">yes_no_yes_pool</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_yes_no_no_computable_witness</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inhabited</span> (<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">yes_no_protocol</span> <span class="id" title="var">yes_no_no_pool</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Full-trace functions used to compute concrete bundles from the
+        Type-level reachability witnesses below.  Each executed thread is
+        already complete in these small examples, so the suffixes are empty. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_yes_full_trace</span> (<span class="id" title="var">i</span> : <span class="id" title="var">nat</span>) : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">i</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ [⊕ <span class="id" title="var">yes_no_question</span>; ⊖ <span class="id" title="var">Y</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1 ⇒ [⊖ <span class="id" title="var">yes_no_question</span>; ⊕ <span class="id" title="var">Y</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yes_no_no_full_trace</span> (<span class="id" title="var">i</span> : <span class="id" title="var">nat</span>) : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">i</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ [⊕ <span class="id" title="var">yes_no_question</span>; ⊖ <span class="id" title="var">N</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1 ⇒ [⊖ <span class="id" title="var">yes_no_question</span>; ⊕ <span class="id" title="var">N</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">yes_no_yes_full_trace_extends</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">yes_no_yes_pool</span> <span class="id" title="var">yes_no_yes_full_trace</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">yes_no_no_full_trace_extends</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">yes_no_no_pool</span> <span class="id" title="var">yes_no_no_full_trace</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Executable reachability witnesses for the yes and no branches.  Unlike
+        the Prop-level reachability proofs, these retain the indexed send
+        occurrences used to construct communication edges. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">paper_yes_no_yes_poolT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">yes_no_protocol</span> <span class="id" title="var">yes_no_yes_pool</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">paper_yes_no_no_poolT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">yes_no_protocol</span> <span class="id" title="var">yes_no_no_pool</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Labelled version of the yes-answer execution shown in Section 4.5.
+        The labels make explicit the nodes created by the four steps and the
+        two communication sources:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> the answerer's receive of the question uses node <span class="inlinecode">(0,0)</span>;
+
+</li>
+<li> the questioner's receive of <span class="inlinecode"><span class="id" title="var">Y</span></span> uses node <span class="inlinecode">(1,1)</span>.
+
+</li>
+</ul>
+     
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">paper_yes_no_yes_labels</span> : <span class="id" title="var">list</span> <span class="id" title="var">step_label</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">dst</span> := {| <span class="id" title="var">ref_thread</span> := 0; <span class="id" title="var">ref_index</span> := 0 |};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ev</span> := ⊕ <span class="id" title="var">yes_no_question</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">src</span> := <span class="id" title="var">None</span> |};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">dst</span> := {| <span class="id" title="var">ref_thread</span> := 1; <span class="id" title="var">ref_index</span> := 0 |};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ev</span> := ⊖ <span class="id" title="var">yes_no_question</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">src</span> := <span class="id" title="var">Some</span> {| <span class="id" title="var">ref_thread</span> := 0; <span class="id" title="var">ref_index</span> := 0 |} |};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">dst</span> := {| <span class="id" title="var">ref_thread</span> := 1; <span class="id" title="var">ref_index</span> := 1 |};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ev</span> := ⊕ <span class="id" title="var">Y</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">src</span> := <span class="id" title="var">None</span> |};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">dst</span> := {| <span class="id" title="var">ref_thread</span> := 0; <span class="id" title="var">ref_index</span> := 1 |};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ev</span> := ⊖ <span class="id" title="var">Y</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">src</span> := <span class="id" title="var">Some</span> {| <span class="id" title="var">ref_thread</span> := 1; <span class="id" title="var">ref_index</span> := 1 |} |}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">paper_yes_no_yes_labelled_execution</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="id" title="var">ls</span> : <span class="id" title="var">list</span> <span class="id" title="var">step_label</span> &amp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span> ⊩ᵀ [] -[ <span class="id" title="var">ls</span> ]→* <span class="id" title="var">yes_no_yes_pool</span> } :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_poolT_has_labelsT</span> <span class="id" title="var">paper_yes_no_yes_poolT</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">paper_yes_no_yes_labelled_execution_labels</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">projT1</span> <span class="id" title="var">paper_yes_no_yes_labelled_execution</span> = <span class="id" title="var">paper_yes_no_yes_labels</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+It is possible to display the labelled yes execution and the generated
+        labels by running:
+
+<div class="paragraph"> </div>
+
+<pre>
+Compute paper_yes_no_yes_labelled_execution.
+Compute projT1 paper_yes_no_yes_labelled_execution.
+Compute paper_yes_no_yes_labels.
+</pre>
+     
+<div class="paragraph"> </div>
+
+ Concrete bundle extracted from the executable yes-branch derivation.
+        This is the form to inspect when comparing the Section 4.3 yes trace
+        with the bundle construction theorem. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">paper_yes_no_yes_computed_bundle</span> : <span class="id" title="var">bundle_type</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">computed_bundle_of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bundle_derivation_of_reachableT_with_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_yes_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">paper_yes_no_yes_poolT</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_yes_full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_yes_full_trace_extends</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Concrete bundle extracted from the executable no-branch derivation.
+        Together with <span class="inlinecode"><span class="id" title="var">paper_yes_no_yes_computed_bundle</span></span>, this shows that the
+        common pool <span class="inlinecode"><span class="id" title="var">T2</span></span> can be completed by either branch. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">paper_yes_no_no_computed_bundle</span> : <span class="id" title="var">bundle_type</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">computed_bundle_of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bundle_derivation_of_reachableT_with_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_protocol</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_no_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">paper_yes_no_no_poolT</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_no_full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_no_full_trace_extends</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+It is possible to display the concrete yes-or-no bundles by running:
+
+<div class="paragraph"> </div>
+
+<pre>
+Compute paper_yes_no_yes_computed_bundle.
+Compute paper_yes_no_no_computed_bundle.
+</pre>
+     
+<div class="paragraph"> </div>
+
+ The computed yes bundle satisfies the same representation property as
+        the abstract soundness theorem. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">paper_yes_no_yes_computed_bundle_sound</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">paper_yes_no_yes_computed_bundle</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">paper_yes_no_yes_computed_bundle</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_yes_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_yes_full_trace</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The computed no bundle satisfies the same representation property as
+        the abstract soundness theorem. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">paper_yes_no_no_computed_bundle_sound</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">paper_yes_no_no_computed_bundle</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">paper_yes_no_no_computed_bundle</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_no_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">yes_no_no_full_trace</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Local Close</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">paper_yes_no_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <span class="id" title="var">YesOrNoProtocol</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab12"></a><h2 class="section">Paper Section 7.3: Concurrent Yahalom worked example</h2>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <span class="id" title="var">ConcurrentYahalom</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Symbolic variables for the Concurrent Yahalom roles in the worked
+        example.  They match the paper's role listing: principals <span class="inlinecode"><span class="id" title="var">a</span></span>, <span class="inlinecode"><span class="id" title="var">b</span></span>,
+        and <span class="inlinecode"><span class="id" title="var">s</span></span>, nonces <span class="inlinecode"><span class="id" title="var">n</span>-<span class="id" title="var">a</span></span> and <span class="inlinecode"><span class="id" title="var">n</span>-<span class="id" title="var">b</span></span>, and the session key <span class="inlinecode"><span class="id" title="var">k</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">a</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "a".<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">b</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "b".<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">s</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "s".<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">na</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "n-a".<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">nb</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "n-b".<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Let</span> <span class="id" title="var">k</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Skey</span> := <span class="id" title="var">mkTVar</span> "k".<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'A'" := (<span class="id" title="var">MkName</span> 0)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'B'" := (<span class="id" title="var">MkName</span> 1)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'S'" := (<span class="id" title="var">MkName</span> 2)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'Na'" := (<span class="id" title="var">MkText</span> 0)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'Nb'" := (<span class="id" title="var">MkText</span> 1)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'K0'" := (<span class="id" title="var">skey</span> 0)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'M0'" := (<span class="id" title="var">M_Skey</span> (<span class="id" title="var">skey</span> 0))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'Ltk' a b" :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">M_Skey</span> (<span class="id" title="var">EmbeddedTraceStrands.TermNat.ltk</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 31,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">a</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">b</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'tag1'" := (<span class="id" title="var">MkTag</span> 0)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;'tag2'" := (<span class="id" title="var">MkTag</span> 1)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Local Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Initiator role from the worked Yahalom example.  The two tags keep the
+        peer confirmations distinct. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">concurrent_yahalom_init_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "init"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">s</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">na</span>; <span class="id" title="var">nb</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">k</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">na</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">k</span>; <span class="id" title="var">na</span>; <span class="id" title="var">nb</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">a</span> <span class="id" title="var">s</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">tag1</span>; <span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">na</span>; <span class="id" title="var">nb</span>}<span class="id" title="var">_k</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">tag2</span>; <span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">na</span>; <span class="id" title="var">nb</span>}<span class="id" title="var">_k</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Responder role, symmetric to the initiator after the first request. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">concurrent_yahalom_resp_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "resp"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">s</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">na</span>; <span class="id" title="var">nb</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">k</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">nb</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">k</span>; <span class="id" title="var">na</span>; <span class="id" title="var">nb</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">b</span> <span class="id" title="var">s</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">tag2</span>; <span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">na</span>; <span class="id" title="var">nb</span>}<span class="id" title="var">_k</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">tag1</span>; <span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">na</span>; <span class="id" title="var">nb</span>}<span class="id" title="var">_k</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Server role.  The server receives both requests, sends both tickets,
+        and uniquely originates the session key <span class="inlinecode"><span class="id" title="var">k</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">concurrent_yahalom_serv_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "serv"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">s</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">na</span>; <span class="id" title="var">nb</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">k</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">na</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">nb</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">k</span>; <span class="id" title="var">na</span>; <span class="id" title="var">nb</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">a</span> <span class="id" title="var">s</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">a</span>; <span class="id" title="var">b</span>; <span class="id" title="var">k</span>; <span class="id" title="var">na</span>; <span class="id" title="var">nb</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">b</span> <span class="id" title="var">s</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span>{<span class="id" title="var">k</span>}.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The Concurrent Yahalom protocol used in the worked example. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">concurrent_yahalom_protocol</span> : <span class="id" title="var">protocol</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">mkProtocol</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_init_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_resp_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_serv_role</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_concurrent_yahalom_protocol_well_formed</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">concurrent_yahalom_protocol</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Ground atoms for the worked run.  With
+        <span class="inlinecode"><span class="id" title="var">paper_yahalom_scope</span></span> open, the run can use the paper names
+        <span class="inlinecode"><span class="id" title="var">A</span></span>, <span class="inlinecode"><span class="id" title="var">B</span></span>, <span class="inlinecode"><span class="id" title="var">S</span></span>, <span class="inlinecode"><span class="id" title="var">Na</span></span>, <span class="inlinecode"><span class="id" title="var">Nb</span></span>, <span class="inlinecode"><span class="id" title="var">K0</span></span>, <span class="inlinecode"><span class="id" title="var">tag1</span></span>, and <span class="inlinecode"><span class="id" title="var">tag2</span></span>. 
+<div class="paragraph"> </div>
+
+ The valuation instantiating the three symbolic Yahalom roles with the
+        concrete run shown in the paper. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">concurrent_yahalom_valuation</span> : <span class="id" title="var">valuation</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">eta</span> {{ <span class="id" title="var">a</span> := <span class="id" title="var">A</span> }}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ <span class="id" title="var">b</span> := <span class="id" title="var">B</span> }}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ <span class="id" title="var">s</span> := <span class="id" title="var">S</span> }}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ <span class="id" title="var">na</span> := <span class="id" title="var">Na</span> }}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ <span class="id" title="var">nb</span> := <span class="id" title="var">Nb</span> }}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ <span class="id" title="var">k</span> := <span class="id" title="var">K0</span> }}.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Ground requests, tickets, and confirmations for the worked execution. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_req_a</span> : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span> ⋅ <span class="id" title="var">B</span> ⋅ <span class="id" title="var">Na</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_req_b</span> : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">A</span> ⋅ <span class="id" title="var">B</span> ⋅ <span class="id" title="var">Nb</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_tic_a</span> : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">B</span> ⋅ <span class="id" title="var">M0</span> ⋅ <span class="id" title="var">Na</span> ⋅ <span class="id" title="var">Nb</span> ⟩<span class="id" title="var">_</span> <span class="id" title="var">Ltk</span> <span class="id" title="var">A</span> <span class="id" title="var">S</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_tic_b</span> : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">B</span> ⋅ <span class="id" title="var">M0</span> ⋅ <span class="id" title="var">Na</span> ⋅ <span class="id" title="var">Nb</span> ⟩<span class="id" title="var">_</span> <span class="id" title="var">Ltk</span> <span class="id" title="var">B</span> <span class="id" title="var">S</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_conf_a</span> : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟨ <span class="id" title="var">tag1</span> ⋅ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">B</span> ⋅ <span class="id" title="var">Na</span> ⋅ <span class="id" title="var">Nb</span> ⟩<span class="id" title="var">_</span> <span class="id" title="var">M0</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_conf_b</span> : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟨ <span class="id" title="var">tag2</span> ⋅ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">B</span> ⋅ <span class="id" title="var">Na</span> ⋅ <span class="id" title="var">Nb</span> ⟩<span class="id" title="var">_</span> <span class="id" title="var">M0</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Final thread traces for the initiator, responder, and server strands
+        in the worked example. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_init_trace</span> : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊕ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_conf_a</span>; ⊖ <span class="id" title="var">cy_conf_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_resp_trace</span> : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊕ <span class="id" title="var">cy_req_b</span>; ⊖ <span class="id" title="var">cy_tic_b</span>; ⊕ <span class="id" title="var">cy_conf_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_serv_trace</span> : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_tic_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">concurrent_yahalom_pool</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cy_init_trace</span>] ⋈ <span class="id" title="var">cy_resp_trace</span> ⋈ [<span class="id" title="var">cy_serv_trace</span>].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Intermediate pools from the operational history.  The final pool
+        <span class="inlinecode"><span class="id" title="var">concurrent_yahalom_pool</span></span> is <span class="inlinecode"><span class="id" title="var">T11</span></span> in the paper. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T1</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T2</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>]] ⋈ [⊕ <span class="id" title="var">cy_req_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T3</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>]] ⋈ [⊕ <span class="id" title="var">cy_req_b</span>] ⋈ [[⊖ <span class="id" title="var">cy_req_a</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T4</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>]] ⋈ [⊕ <span class="id" title="var">cy_req_b</span>] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T5</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>]] ⋈ [⊕ <span class="id" title="var">cy_req_b</span>] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T6</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>]] ⋈ [⊕ <span class="id" title="var">cy_req_b</span>] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_tic_b</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T7</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_tic_a</span>]] ⋈ [⊕ <span class="id" title="var">cy_req_b</span>] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_tic_b</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T8</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_conf_a</span>]] ⋈ [⊕ <span class="id" title="var">cy_req_b</span>] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_tic_b</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T9</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_conf_a</span>]] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊕ <span class="id" title="var">cy_req_b</span>; ⊖ <span class="id" title="var">cy_tic_b</span>] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_tic_b</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_T10</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊕ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_conf_a</span>]] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊕ <span class="id" title="var">cy_req_b</span>; ⊖ <span class="id" title="var">cy_tic_b</span>; ⊕ <span class="id" title="var">cy_conf_b</span>] ⋈<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_tic_b</span>]].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">cy_prefix</span> <span class="id" title="var">role</span> <span class="id" title="var">suffix</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">role</span>, <span class="id" title="var">concurrent_yahalom_valuation</span>, <span class="id" title="var">suffix</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">split</span>; [<span class="id" title="tactic">simpl</span>; <span class="id" title="tactic">auto</span> | <span class="id" title="keyword">vm_compute</span>; <span class="id" title="tactic">reflexivity</span>].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Prefix witnesses used by the operational rules in the Yahalom
+        schedule. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_init_send</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷ [⊕ <span class="id" title="var">cy_req_a</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_resp_send</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷ [⊕ <span class="id" title="var">cy_req_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_serv_recv_a</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷ [⊖ <span class="id" title="var">cy_req_a</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_serv_recv_b</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷ [⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_serv_send_a</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_serv_send_b</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊖ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_req_b</span>; ⊕ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_tic_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_init_recv_ticket</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷ [⊕ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_tic_a</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_init_send_conf</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊕ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_conf_a</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_resp_recv_ticket</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷ [⊕ <span class="id" title="var">cy_req_b</span>; ⊖ <span class="id" title="var">cy_tic_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_resp_send_conf</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊕ <span class="id" title="var">cy_req_b</span>; ⊖ <span class="id" title="var">cy_tic_b</span>; ⊕ <span class="id" title="var">cy_conf_b</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_cy_prefix_init_recv_conf</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ▷<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊕ <span class="id" title="var">cy_req_a</span>; ⊖ <span class="id" title="var">cy_tic_a</span>; ⊕ <span class="id" title="var">cy_conf_a</span>; ⊖ <span class="id" title="var">cy_conf_b</span>].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The following reachability lemmas formalize the linear schedule in the
+        worked example.  This is one schedule compatible with the Yahalom
+        bundle; independent events could be swapped, but this order matches
+        the displayed sequence <span class="inlinecode"><span class="id" title="var">T0</span></span>, ..., <span class="inlinecode"><span class="id" title="var">T11</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T1_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T1</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T2_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T2</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T3_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T3</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T4_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T4</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T5_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T5</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T6_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T6</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T7_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T7</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T8_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T8</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T9_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T9</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">paper_concurrent_yahalom_T10_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">cy_T10</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Final Prop-level reachability theorem for the worked Yahalom pool
+        <span class="inlinecode"><span class="id" title="var">T11</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_concurrent_yahalom_pool_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span> ⊨ <span class="id" title="var">concurrent_yahalom_pool</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Soundness instance for the worked example: the reachable pool produces
+        an inductive bundle that represents the three executed thread traces. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_concurrent_yahalom_soundness_witness</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">G</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">concurrent_yahalom_pool</span> <span class="id" title="var">full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">concurrent_yahalom_pool</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Prop-to-Type bridge for the same execution.  This establishes that a
+        witness-carrying reachability derivation exists. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">paper_concurrent_yahalom_computable_witness</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inhabited</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">concurrent_yahalom_protocol</span> <span class="id" title="var">concurrent_yahalom_pool</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Full trace assignment used by the computed bundle: thread <span class="inlinecode">0</span> is the
+        initiator, thread <span class="inlinecode">1</span> the responder, and thread <span class="inlinecode">2</span> the server. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">concurrent_yahalom_full_trace</span> (<span class="id" title="var">i</span> : <span class="id" title="var">nat</span>) : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">i</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ <span class="id" title="var">cy_init_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1 ⇒ <span class="id" title="var">cy_resp_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 2 ⇒ <span class="id" title="var">cy_serv_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">concurrent_yahalom_full_trace_extends</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_full_trace</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Executable reachability witness for the worked schedule.  Each receive
+        rule records the indexed send occurrence that becomes a communication
+        edge in <span class="inlinecode"><span class="id" title="var">paper_concurrent_yahalom_computed_bundle</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">paper_concurrent_yahalom_poolT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">concurrent_yahalom_protocol</span> <span class="id" title="var">concurrent_yahalom_pool</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Bundle computed from the executable Concurrent Yahalom reachability
+        witness.  This is the concrete bundle used for the worked example in
+        Section 7.3: the thread pool supplies the strands, and the indexed
+        receives in <span class="inlinecode"><span class="id" title="var">paper_concurrent_yahalom_poolT</span></span> supply the communication
+        edges. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">paper_concurrent_yahalom_computed_bundle</span> : <span class="id" title="var">bundle_type</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">computed_bundle_of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bundle_derivation_of_reachableT_with_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_protocol</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">paper_concurrent_yahalom_poolT</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_full_trace_extends</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+It is possible to display the concrete Yahalom bundle by running:
+
+<div class="paragraph"> </div>
+
+<pre>
+    Compute paper_concurrent_yahalom_computed_bundle.
+</pre>
+
+<div class="paragraph"> </div>
+
+ Named strands used to state the Section 7.3 edge set in the same
+        initiator/responder/server terminology as the paper. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_init_strand</span> : <span class="id" title="var">Σ</span> := (0, <span class="id" title="var">cy_init_trace</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_resp_strand</span> : <span class="id" title="var">Σ</span> := (1, <span class="id" title="var">cy_resp_trace</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cy_serv_strand</span> : <span class="id" title="var">Σ</span> := (2, <span class="id" title="var">cy_serv_trace</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Section 7.3 communication edges computed from the executable
+        reachability witness.  They are listed in reverse construction order,
+        because each new receive edge is consed onto the bundle edge list. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">paper_concurrent_yahalom_computed_bundle_inter_edges</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> <span class="id" title="var">paper_concurrent_yahalom_computed_bundle</span> = [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id" title="var">cy_resp_strand</span>, 2), (<span class="id" title="var">cy_init_strand</span>, 3));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id" title="var">cy_serv_strand</span>, 3), (<span class="id" title="var">cy_resp_strand</span>, 1));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id" title="var">cy_serv_strand</span>, 2), (<span class="id" title="var">cy_init_strand</span>, 1));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id" title="var">cy_resp_strand</span>, 0), (<span class="id" title="var">cy_serv_strand</span>, 1));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id" title="var">cy_init_strand</span>, 0), (<span class="id" title="var">cy_serv_strand</span>, 0))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The computed Yahalom bundle satisfies the canonical representation
+        property promised by the bundle soundness theorem. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">paper_concurrent_yahalom_computed_bundle_sound</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">paper_concurrent_yahalom_computed_bundle</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">paper_concurrent_yahalom_computed_bundle</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">concurrent_yahalom_full_trace</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The definitions above are the documentable endpoints for the worked
+        example: <span class="inlinecode"><span class="id" title="var">paper_concurrent_yahalom_computed_bundle</span></span> is the ground
+        bundle, <span class="inlinecode"><span class="id" title="var">paper_concurrent_yahalom_computed_bundle_inter_edges</span></span> records
+        its communication edges, and
+        <span class="inlinecode"><span class="id" title="var">paper_concurrent_yahalom_computed_bundle_sound</span></span> checks that the
+        computed object represents the final pool <span class="inlinecode"><span class="id" title="var">T11</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Local Close</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">paper_yahalom_scope</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <span class="id" title="var">ConcurrentYahalom</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">PaperExamples</span>.<br/>
+</div>
+</main>
+</body>
+</html>

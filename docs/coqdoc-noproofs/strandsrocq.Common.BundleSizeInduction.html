@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.Common.BundleSizeInduction</h1>
+
+<div class="code">
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Lists.List</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Lists.ListSet</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Arith.PeanoNat</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Sorting.Permutation</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Lia</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Relations.Relations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Strands</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Bundles</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">RelMinimal</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">BundleInductive</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Lists.List.ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="keyword">Type</span> <span class="id" title="var">BundleSizeInductionSig</span><br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">T</span> : <span class="id" title="var">TermSig</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">St</span> : <span class="id" title="var">StrandSig</span> <span class="id" title="var">T</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">SSp</span> : <span class="id" title="var">StrandSpaceSig</span> <span class="id" title="var">T</span> <span class="id" title="var">St</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">B</span> : <span class="id" title="var">BundleSig</span> <span class="id" title="var">T</span> <span class="id" title="var">St</span> <span class="id" title="var">SSp</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">BI</span> : <span class="id" title="var">BundleInductiveSig</span> <span class="id" title="var">T</span> <span class="id" title="var">St</span> <span class="id" title="var">SSp</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">bundle_size</span> (<span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span>) : <span class="id" title="var">nat</span> := <span class="id" title="var">length</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">bundle_size_induction</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">P</span> : <span class="id" title="var">bundle_type</span> → <span class="id" title="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">n</span>, <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">C</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">C</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">bundle_size</span> <span class="id" title="var">C</span> &lt; <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> <span class="id" title="var">C</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">bundle_size</span> <span class="id" title="var">B</span> ≤ <span class="id" title="var">n</span> → <span class="id" title="var">P</span> <span class="id" title="var">B</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">B</span>, <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">bundle_size</span> <span class="id" title="var">B</span> ≤ <span class="id" title="var">n</span> → <span class="id" title="var">P</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">bundle_size_induction_cor1</span>: <span class="id" title="keyword">∀</span> (<span class="id" title="var">P</span> : <span class="id" title="var">bundle_type</span> → <span class="id" title="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">n</span>, <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">C</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">C</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">bundle_size</span> <span class="id" title="var">C</span> &lt; <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> <span class="id" title="var">C</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">bundle_size</span> <span class="id" title="var">B</span> ≤ <span class="id" title="var">n</span> → <span class="id" title="var">P</span> <span class="id" title="var">B</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>, <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">P</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">bundle_size_induction_cor</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">P</span> : <span class="id" title="var">bundle_type</span> → <span class="id" title="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>, <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">C</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">C</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">bundle_size</span> <span class="id" title="var">C</span> &lt; <span class="id" title="var">bundle_size</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> <span class="id" title="var">C</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> <span class="id" title="var">B</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>, <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">P</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">dedup_bundle</span> (<span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span>) : <span class="id" title="var">bundle_type</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">nodup</span> <span class="id" title="var">eq_node__t_dec</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> := <span class="id" title="var">nodup</span> <span class="id" title="var">eq_edge__t_dec</span> (<span class="id" title="var">intra</span> <span class="id" title="var">B</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> := <span class="id" title="var">nodup</span> <span class="id" title="var">eq_edge__t_dec</span> (<span class="id" title="var">inter</span> <span class="id" title="var">B</span>) |}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">is_bundle_dedup</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">is_bundle</span> (<span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">dedup_ordering</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">edges</span> <span class="id" title="var">B</span> ⊢ <span class="id" title="var">m</span> ⪯ <span class="id" title="var">n</span> ↔ <span class="id" title="var">edges</span> (<span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span>) ⊢ <span class="id" title="var">m</span> ⪯ <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">dedup_nodes</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) ↔ <span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> (<span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span>)).<br/>
+ 
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">dedup_sink</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">sink</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">sink</span> <span class="id" title="var">m</span> (<span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">remove_node</span> (<span class="id" title="var">m</span> : <span class="id" title="var">node__t</span>) (<span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">B'</span> := <span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span> <span class="id" title="tactic">in</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">set_remove</span> <span class="id" title="var">eq_node__t_dec</span> <span class="id" title="var">m</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B'</span>); <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> := <span class="id" title="var">remove_edges_to</span> <span class="id" title="var">m</span> (<span class="id" title="var">intra</span> <span class="id" title="var">B'</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> := <span class="id" title="var">remove_edges_to</span> <span class="id" title="var">m</span> (<span class="id" title="var">inter</span> <span class="id" title="var">B'</span>) |}.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">remove_sink_bundle</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> →      <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">sink</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> (<span class="id" title="var">remove_node</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">length_nodup</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">B</span>) (<span class="id" title="var">eq_dec</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span>, {<span class="id" title="var">x</span>=<span class="id" title="var">y</span>}+{<span class="id" title="var">x</span>≠<span class="id" title="var">y</span>}),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>) ≤ <span class="id" title="var">length</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">dedup_le</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">bundle_size</span> (<span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span>) ≤ <span class="id" title="var">bundle_size</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">NoDup_dedup</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> (<span class="id" title="var">nodes</span> (<span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">remove_sink_smaller</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">sink</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">bundle_size</span> (<span class="id" title="var">remove_node</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span>) &lt; <span class="id" title="var">bundle_size</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">remove_sink_dedup_smaller</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">sink</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">bundle_size</span> (<span class="id" title="var">remove_node</span> <span class="id" title="var">m</span> (<span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span>)) &lt; <span class="id" title="var">bundle_size</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">bundle_sink_induction</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">P</span> : <span class="id" title="var">bundle_type</span> → <span class="id" title="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">m</span>, <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">sink</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> (<span class="id" title="var">remove_node</span> <span class="id" title="var">m</span> (<span class="id" title="var">dedup_bundle</span> <span class="id" title="var">B</span>))) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> <span class="id" title="var">B</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>, <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">P</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">bundle_sink_induction_alt</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">P</span> : <span class="id" title="var">bundle_type</span> → <span class="id" title="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">m</span>, <span class="id" title="var">NoDup</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) → <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">sink</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> (<span class="id" title="var">remove_node</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span>)) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> <span class="id" title="var">B</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>, <span class="id" title="var">NoDup</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) → <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> → <span class="id" title="var">P</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">BundleSizeInductionSig</span>.<br/>
+
+<br/>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.ComputableSemantics</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">List</span> <span class="id" title="var">Lia</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">RoleSyntax</span> <span class="id" title="var">ChoiceRoles</span> <span class="id" title="var">Semantics</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">ProtocolExamples</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">DefaultInstances</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Direct_Syntax</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ChoiceRoles</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Semantics</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab2"></a><h1 class="section">Computable CPSA semantics</h1>
+
+
+<div class="paragraph"> </div>
+
+This module refines the Prop-level operational semantics from
+<span class="inlinecode"><span class="id" title="var">CPSA_Semantics</span></span> into a Type-level presentation.  The extra computational
+content records enough information to recover a concrete bundle from a
+reachability derivation.
+
+<div class="paragraph"> </div>
+
+The main additions are indexed pool occurrences, written <span class="inlinecode"><span class="id" title="var">T</span></span> <span class="inlinecode">↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>]</span> <span class="inlinecode"><span class="id" title="var">e</span></span>, and a
+bundle-producing reachability judgment, written <span class="inlinecode"><span class="id" title="var">P</span></span> <span class="inlinecode">⊨ᵀ[<span class="id" title="var">st</span>]</span> <span class="inlinecode"><span class="id" title="var">T</span>,</span> <span class="inlinecode"><span class="id" title="var">B</span></span>.
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Module</span> <span class="id" title="var">CPSA_Computable_Semantics</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab3"></a><h2 class="section">Indexed pool occurrences</h2>
+
+
+<div class="paragraph"> </div>
+
+  <span class="inlinecode"><span class="id" title="var">event_at</span></span> <span class="inlinecode"><span class="id" title="var">T</span></span> <span class="inlinecode"><span class="id" title="var">i</span></span> <span class="inlinecode"><span class="id" title="var">j</span></span> <span class="inlinecode"><span class="id" title="var">e</span></span> records that event <span class="inlinecode"><span class="id" title="var">e</span></span> occurs at thread <span class="inlinecode"><span class="id" title="var">i</span></span> and position
+  <span class="inlinecode"><span class="id" title="var">j</span></span> in the pool <span class="inlinecode"><span class="id" title="var">T</span></span>.  Receive steps use this indexed witness so that the
+  generated bundle can point to the exact positive node that justifies the
+  receive.
+  
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <span class="id" title="var">event_at</span> (<span class="id" title="var">T</span> : <span class="id" title="var">thread_pool</span>) : <span class="id" title="var">nat</span> → <span class="id" title="var">nat</span> → <span class="id" title="var">sT</span> → <span class="id" title="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" title="var">EventAt</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">th</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">th</span> <span class="id" title="var">j</span> = <span class="id" title="var">Some</span> <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">event_at</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">e</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;T '↓[' i ',' j ']' e" := (<span class="id" title="var">event_at</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">e</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;T '↓[' i ',' j ']' '⊕' m" := (<span class="id" title="var">event_at</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> (⊕<span class="id" title="var">m</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Indexed occurrence is the computable refinement of ordinary occurrence. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">event_at_occurred</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> ↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>] <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> ↓ <span class="id" title="var">e</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Ordinary occurrence contains an indexed witness, but only
+      propositionally: this is enough for bridge theorems, not for computation. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">event_at_inhabited_of_occurred</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> ↓ <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inhabited</span> { <span class="id" title="var">i</span> : <span class="id" title="var">nat</span> &amp; { <span class="id" title="var">j</span> : <span class="id" title="var">nat</span> &amp; <span class="id" title="var">T</span> ↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>] <span class="id" title="var">e</span> } }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab4"></a><h2 class="section">Type-level pool reachability</h2>
+
+
+<div class="paragraph"> </div>
+
+  <span class="inlinecode"><span class="id" title="var">pool_reachable_fromT</span></span> mirrors <span class="inlinecode"><span class="id" title="var">pool_reachable_from</span></span>, but lives in <span class="inlinecode"><span class="id" title="keyword">Type</span></span>.
+  The receive rules carry indexed positive-event witnesses instead of merely
+  knowing that some positive event occurred somewhere in the pool.
+  
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <span class="id" title="var">pool_reachable_fromT</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">P</span> : <span class="id" title="var">protocol</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T0</span> : <span class="id" title="var">thread_pool</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">thread_pool</span> → <span class="id" title="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolBaseT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T0</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnSendT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ [⊕<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T</span> ⋈ [⊕<span class="id" title="var">m</span>])<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolExtendSendT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ <span class="id" title="var">tr</span> ++ [⊕<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T1</span> ⋈ (<span class="id" title="var">tr</span> ++ [⊕<span class="id" title="var">m</span>]) ⋈ <span class="id" title="var">T2</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnRecvT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> ↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>] ⊕<span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ [⊖<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T</span> ⋈ [⊖<span class="id" title="var">m</span>])<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolExtendRecvT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span> ↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>] ⊕<span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ <span class="id" title="var">tr</span> ++ [⊖<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T1</span> ⋈ (<span class="id" title="var">tr</span> ++ [⊖<span class="id" title="var">m</span>]) ⋈ <span class="id" title="var">T2</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">reachable_poolT</span> <span class="id" title="var">P</span> := <span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> [].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Type-level reachability composes just like the Prop-level semantics. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">pool_reachable_fromT_trans</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T1</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T2</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Prop-level reachability can be lifted to an inhabited Type-level
+      derivation.  The result is intentionally <span class="inlinecode"><span class="id" title="var">inhabited</span></span>, because the
+      Prop-level proof does not expose computational content. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">pool_reachable_fromT_inhabited_of_prop</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inhabited</span> (<span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">reachable_poolT_inhabited_of_prop</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inhabited</span> (<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Forget the computational witnesses and recover the Prop semantics. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">erase_pool_reachable_fromT</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">d</span> : <span class="id" title="var">pool_reachable_fromT</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">d</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolBaseT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolBase</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnSendT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">T</span> <span class="id" title="var">m</span> <span class="id" title="var">d'</span> <span class="id" title="var">Hprefix</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolSpawnSend</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span> <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">erase_pool_reachable_fromT</span> <span class="id" title="var">d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hprefix</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolExtendSendT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">m</span> <span class="id" title="var">d'</span> <span class="id" title="var">Hprefix</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolExtendSend</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">erase_pool_reachable_fromT</span> <span class="id" title="var">d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hprefix</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnRecvT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span> <span class="id" title="var">d'</span> <span class="id" title="var">Hocc</span> <span class="id" title="var">Hprefix</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolSpawnRecv</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span> <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">erase_pool_reachable_fromT</span> <span class="id" title="var">d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">event_at_occurred</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> (⊕<span class="id" title="var">m</span>) <span class="id" title="var">Hocc</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hprefix</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolExtendRecvT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span> <span class="id" title="var">d'</span> <span class="id" title="var">Hocc</span> <span class="id" title="var">Hprefix</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolExtendRecv</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">erase_pool_reachable_fromT</span> <span class="id" title="var">d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">event_at_occurred</span> (<span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span>) <span class="id" title="var">i</span> <span class="id" title="var">j</span> (⊕<span class="id" title="var">m</span>) <span class="id" title="var">Hocc</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hprefix</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Reserved Notation</span> &quot;P '⊨ᵀ[' st ']' T ',' B" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab5"></a><h2 class="section">Bundle-producing reachability</h2>
+
+
+<div class="paragraph"> </div>
+
+  <span class="inlinecode"><span class="id" title="var">reachable_pool_bundleT</span></span> <span class="inlinecode"><span class="id" title="var">P</span></span> <span class="inlinecode"><span class="id" title="var">st</span></span> <span class="inlinecode"><span class="id" title="var">T</span></span> <span class="inlinecode"><span class="id" title="var">B</span></span> builds the final thread pool <span class="inlinecode"><span class="id" title="var">T</span></span> and the
+  bundle <span class="inlinecode"><span class="id" title="var">B</span></span> in lockstep.  The map <span class="inlinecode"><span class="id" title="var">st</span></span> assigns a strand identifier to each
+  thread index; in the canonical case it is instantiated with the thread's full
+  trace.
+
+<div class="paragraph"> </div>
+
+  Send steps add nodes and intrastrand edges.  Receive steps additionally add
+  an interstrand edge from the indexed positive witness <span class="inlinecode"><span class="id" title="var">T</span></span> <span class="inlinecode">↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>]</span> <span class="inlinecode">⊕<span class="id" title="var">m</span></span> to the
+  newly added negative node.
+  
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <span class="id" title="var">reachable_pool_bundleT</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">P</span> : <span class="id" title="var">protocol</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">st</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">Σ</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">thread_pool</span> → <span class="id" title="var">bundle_type</span> → <span class="id" title="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolBaseBundleT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] [] , {| <span class="id" title="var">nodes</span> := []; <span class="id" title="var">intra</span> := []; <span class="id" title="var">inter</span> := [] |}<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnSendBundleT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] <span class="id" title="var">T</span>, <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ [⊕<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">n</span> := (<span class="id" title="var">st</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>), 0) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] <span class="id" title="var">T</span> ⋈ [⊕<span class="id" title="var">m</span>],<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">n</span> :: <span class="id" title="var">nodes</span> <span class="id" title="var">B</span>; <span class="id" title="var">intra</span> := <span class="id" title="var">intra</span> <span class="id" title="var">B</span>; <span class="id" title="var">inter</span> := <span class="id" title="var">inter</span> <span class="id" title="var">B</span> |}<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolExtendSendBundleT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] <span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span>, <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ <span class="id" title="var">tr</span> ++ [⊕<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">n'</span> := (<span class="id" title="var">st</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>), <span class="id" title="var">length</span> <span class="id" title="var">tr</span>) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">n</span> := (<span class="id" title="var">st</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>), <span class="id" title="var">length</span> <span class="id" title="var">tr</span> - 1) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] <span class="id" title="var">T1</span> ⋈ (<span class="id" title="var">tr</span> ++ [⊕<span class="id" title="var">m</span>]) ⋈ <span class="id" title="var">T2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">n'</span> :: <span class="id" title="var">nodes</span> <span class="id" title="var">B</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">tr</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [] ⇒ <span class="id" title="var">intra</span> <span class="id" title="var">B</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ (<span class="id" title="var">n</span>, <span class="id" title="var">n'</span>) :: <span class="id" title="var">intra</span> <span class="id" title="var">B</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> := <span class="id" title="var">inter</span> <span class="id" title="var">B</span> |}<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnRecvBundleT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] <span class="id" title="var">T</span>, <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> ↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>] ⊕<span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ [⊖<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">src</span> := (<span class="id" title="var">st</span> <span class="id" title="var">i</span>, <span class="id" title="var">j</span>) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">dst</span> := (<span class="id" title="var">st</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>), 0) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] <span class="id" title="var">T</span> ⋈ [⊖<span class="id" title="var">m</span>],<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">dst</span> :: <span class="id" title="var">nodes</span> <span class="id" title="var">B</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> := <span class="id" title="var">intra</span> <span class="id" title="var">B</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> := (<span class="id" title="var">src</span>, <span class="id" title="var">dst</span>) :: <span class="id" title="var">inter</span> <span class="id" title="var">B</span> |}<br/>
+&nbsp;&nbsp;| <span class="id" title="var">PoolExtendRecvBundleT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">B</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] <span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span>, <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span> ↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>] ⊕<span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ <span class="id" title="var">tr</span> ++ [⊖<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">src</span> := (<span class="id" title="var">st</span> <span class="id" title="var">i</span>, <span class="id" title="var">j</span>) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">pred</span> := (<span class="id" title="var">st</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>), <span class="id" title="var">length</span> <span class="id" title="var">tr</span> - 1) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">dst</span> := (<span class="id" title="var">st</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>), <span class="id" title="var">length</span> <span class="id" title="var">tr</span>) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᵀ[<span class="id" title="var">st</span>] <span class="id" title="var">T1</span> ⋈ (<span class="id" title="var">tr</span> ++ [⊖<span class="id" title="var">m</span>]) ⋈ <span class="id" title="var">T2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">dst</span> :: <span class="id" title="var">nodes</span> <span class="id" title="var">B</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">tr</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [] ⇒ <span class="id" title="var">intra</span> <span class="id" title="var">B</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ (<span class="id" title="var">pred</span>, <span class="id" title="var">dst</span>) :: <span class="id" title="var">intra</span> <span class="id" title="var">B</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> := (<span class="id" title="var">src</span>, <span class="id" title="var">dst</span>) :: <span class="id" title="var">inter</span> <span class="id" title="var">B</span> |}<br/>
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">where</span> &quot;P '⊨ᵀ[' st ']' T ',' B" :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">reachable_pool_bundleT</span> <span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span>) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+A bundle derivation contains a plain pool derivation by erasure. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">erase_reachable_pool_bundleT</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">d</span> : <span class="id" title="var">reachable_pool_bundleT</span> <span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">reachable_poolT</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">d</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolBaseBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolBaseT</span> <span class="id" title="var">P</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnSendBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span> <span class="id" title="var">d'</span> <span class="id" title="var">Hprefix</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolSpawnSendT</span> <span class="id" title="var">P</span> [] <span class="id" title="var">T</span> <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">erase_reachable_pool_bundleT</span> <span class="id" title="var">d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hprefix</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolExtendSendBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span> <span class="id" title="var">d'</span> <span class="id" title="var">Hprefix</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolExtendSendT</span> <span class="id" title="var">P</span> [] <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">erase_reachable_pool_bundleT</span> <span class="id" title="var">d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hprefix</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnRecvBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span> <span class="id" title="var">d'</span> <span class="id" title="var">Hocc</span> <span class="id" title="var">Hprefix</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolSpawnRecvT</span> <span class="id" title="var">P</span> [] <span class="id" title="var">T</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">erase_reachable_pool_bundleT</span> <span class="id" title="var">d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hocc</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hprefix</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolExtendRecvBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">B</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span> <span class="id" title="var">d'</span> <span class="id" title="var">Hocc</span> <span class="id" title="var">Hprefix</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">PoolExtendRecvT</span> <span class="id" title="var">P</span> [] <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">erase_reachable_pool_bundleT</span> <span class="id" title="var">d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hocc</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Hprefix</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">computed_bundle_of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">d</span> : { <span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span> &amp; <span class="id" title="var">reachable_pool_bundleT</span> <span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span> })<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">bundle_type</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">projT1</span> <span class="id" title="var">d</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">computed_reachability_of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">d</span> : { <span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span> &amp; <span class="id" title="var">reachable_pool_bundleT</span> <span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span> })<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">reachable_poolT</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">erase_reachable_pool_bundleT</span> (<span class="id" title="var">projT2</span> <span class="id" title="var">d</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab6"></a><h2 class="section">Communication edges</h2>
+
+
+<div class="paragraph"> </div>
+
+  <span class="inlinecode"><span class="id" title="var">receive_edges_of</span></span> extracts the interstrand edges introduced by the receive
+  rules of a bundle derivation.  It is useful as a small audit trail for the
+  indexed witnesses that generated the communication edges.
+  
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">receive_edges_of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">d</span> : <span class="id" title="var">reachable_pool_bundleT</span> <span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">edge_set__t</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">d</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolBaseBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnSendBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">d'</span> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">receive_edges_of</span> <span class="id" title="var">d'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolExtendSendBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">d'</span> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">receive_edges_of</span> <span class="id" title="var">d'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnRecvBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">T</span> <span class="id" title="var">_</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">_</span> <span class="id" title="var">d'</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id" title="var">st</span> <span class="id" title="var">i</span>, <span class="id" title="var">j</span>), (<span class="id" title="var">st</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>), 0)) :: <span class="id" title="var">receive_edges_of</span> <span class="id" title="var">d'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolExtendRecvBundleT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">_</span> <span class="id" title="var">d'</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id" title="var">st</span> <span class="id" title="var">i</span>, <span class="id" title="var">j</span>), (<span class="id" title="var">st</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>), <span class="id" title="var">length</span> <span class="id" title="var">tr</span>)) :: <span class="id" title="var">receive_edges_of</span> <span class="id" title="var">d'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The bundle's interstrand edges are exactly the receive-generated edges. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">reachable_pool_bundleT_inter_is_receive_edges</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span> (<span class="id" title="var">d</span> : <span class="id" title="var">reachable_pool_bundleT</span> <span class="id" title="var">P</span> <span class="id" title="var">st</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> <span class="id" title="var">B</span> = <span class="id" title="var">receive_edges_of</span> <span class="id" title="var">d</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab7"></a><h2 class="section">Bundle soundness and extraction</h2>
+
+
+<div class="paragraph"> </div>
+
+  Indexed pool occurrences become canonical bundle nodes with the same term.
+  This is the key receive-side lookup used in the soundness proof.
+  
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">event_at_source_canonical</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> ↓[<span class="id" title="var">i</span>,<span class="id" title="var">j</span>] <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> ((<span class="id" title="var">i</span>, <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span>), <span class="id" title="var">j</span>) (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term</span> ((<span class="id" title="var">i</span>, <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span>), <span class="id" title="var">j</span>) = <span class="id" title="var">e</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Soundness: a computable bundle derivation produces an inductive bundle
+      that canonically represents the final thread pool. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">reachable_pool_bundleT_canonical_sound</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span> <span class="id" title="var">B</span> <span class="id" title="var">full_trace</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_bundleT</span> <span class="id" title="var">P</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒ (<span class="id" title="var">i</span>, <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span>)) <span class="id" title="var">T</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">B</span> ∧ <span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">B</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Every Type-level reachable pool computes a bundle derivation, once a full
+      trace is chosen for each thread. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">bundle_derivation_of_reachableT_with_trace</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">full_trace</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span> &amp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_bundleT</span> <span class="id" title="var">P</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒ (<span class="id" title="var">i</span>, <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span>)) <span class="id" title="var">T</span> <span class="id" title="var">B</span> }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Type-level counterpart of <span class="inlinecode"><span class="id" title="var">bundle_of_reachable_with_trace</span></span>: the computed
+      bundle is an inductive bundle and canonically represents the pool. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">bundle_of_reachableT_with_trace</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">full_trace</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span> &amp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">B</span> ∧ <span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">B</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The computed bundle extracted from a Type-level derivation satisfies the
+      soundness invariant without exposing the dependent pair. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">reachable_poolT_computed_bundle_sound</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span> (<span class="id" title="var">d</span> : <span class="id" title="var">reachable_poolT</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>) <span class="id" title="var">full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Hext</span> : <span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">B</span> := <span class="id" title="var">computed_bundle_of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bundle_derivation_of_reachableT_with_trace</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span> <span class="id" title="var">d</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">Hext</span>) <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">B</span> ∧ <span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">B</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Prop-friendly completeness bridge: every compatible bundle represented by
+      the Prop-level completeness theorem gives an inhabited Type-level
+      reachability derivation.  This deliberately preserves the non-computing
+      nature of the bundle-to-pool direction. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">reachable_poolT_inhabited_of_bundle</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">P</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ofProtocol</span> <span class="id" title="var">G</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tau_non_originating</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inhabited</span> (<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <span class="id" title="var">Examples</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab8"></a><h2 class="section">Example</h2>
+
+
+<div class="paragraph"> </div>
+
+    The example constructs a Type-level derivation for <span class="inlinecode"><span class="id" title="var">example_protocol</span></span> and
+    computes the corresponding bundle through
+    <span class="inlinecode"><span class="id" title="var">bundle_derivation_of_reachableT_with_trace</span></span>.
+    The resulting bundle is definitionally equal to the hand-written bundle
+    from <span class="inlinecode"><span class="id" title="var">ProtocolExamples</span></span>.
+    
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">ProtocolExamples</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Name</span> : <span class="id" title="var">Name</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Text</span> : <span class="id" title="var">Text</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Akey</span> : <span class="id" title="var">Akey</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_thread_strand</span> (<span class="id" title="var">i</span> : <span class="id" title="var">nat</span>) : <span class="id" title="var">Σ</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">i</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ <span class="id" title="var">example_init_strand</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1 ⇒ <span class="id" title="var">example_resp_strand</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ (<span class="id" title="var">i</span>, [])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">reachable_pool_example_bundleT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span> &amp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_protocol</span> ⊨ᵀ[<span class="id" title="var">example_thread_strand</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_pool</span>, <span class="id" title="var">B</span> }.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">computed_example_bundle_is_expected</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">computed_bundle_of</span> <span class="id" title="var">reachable_pool_example_bundleT</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_bundle</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">computed_example_erases</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_protocol</span> ⊨ <span class="id" title="var">reachable_pool_example_pool</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">reachable_pool_exampleT</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_poolT</span> <span class="id" title="var">example_protocol</span> <span class="id" title="var">reachable_pool_example_pool</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">reachable_pool_example_computed_bundle</span> : <span class="id" title="var">bundle_type</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">computed_bundle_of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">bundle_derivation_of_reachableT_with_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_protocol</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_exampleT</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_full_trace_extends</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Running <span class="inlinecode"><span class="id" title="keyword">Compute</span></span> <span class="inlinecode"><span class="id" title="var">reachable_pool_example_computed_bundle</span></span> we obtain:
+
+<div class="paragraph"> </div>
+
+<pre>
+= {|
+    nodes :=
+      [(0, [⊕ A ⋅ $ t; ⊖ ⟨ A ⋅ $ t ⟩_ K B], 1);
+       (1, [⊖ A ⋅ $ t; ⊕ ⟨ A ⋅ $ t ⟩_ K B], 1);
+       (1, [⊖ A ⋅ $ t; ⊕ ⟨ A ⋅ $ t ⟩_ K B], 0);
+       (0, [⊕ A ⋅ $ t; ⊖ ⟨ A ⋅ $ t ⟩_ K B], 0)];
+
+    intra :=
+      [((0, [⊕ A ⋅ $ t; ⊖ ⟨ A ⋅ $ t ⟩_ K B], 0),
+        (0, [⊕ A ⋅ $ t; ⊖ ⟨ A ⋅ $ t ⟩_ K B], 1));
+       ((1, [⊖ A ⋅ $ t; ⊕ ⟨ A ⋅ $ t ⟩_ K B], 0),
+        (1, [⊖ A ⋅ $ t; ⊕ ⟨ A ⋅ $ t ⟩_ K B], 1))];
+
+    inter :=
+      [((1, [⊖ A ⋅ $ t; ⊕ ⟨ A ⋅ $ t ⟩_ K B], 1),
+        (0, [⊕ A ⋅ $ t; ⊖ ⟨ A ⋅ $ t ⟩_ K B], 1));
+       ((0, [⊕ A ⋅ $ t; ⊖ ⟨ A ⋅ $ t ⟩_ K B], 0),
+        (1, [⊖ A ⋅ $ t; ⊕ ⟨ A ⋅ $ t ⟩_ K B], 0))]
+  |}
+  : bundle_type
+</pre>
+    
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">reachable_pool_example_computed_bundle_is_expected</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_computed_bundle</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_bundle</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">reachable_pool_example_computed_bundle_sound</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">reachable_pool_example_computed_bundle</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_computed_bundle</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_full_trace</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <span class="id" title="var">Examples</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">CPSA_Computable_Semantics</span>.<br/>
+</div>
+</main>
+</body>
+</html>

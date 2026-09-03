@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.Instances.EmbeddedTraceStrands</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.Common</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">EmbeddedTraceStrandsFunctor</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.Common</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">UniverseNat</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">UTerms</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="var">TermNat</span> := <span class="id" title="var">UTerm</span> <span class="id" title="var">UniverseNat</span>.<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="keyword">Export</span> <span class="id" title="var">EmbeddedTraceInstance</span> := <span class="id" title="var">MakeEmbeddedTraceStrandSpace</span> <span class="id" title="var">TermNat</span>.<br/>
+</div>
+</main>
+</body>
+</html>

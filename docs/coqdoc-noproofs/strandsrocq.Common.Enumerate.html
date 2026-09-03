@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.Common.Enumerate</h1>
+
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Init.Datatypes</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Arith</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">ListSet</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Lists.List</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Lia</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Relations</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Relations.Relation_Operators</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">FunctionalExtensionality</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Logic.Decidable</span>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">RelMinimal</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">Nat</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Lists.List.ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="var">Enumerate</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <span class="id" title="var">Card</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <span class="id" title="var">eq_dec</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="var">A</span>, {<span class="id" title="var">x</span> = <span class="id" title="var">y</span>}+{<span class="id" title="var">x</span> ≠ <span class="id" title="var">y</span>}.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">injective_from</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span>, <span class="id" title="var">i</span> &lt; <span class="id" title="var">n</span> → <span class="id" title="var">j</span> &lt; <span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">f</span> <span class="id" title="var">j</span> → <span class="id" title="var">i</span>=<span class="id" title="var">j</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">injective_into_list</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_from</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> → <span class="id" title="var">In</span> (<span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_list_in</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> (<span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_list_eq</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> → <span class="id" title="var">j</span>&lt;<span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">f</span> <span class="id" title="var">j</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> = <span class="id" title="var">j</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_list_preserved</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l1</span> <span class="id" title="var">l2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l1</span> → <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l2</span>) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l1</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l2</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">app_in_invariant</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">B</span> : <span class="id" title="keyword">Type</span>) (<span class="id" title="var">l1</span> <span class="id" title="var">l2</span> : <span class="id" title="var">list</span> <span class="id" title="var">B</span>) <span class="id" title="var">a</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">a</span> (<span class="id" title="var">l1</span> ++ <span class="id" title="var">l2</span>) ↔ <span class="id" title="var">In</span> <span class="id" title="var">a</span> (<span class="id" title="var">l2</span> ++ <span class="id" title="var">l1</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_list_app</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l1</span> <span class="id" title="var">l2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> (<span class="id" title="var">l1</span> ++ <span class="id" title="var">l2</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> (<span class="id" title="var">l2</span> ++ <span class="id" title="var">l1</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_from_pred</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_from</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) → <span class="id" title="var">injective_from</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_list_pred</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">NoDup_cons_notin_tail</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">a</span> : <span class="id" title="var">A</span>) (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>), <span class="id" title="var">NoDup</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) → ¬ <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">NoDup_cons_NoDup_tail</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">a</span> : <span class="id" title="var">A</span>) (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>), <span class="id" title="var">NoDup</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) → <span class="id" title="var">NoDup</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">remove_length_pred</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) (<span class="id" title="var">x</span> : <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span> → <span class="id" title="var">In</span> <span class="id" title="var">x</span> <span class="id" title="var">l</span> → <span class="id" title="var">S</span> (<span class="id" title="var">length</span> (<span class="id" title="var">remove</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">x</span> <span class="id" title="var">l</span>)) = <span class="id" title="var">length</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_remove</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) <span class="id" title="var">l</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> (<span class="id" title="var">remove</span> <span class="id" title="var">eq_dec</span> (<span class="id" title="var">f</span> <span class="id" title="var">n</span>) <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_list_nil</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>), <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> 0 [].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_successor</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬<span class="id" title="var">In</span> (<span class="id" title="var">f</span> <span class="id" title="var">n</span>) <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) (<span class="id" title="var">f</span> <span class="id" title="var">n</span> :: <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">injective_into_length</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">n</span> ≤ <span class="id" title="var">length</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_list_nodup</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_list_value_in_list</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span>&lt;<span class="id" title="var">length</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> (<span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">l</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">surjective_onto_list</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span> → <span class="id" title="tactic">∃</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> ∧ <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_list_exists</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span> <span class="id" title="var">a</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> ∧ <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_list_if_exists</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> ∧ <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_tail</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) → <span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_list_reflected</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l1</span> <span class="id" title="var">l2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l2</span> → <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l1</span>) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l1</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l2</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_list_nodup</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_list_app</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l1</span> <span class="id" title="var">l2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> (<span class="id" title="var">l1</span> ++ <span class="id" title="var">l2</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> (<span class="id" title="var">l2</span> ++ <span class="id" title="var">l1</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_successor</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> → <span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">omit_at</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">i</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">j</span> : <span class="id" title="var">nat</span> ⇒ <span class="id" title="keyword">if</span> <span class="id" title="var">j</span> &lt;? <span class="id" title="var">i</span> <span class="id" title="keyword">then</span> <span class="id" title="var">f</span> <span class="id" title="var">j</span> <span class="id" title="keyword">else</span> <span class="id" title="var">f</span> (<span class="id" title="var">j</span> + 1)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_sublist_any</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">i</span> <span class="id" title="var">a</span> <span class="id" title="var">f</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">S</span> <span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">n</span> (<span class="id" title="var">remove</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">injective_into_sublist</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">i</span> <span class="id" title="var">a</span> <span class="id" title="var">f</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">S</span> <span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_sublist_any</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">i</span> <span class="id" title="var">a</span> <span class="id" title="var">f</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">S</span> <span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">n</span> (<span class="id" title="var">remove</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_sublist</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">i</span> <span class="id" title="var">a</span> <span class="id" title="var">f</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">S</span> <span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">n</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_successor_cons</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) (<span class="id" title="var">f</span> <span class="id" title="var">n</span> :: <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">surjective_onto_length</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) ,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span> → <span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> → <span class="id" title="var">length</span> <span class="id" title="var">l</span> ≤ <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">NoDup_remove_first</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">a</span> :<span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) → <span class="id" title="var">NoDup</span> <span class="id" title="var">l</span> ∧ ¬ <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_less_length</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) ,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> → <span class="id" title="var">n</span> &lt; <span class="id" title="var">length</span> <span class="id" title="var">l</span> → ¬<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">surjective_onto_length_nodup</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> → <span class="id" title="var">length</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>) ≤ <span class="id" title="var">n</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+*
+
+<div class="paragraph"> </div>
+
+  A function f : N -&gt; T *enumerates* a list l : list T up to n iff 
+
+<div class="paragraph"> </div>
+
+  (i) for all i, i &lt; n -&gt; In (f i) l,
+  (ii) for all a : T, In a l -&gt; exists i, i&lt;n and f i = a, and
+  (iii) for all i j, i &lt; j -&gt; j &lt; n -&gt; f i &lt;&gt; f j.
+
+<div class="paragraph"> </div>
+
+  That is, f is a bijection between <span class="inlinecode">0,<span class="id" title="var">n</span>)</span> <span class="inlinecode"><span class="id" title="var">and</span></span> <span class="inlinecode"><span class="id" title="var">the</span></span> <span class="inlinecode"><span class="id" title="var">members</span></span> <span class="inlinecode"><span class="id" title="keyword">of</span></span> <span class="inlinecode"><span class="id" title="var">l</span>.</span>
+
+     <span class="inlinecode"></span>
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">enumerates</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">n</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span> ∧ <span class="id" title="var">surjective_onto_list</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">list_of_enum</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">n</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">S</span> <span class="id" title="var">n'</span> ⇒ <span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">n'</span> ++ [(<span class="id" title="var">f</span> <span class="id" title="var">n'</span>)]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_zero</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>), <span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> 0 = [].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_successor</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span>) ++ [(<span class="id" title="var">f</span> <span class="id" title="var">n</span>)].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_ext</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> <span class="id" title="var">g</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span> &lt; <span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">g</span> <span class="id" title="var">i</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> = <span class="id" title="var">list_of_enum</span> <span class="id" title="var">g</span> <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_omit_last</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">k</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">list_of_enum</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>) <span class="id" title="var">k</span> = <span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_remove_eq_set_remove</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">x</span> : <span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">remove</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">x</span> <span class="id" title="var">l</span> = <span class="id" title="var">set_remove</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">x</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_sum</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> (<span class="id" title="var">i</span>+<span class="id" title="var">n</span>) =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++ (<span class="id" title="var">list_of_enum</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">j</span> ⇒ <span class="id" title="var">f</span> (<span class="id" title="var">i</span>+<span class="id" title="var">j</span>)) <span class="id" title="var">n</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_length</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span>) = <span class="id" title="var">n</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_head</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) = <span class="id" title="var">f</span>(0) :: (<span class="id" title="var">list_of_enum</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒ <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">i</span>)) <span class="id" title="var">n</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_in</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">a</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">a</span> (<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span>) ↔ <span class="id" title="tactic">∃</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> ∧ <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">enum_of_list</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">default</span> <span class="id" title="var">i</span> : <span class="id" title="var">A</span> := <span class="id" title="var">nth</span> <span class="id" title="var">i</span> <span class="id" title="var">l</span> <span class="id" title="var">default</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_successor</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">a</span> : <span class="id" title="var">A</span>) (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">default</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enum_of_list</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) <span class="id" title="var">default</span> (<span class="id" title="var">S</span> <span class="id" title="var">i</span>) = <span class="id" title="var">enum_of_list</span> <span class="id" title="var">l</span> <span class="id" title="var">default</span> <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_default</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">default</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> <span class="id" title="var">l</span> ≤ <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l</span> <span class="id" title="var">default</span> <span class="id" title="var">i</span> = <span class="id" title="var">default</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_zero</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">a</span> : <span class="id" title="var">A</span>) (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">default</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enum_of_list</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) <span class="id" title="var">default</span> 0 = <span class="id" title="var">a</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The default chosen doesn't matter for the arguments we care about.  
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_default_irrelevance</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">default</span> <span class="id" title="var">default'</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">length</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l</span> <span class="id" title="var">default</span> <span class="id" title="var">i</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l</span> <span class="id" title="var">default'</span> <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_app_fst</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">l1</span> <span class="id" title="var">l2</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">default</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">length</span> <span class="id" title="var">l1</span> →      <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">enum_of_list</span> (<span class="id" title="var">l1</span> ++ <span class="id" title="var">l2</span>) <span class="id" title="var">default</span>) <span class="id" title="var">i</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l1</span> <span class="id" title="var">default</span>) <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_app_snd</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">l1</span> <span class="id" title="var">l2</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">default</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> <span class="id" title="var">l1</span> ≤ <span class="id" title="var">i</span> →      <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">enum_of_list</span> (<span class="id" title="var">l1</span> ++ <span class="id" title="var">l2</span>) <span class="id" title="var">default</span>) <span class="id" title="var">i</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l2</span> <span class="id" title="var">default</span>) (<span class="id" title="var">i</span>-(<span class="id" title="var">length</span> <span class="id" title="var">l1</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_nil</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">default</span> (<span class="id" title="var">i</span> : <span class="id" title="var">nat</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span>, (<span class="id" title="var">enum_of_list</span> [] <span class="id" title="var">default</span>) <span class="id" title="var">i</span> = <span class="id" title="var">default</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_cons</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">a</span> : <span class="id" title="var">A</span>) (<span class="id" title="var">l1</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">default</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enum_of_list</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l1</span>) <span class="id" title="var">default</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒ <span class="id" title="keyword">match</span> <span class="id" title="var">i</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ <span class="id" title="var">a</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">S</span> <span class="id" title="var">i'</span> ⇒ (<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l1</span> <span class="id" title="var">default</span>) <span class="id" title="var">i'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_injective_into</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> <span class="id" title="var">d</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_into_list</span> (<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l</span> <span class="id" title="var">d</span>) (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_surjective_onto</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> <span class="id" title="var">d</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">surjective_onto_list</span> (<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l</span> <span class="id" title="var">d</span>) (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) <span class="id" title="var">l</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+yields <span class="inlinecode">0;</span> <span class="inlinecode">1;</span> <span class="inlinecode">2;</span> <span class="inlinecode">3;</span> <span class="inlinecode">4;</span> <span class="inlinecode">5;</span> <span class="inlinecode">6;</span> <span class="inlinecode">7</span> 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_list_of_enum</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">d</span> <span class="id" title="var">n</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">enum_of_list</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">d</span>) <span class="id" title="var">i</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=  <span class="id" title="var">f</span> <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_enum_of_list</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">d</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">list_of_enum</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l</span> <span class="id" title="var">d</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">length</span> <span class="id" title="var">l</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=<span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_nodup</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> → <span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>) <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_exists_index</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">a</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">i</span> : <span class="id" title="var">nat</span>, <span class="id" title="var">i</span> &lt; <span class="id" title="var">n</span> ∧ <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_in</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">n</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">n</span>  → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> (<span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_length</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> → <span class="id" title="var">length</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>) = <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_nil_zero</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> [] 0.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nodups_length_0</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>) = 0 → <span class="id" title="var">l</span> = [].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nothing_in_list_is_nil</span> : <span class="id" title="keyword">∀</span> {<span class="id" title="var">B</span>} (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">B</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">b</span>, ¬<span class="id" title="var">In</span> <span class="id" title="var">b</span> <span class="id" title="var">l</span>) → <span class="id" title="var">l</span> = [].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_zero_nil</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> 0 → <span class="id" title="var">l</span> = [].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_nil_only_zero</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> [] <span class="id" title="var">n</span> → <span class="id" title="var">n</span> = 0.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_one_single</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> [<span class="id" title="var">f</span> 0] 1.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_cons_successor</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~(<span class="id" title="var">In</span> (<span class="id" title="var">f</span> <span class="id" title="var">n</span>) <span class="id" title="var">l</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> ((<span class="id" title="var">f</span> <span class="id" title="var">n</span>) :: <span class="id" title="var">l</span>) (<span class="id" title="var">S</span> <span class="id" title="var">n</span>).<br/>
+ 
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_app</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l1</span> <span class="id" title="var">l2</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> (<span class="id" title="var">l1</span> ++ <span class="id" title="var">l2</span>) <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> (<span class="id" title="var">l2</span> ++ <span class="id" title="var">l1</span>) <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_cons_append</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> ((<span class="id" title="var">f</span> <span class="id" title="var">n</span>) :: <span class="id" title="var">l</span>) (<span class="id" title="var">S</span> <span class="id" title="var">n</span>) ↔<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> (<span class="id" title="var">l</span> ++ [<span class="id" title="var">f</span> <span class="id" title="var">n</span>]) (<span class="id" title="var">S</span> <span class="id" title="var">n</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_nodup_length</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> → <span class="id" title="var">length</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>) = <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_list_of_enum</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">injective_from</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> (<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span>) <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_of_list_enumerates</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> <span class="id" title="var">d</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span> → <span class="id" title="var">enumerates</span> (<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l</span> <span class="id" title="var">d</span>) <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">shift</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">a</span> <span class="id" title="var">i</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">i</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ <span class="id" title="var">a</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">S</span> <span class="id" title="var">i'</span> ⇒ <span class="id" title="var">f</span> <span class="id" title="var">i'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_to_length_cons</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">a</span>,      <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) → ¬ <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> (<span class="id" title="var">shift</span> <span class="id" title="var">f</span> <span class="id" title="var">a</span>) (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) (<span class="id" title="var">S</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_is_a_set_property</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l1</span> <span class="id" title="var">l2</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> (<span class="id" title="var">a</span> : <span class="id" title="var">A</span>), <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l1</span> ↔ <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l2</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l1</span> <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l2</span> <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_nodup_list</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">l1</span> <span class="id" title="var">l2</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">d</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">l2</span> = <span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l1</span> →      <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> (<span class="id" title="var">enum_of_list</span> <span class="id" title="var">l2</span> <span class="id" title="var">d</span>) <span class="id" title="var">l1</span> (<span class="id" title="var">length</span> <span class="id" title="var">l2</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_n</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f1</span> <span class="id" title="var">f2</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">n1</span> <span class="id" title="var">n2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f1</span> <span class="id" title="var">l</span> <span class="id" title="var">n1</span> → <span class="id" title="var">enumerates</span> <span class="id" title="var">f2</span> <span class="id" title="var">l</span> <span class="id" title="var">n2</span> → <span class="id" title="var">n1</span> = <span class="id" title="var">n2</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nodup_length_nonincreasing</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>) ≤ <span class="id" title="var">length</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nodup_length_unchanged_NoDup</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">nodup</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">l</span>) = <span class="id" title="var">length</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enum_to_length_nodup</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) → <span class="id" title="var">NoDup</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_from_enumeration_nth</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">n</span> <span class="id" title="var">d</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> → <span class="id" title="var">nth</span> <span class="id" title="var">i</span> (<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span>) <span class="id" title="var">d</span> = <span class="id" title="var">f</span> <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_from_enumeration_In</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span> → <span class="id" title="var">In</span> <span class="id" title="var">a</span> (<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_omit_at</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">a</span> <span class="id" title="var">i</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">length</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) (<span class="id" title="var">length</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>)) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span>) <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_omit_at_any</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">a</span> <span class="id" title="var">i</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">length</span> <span class="id" title="var">l</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">a</span> → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span>) (<span class="id" title="var">remove</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>) (<span class="id" title="var">length</span> (<span class="id" title="var">remove</span> <span class="id" title="var">eq_dec</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumerates_tail</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">a</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>) (<span class="id" title="var">length</span> (<span class="id" title="var">a</span> :: <span class="id" title="var">l</span>)) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">f'</span>, <span class="id" title="var">enumerates</span> <span class="id" title="var">f'</span> <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">list_of_enum_from_enumeration_In_converse</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <span class="id" title="var">In</span> <span class="id" title="var">a</span> (<span class="id" title="var">list_of_enum</span> <span class="id" title="var">f</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>)) →  <span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <span class="id" title="var">CompatibleEnumerate</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <span class="id" title="var">R</span> : <span class="id" title="var">A</span> →  <span class="id" title="var">A</span> → <span class="id" title="keyword">Prop</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <span class="id" title="var">R_dec</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="var">A</span>, { <span class="id" title="var">R</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> } + { ¬<span class="id" title="var">R</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> }.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">asymmetric</span> {<span class="id" title="var">B</span> : <span class="id" title="keyword">Type</span>} (<span class="id" title="var">S</span> : <span class="id" title="var">B</span> → <span class="id" title="var">B</span> → <span class="id" title="keyword">Prop</span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span>, <span class="id" title="var">S</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> → <span class="id" title="var">S</span> <span class="id" title="var">b</span> <span class="id" title="var">a</span> → <span class="id" title="var">False</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <span class="id" title="var">R_asymmetric</span>: <span class="id" title="var">asymmetric</span> <span class="id" title="var">R</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <span class="id" title="var">R_transitive</span>: <span class="id" title="var">transitive</span> <span class="id" title="var">A</span> <span class="id" title="var">R</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">is_compatible</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span>, <span class="id" title="var">i</span>&lt;<span class="id" title="var">n</span> → <span class="id" title="var">j</span>&lt;<span class="id" title="var">n</span> → <span class="id" title="var">R</span> (<span class="id" title="var">f</span> <span class="id" title="var">i</span>) (<span class="id" title="var">f</span> <span class="id" title="var">j</span>) → <span class="id" title="var">i</span>&lt;<span class="id" title="var">j</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">monotone</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> := <span class="id" title="keyword">∀</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span>, <span class="id" title="var">i</span> &lt; <span class="id" title="var">j</span> → <span class="id" title="var">j</span> ≤ <span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> &lt; <span class="id" title="var">f</span> <span class="id" title="var">j</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">monotone_increases</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">monotone</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> → <span class="id" title="var">i</span> ≤ <span class="id" title="var">n</span> → <span class="id" title="var">i</span> ≤ <span class="id" title="var">f</span> <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">monotone_conv</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">monotone</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> → <span class="id" title="var">i</span>≤<span class="id" title="var">n</span> → <span class="id" title="var">j</span>≤<span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> &lt; <span class="id" title="var">f</span> <span class="id" title="var">j</span> → <span class="id" title="var">i</span> &lt; <span class="id" title="var">j</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">ordering_agrees</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">n</span> <span class="id" title="var">g</span> <span class="id" title="var">m</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">up</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">monotone</span> <span class="id" title="var">up</span> <span class="id" title="var">n</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span> &lt; <span class="id" title="var">n</span> → <span class="id" title="var">up</span> <span class="id" title="var">i</span> &lt; <span class="id" title="var">m</span>) ∧ <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span>, <span class="id" title="var">i</span> &lt; <span class="id" title="var">n</span> → <span class="id" title="var">f</span> <span class="id" title="var">i</span> = <span class="id" title="var">g</span> (<span class="id" title="var">up</span> <span class="id" title="var">i</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">compatible_preserved</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">g</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ordering_agrees</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span> <span class="id" title="var">g</span> <span class="id" title="var">m</span> → <span class="id" title="var">is_compatible</span> <span class="id" title="var">g</span> <span class="id" title="var">m</span> → <span class="id" title="var">is_compatible</span> <span class="id" title="var">f</span> <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">compat_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_compatible</span> <span class="id" title="var">f</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumerates</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> (<span class="id" title="var">length</span> <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">compat_enum_tail</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">A</span>) <span class="id" title="var">l</span> <span class="id" title="var">k</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">k</span>&lt;<span class="id" title="var">length</span> (<span class="id" title="var">f</span> <span class="id" title="var">k</span> :: <span class="id" title="var">l</span>) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compat_enum</span> <span class="id" title="var">f</span> (<span class="id" title="var">f</span> <span class="id" title="var">k</span> :: <span class="id" title="var">l</span>) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compat_enum</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>) <span class="id" title="var">l</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">compat_enum_nodups</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> <span class="id" title="var">f</span>,            <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compat_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> <span class="id" title="var">l</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">In_dec</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span> (<span class="id" title="var">l</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>), {<span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>}+{~<span class="id" title="var">In</span> <span class="id" title="var">a</span> <span class="id" title="var">l</span>}.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">compat_enum_omit</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">l</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compat_enum</span> <span class="id" title="var">f</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">k</span>&lt;<span class="id" title="var">length</span> <span class="id" title="var">l</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compat_enum</span> (<span class="id" title="var">omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">remove</span> <span class="id" title="var">eq_dec</span> (<span class="id" title="var">f</span> <span class="id" title="var">k</span>) <span class="id" title="var">l</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">End</span> <span class="id" title="var">CompatibleEnumerate</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <span class="id" title="var">Card</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">Enumerate</span>.<br/>
+
+<br/>
+</div>
+</main>
+</body>
+</html>

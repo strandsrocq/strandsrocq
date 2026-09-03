@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.RoleSyntax</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">List</span> <span class="id" title="var">String</span> <span class="id" title="var">Lia</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">DefaultInstances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab13"></a><h1 class="section">CPSA direct syntax</h1>
+
+
+<div class="paragraph"> </div>
+
+This module provides an intrinsically sorted syntax for CPSA roles and
+protocols, together with notations for common message constructors and traces.
+
+<div class="paragraph"> </div>
+
+The distinguished message <span class="inlinecode">τ</span> belongs to the underlying strand-space interface,
+but is not intended as a protocol message.  The syntax prevents empty
+concatenations from instantiating to <span class="inlinecode">τ</span>; well-formed roles should also prevent
+regular origination of <span class="inlinecode">τ</span>, for example by ensuring that unconstrained message
+variables do not first occur in send events.
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="var">CPSA_Direct_Syntax</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Declare Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+<span class="id" title="keyword">Delimit</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span> <span class="id" title="keyword">with</span> <span class="id" title="var">cpsa_direct_syntax</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">var</span> : <span class="id" title="keyword">Type</span> := <span class="id" title="var">string</span>.<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">var_eq_dec</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="var">var</span>, {<span class="id" title="var">x</span> = <span class="id" title="var">y</span>} + {<span class="id" title="var">x</span> ≠ <span class="id" title="var">y</span>} :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">string_dec</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <span class="id" title="var">sort</span> :=<br/>
+| <span class="id" title="var">S_Name</span><br/>
+| <span class="id" title="var">S_Text</span><br/>
+| <span class="id" title="var">S_Data</span><br/>
+| <span class="id" title="var">S_Tag</span><br/>
+| <span class="id" title="var">S_Skey</span><br/>
+| <span class="id" title="var">S_Akey</span><br/>
+| <span class="id" title="var">S_Mesg</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">sort_eq_dec</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">s1</span> <span class="id" title="var">s2</span> : <span class="id" title="var">sort</span>, {<span class="id" title="var">s1</span> = <span class="id" title="var">s2</span>} + {<span class="id" title="var">s1</span> ≠ <span class="id" title="var">s2</span>}.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">sort_denote</span> (<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>) : <span class="id" title="keyword">Set</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">s</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Name</span> ⇒ <span class="id" title="var">Name</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Text</span> ⇒ <span class="id" title="var">Text</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Data</span> ⇒ <span class="id" title="var">Data</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Tag</span> ⇒ <span class="id" title="var">Tag</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Skey</span> ⇒ <span class="id" title="var">Skey</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Akey</span> ⇒ <span class="id" title="var">Akey</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Mesg</span> ⇒ <span class="id" title="var">Mesg</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Record</span> <span class="id" title="var">tvar</span> (<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>) : <span class="id" title="keyword">Type</span> := <span class="id" title="var">mkTVar</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="id" title="var">tv_var</span> : <span class="id" title="var">var</span><br/>
+}.<br/>
+
+<br/>
+<span class="id" title="keyword">Arguments</span> <span class="id" title="var">mkTVar</span> {<span class="id" title="var">s</span>} <span class="id" title="var">tv_var</span>.<br/>
+<span class="id" title="keyword">Arguments</span> <span class="id" title="var">tv_var</span> {<span class="id" title="var">s</span>} <span class="id" title="var">_</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">tvar_eq_dec</span> {<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>} :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">s</span>, {<span class="id" title="var">x</span> = <span class="id" title="var">y</span>} + {<span class="id" title="var">x</span> ≠ <span class="id" title="var">y</span>}.<br/>
+
+<br/>
+<span class="id" title="keyword">Record</span> <span class="id" title="var">packed_tvar</span> : <span class="id" title="keyword">Type</span> := <span class="id" title="var">packTVar</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="id" title="var">packed_sort</span> : <span class="id" title="var">sort</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">packed_var</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">packed_sort</span><br/>
+}.<br/>
+
+<br/>
+<span class="id" title="keyword">Record</span> <span class="id" title="var">var_decl</span> : <span class="id" title="keyword">Type</span> := <span class="id" title="var">mkVarDecl</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="id" title="var">vd_sort</span> : <span class="id" title="var">sort</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">vd_vars</span> : <span class="id" title="var">list</span> (<span class="id" title="var">tvar</span> <span class="id" title="var">vd_sort</span>)<br/>
+}.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">declare_vars</span> {<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>} (<span class="id" title="var">xs</span> : <span class="id" title="var">list</span> (<span class="id" title="var">tvar</span> <span class="id" title="var">s</span>)) : <span class="id" title="var">var_decl</span> :=<br/>
+&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vd_sort</span> := <span class="id" title="var">s</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vd_vars</span> := <span class="id" title="var">xs</span><br/>
+&nbsp;&nbsp;|}.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;xs 'IS' s" :=<br/>
+&nbsp;&nbsp;(@<span class="id" title="var">declare_vars</span> <span class="id" title="var">s</span> <span class="id" title="var">xs</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">pack_tvar</span> {<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>} (<span class="id" title="var">x</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">s</span>) : <span class="id" title="var">packed_tvar</span> :=<br/>
+&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">packed_sort</span> := <span class="id" title="var">s</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">packed_var</span> := <span class="id" title="var">x</span><br/>
+&nbsp;&nbsp;|}.<br/>
+
+<br/>
+<span class="id" title="keyword">Coercion</span> <span class="id" title="var">pack_tvar</span> : <span class="id" title="var">tvar</span> &gt;-&gt; <span class="id" title="var">packed_tvar</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'vars{' x '}'" :=<br/>
+&nbsp;&nbsp;([<span class="id" title="var">pack_tvar</span> <span class="id" title="var">x</span>])<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'vars{' x ';' .. ';' y ';' z '}'" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="var">pack_tvar</span> <span class="id" title="var">x</span> :: .. (<span class="id" title="var">pack_tvar</span> <span class="id" title="var">y</span> :: <span class="id" title="var">pack_tvar</span> <span class="id" title="var">z</span> :: <span class="id" title="var">nil</span>) ..)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <span class="id" title="var">cpsa_term</span> : <span class="id" title="var">sort</span> → <span class="id" title="keyword">Type</span> :=<br/>
+| <span class="id" title="var">TVar</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">s</span>, <span class="id" title="var">tvar</span> <span class="id" title="var">s</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span><br/>
+| <span class="id" title="var">TName</span> : <span class="id" title="var">Name</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span><br/>
+| <span class="id" title="var">TText</span> : <span class="id" title="var">Text</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Text</span><br/>
+| <span class="id" title="var">TData</span> : <span class="id" title="var">Data</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Data</span><br/>
+| <span class="id" title="var">TTag</span> : <span class="id" title="var">Tag</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Tag</span><br/>
+| <span class="id" title="var">TSkey</span> : <span class="id" title="var">Skey</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Skey</span><br/>
+| <span class="id" title="var">TAkey</span> : <span class="id" title="var">Akey</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Akey</span><br/>
+| <span class="id" title="var">TAsMesg</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">s</span>, <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span><br/>
+| <span class="id" title="var">TCat</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span> → <span class="id" title="var">list</span> (<span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span>) → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span><br/>
+| <span class="id" title="var">TEnc</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span><br/>
+| <span class="id" title="var">TPubk</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Akey</span><br/>
+| <span class="id" title="var">TPrivk</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Akey</span><br/>
+| <span class="id" title="var">TInvk</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span><br/>
+| <span class="id" title="var">THash</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span><br/>
+| <span class="id" title="var">TLtk</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span> → <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Skey</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Coercion</span> <span class="id" title="var">TVar</span> : <span class="id" title="var">tvar</span> &gt;-&gt; <span class="id" title="var">cpsa_term</span>.<br/>
+<span class="id" title="keyword">Coercion</span> <span class="id" title="var">TName</span> : <span class="id" title="var">Name</span> &gt;-&gt; <span class="id" title="var">cpsa_term</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">msg</span> : <span class="id" title="keyword">Type</span> := <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Mesg</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">as_msg</span> {<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>} (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">TAsMesg</span> <span class="id" title="var">s</span> <span class="id" title="var">t</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">cat</span> (<span class="id" title="var">t</span> : <span class="id" title="var">msg</span>) (<span class="id" title="var">ts</span> : <span class="id" title="var">list</span> <span class="id" title="var">msg</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">TCat</span> <span class="id" title="var">t</span> <span class="id" title="var">ts</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">cat_prepend</span> (<span class="id" title="var">t</span> <span class="id" title="var">rest</span> : <span class="id" title="var">msg</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">rest</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TCat</span> <span class="id" title="var">u</span> <span class="id" title="var">us</span> ⇒ <span class="id" title="var">TCat</span> <span class="id" title="var">t</span> (<span class="id" title="var">u</span> :: <span class="id" title="var">us</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ <span class="id" title="var">TCat</span> <span class="id" title="var">t</span> [<span class="id" title="var">rest</span>]<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">enc</span> (<span class="id" title="var">payload</span> : <span class="id" title="var">msg</span>) (<span class="id" title="var">payloads</span> : <span class="id" title="var">list</span> <span class="id" title="var">msg</span>) (<span class="id" title="var">k</span> : <span class="id" title="var">msg</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">TEnc</span> (<span class="id" title="var">TCat</span> <span class="id" title="var">payload</span> <span class="id" title="var">payloads</span>) <span class="id" title="var">k</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">pubk</span> (<span class="id" title="var">p</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">as_msg</span> (<span class="id" title="var">TPubk</span> <span class="id" title="var">p</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">privk</span> (<span class="id" title="var">p</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">as_msg</span> (<span class="id" title="var">TPrivk</span> <span class="id" title="var">p</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">invk</span> (<span class="id" title="var">k</span> : <span class="id" title="var">msg</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">TInvk</span> <span class="id" title="var">k</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">hash</span> (<span class="id" title="var">t</span> : <span class="id" title="var">msg</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">THash</span> <span class="id" title="var">t</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">ltk</span> (<span class="id" title="var">p</span> <span class="id" title="var">q</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span>) : <span class="id" title="var">msg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">as_msg</span> (<span class="id" title="var">TLtk</span> <span class="id" title="var">p</span> <span class="id" title="var">q</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <span class="id" title="var">event</span> : <span class="id" title="keyword">Type</span> :=<br/>
+| <span class="id" title="var">Send</span> : <span class="id" title="var">msg</span> → <span class="id" title="var">event</span><br/>
+| <span class="id" title="var">Recv</span> : <span class="id" title="var">msg</span> → <span class="id" title="var">event</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab14"></a><h2 class="section">Well-formed role traces</h2>
+
+
+<div class="paragraph"> </div>
+
+The only syntactic source of <span class="inlinecode">τ</span> left in protocol roles is an unconstrained
+variable of sort <span class="inlinecode"><span class="id" title="var">S_Mesg</span></span>, since valuations may map such variables to any
+message.  A role trace is well-formed when every <span class="inlinecode"><span class="id" title="var">S_Mesg</span></span> variable that occurs
+in an ingredient position of a send event has already occurred in an ingredient
+position of an earlier receive event.  Thus regular roles may forward message
+variables, but should not originate them.
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">mesg_var</span> := <span class="id" title="var">tvar</span> <span class="id" title="var">S_Mesg</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab15"></a><h1 class="section">Mesg variables appearing in a term.</h1>
+
+
+<div class="paragraph"> </div>
+
+JDG:  This should probably descend through all of the substerms, not
+just the ingredient subterms.  Meaning
+
+<div class="paragraph"> </div>
+
+  TEnc payload k =&gt;
+    List.app (mesg_vars_term payload) (mesg_vars_term k)
+
+<div class="paragraph"> </div>
+
+  THash h =&gt; (mesg_vars_term h)
+
+<div class="paragraph"> </div>
+
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">mesg_vars_term</span> {<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>} (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span>) : <span class="id" title="var">list</span> <span class="id" title="var">mesg_var</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">t</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TVar</span> <span class="id" title="var">s</span> <span class="id" title="var">x</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">s</span> <span class="id" title="keyword">return</span> <span class="id" title="var">tvar</span> <span class="id" title="var">s</span> → <span class="id" title="var">list</span> <span class="id" title="var">mesg_var</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">S_Mesg</span> ⇒ <span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> ⇒ [<span class="id" title="var">x</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ <span class="id" title="keyword">fun</span> <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span> <span class="id" title="var">x</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TName</span> <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TText</span> <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TData</span> <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TTag</span> <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TSkey</span> <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TAkey</span> <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TAsMesg</span> <span class="id" title="var">_</span> <span class="id" title="var">t</span> ⇒ <span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TCat</span> <span class="id" title="var">t</span> <span class="id" title="var">ts</span> ⇒ <span class="id" title="var">List.app</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) (<span class="id" title="var">List.concat</span> (<span class="id" title="var">map</span> <span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">ts</span>))<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TEnc</span> <span class="id" title="var">payload</span> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">payload</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TPubk</span> <span class="id" title="var">p</span> ⇒ <span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">p</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TPrivk</span> <span class="id" title="var">p</span> ⇒ <span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">p</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TInvk</span> <span class="id" title="var">k</span> ⇒ <span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">k</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">THash</span> <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TLtk</span> <span class="id" title="var">p</span> <span class="id" title="var">q</span> ⇒ <span class="id" title="var">List.app</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">p</span>) (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">q</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">mesg_vars_event</span> (<span class="id" title="var">e</span> : <span class="id" title="var">event</span>) : <span class="id" title="var">list</span> <span class="id" title="var">mesg_var</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">e</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">Send</span> <span class="id" title="var">t</span> ⇒ <span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">Recv</span> <span class="id" title="var">t</span> ⇒ <span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">vars_in</span> (<span class="id" title="var">xs</span> <span class="id" title="var">seen</span> : <span class="id" title="var">list</span> <span class="id" title="var">mesg_var</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <span class="id" title="var">In</span> <span class="id" title="var">x</span> <span class="id" title="var">xs</span> → <span class="id" title="var">In</span> <span class="id" title="var">x</span> <span class="id" title="var">seen</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">wf_trace_no_mesg_origination</span><br/>
+&nbsp;&nbsp;(<span class="id" title="var">seen</span> : <span class="id" title="var">list</span> <span class="id" title="var">mesg_var</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="var">tr</span> : <span class="id" title="var">list</span> <span class="id" title="var">event</span>)<br/>
+&nbsp;&nbsp;: <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">tr</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| [] ⇒ <span class="id" title="var">True</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">Send</span> <span class="id" title="var">t</span> :: <span class="id" title="var">tr'</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars_in</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) <span class="id" title="var">seen</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_trace_no_mesg_origination</span> <span class="id" title="var">seen</span> <span class="id" title="var">tr'</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">Recv</span> <span class="id" title="var">t</span> :: <span class="id" title="var">tr'</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_trace_no_mesg_origination</span> (<span class="id" title="var">List.app</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) <span class="id" title="var">seen</span>) <span class="id" title="var">tr'</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">valuation</span> : <span class="id" title="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">s</span> : <span class="id" title="var">sort</span>, <span class="id" title="var">tvar</span> <span class="id" title="var">s</span> → <span class="id" title="var">sort_denote</span> <span class="id" title="var">s</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">cast_sort_denote</span> {<span class="id" title="var">s1</span> <span class="id" title="var">s2</span> : <span class="id" title="var">sort</span>}<br/>
+&nbsp;&nbsp;(<span class="id" title="var">H</span> : <span class="id" title="var">s1</span> = <span class="id" title="var">s2</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="var">v</span> : <span class="id" title="var">sort_denote</span> <span class="id" title="var">s1</span>)<br/>
+&nbsp;&nbsp;: <span class="id" title="var">sort_denote</span> <span class="id" title="var">s2</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">eq_rect</span> <span class="id" title="var">s1</span> <span class="id" title="var">sort_denote</span> <span class="id" title="var">v</span> <span class="id" title="var">s2</span> <span class="id" title="var">H</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">update_valuation</span><br/>
+&nbsp;&nbsp;(<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>)<br/>
+&nbsp;&nbsp;{<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>}<br/>
+&nbsp;&nbsp;(<span class="id" title="var">x</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">s</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="var">v</span> : <span class="id" title="var">sort_denote</span> <span class="id" title="var">s</span>)<br/>
+&nbsp;&nbsp;: <span class="id" title="var">valuation</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">fun</span> <span class="id" title="var">s'</span> <span class="id" title="var">y</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">sort_eq_dec</span> <span class="id" title="var">s</span> <span class="id" title="var">s'</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">left</span> <span class="id" title="var">H</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">if</span> <span class="id" title="var">var_eq_dec</span> (<span class="id" title="var">tv_var</span> <span class="id" title="var">x</span>) (<span class="id" title="var">tv_var</span> <span class="id" title="var">y</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">then</span> <span class="id" title="var">cast_sort_denote</span> <span class="id" title="var">H</span> <span class="id" title="var">v</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">else</span> <span class="id" title="var">eta</span> <span class="id" title="var">s'</span> <span class="id" title="var">y</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">right</span> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">eta</span> <span class="id" title="var">s'</span> <span class="id" title="var">y</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;eta '{{' x ':=' v '}}'" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="var">update_valuation</span> <span class="id" title="var">eta</span> <span class="id" title="var">x</span> <span class="id" title="var">v</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">x</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">v</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">to_mesg</span> {<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>} : <span class="id" title="var">sort_denote</span> <span class="id" title="var">s</span> → <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">s</span> <span class="id" title="keyword">return</span> <span class="id" title="var">sort_denote</span> <span class="id" title="var">s</span> → <span class="id" title="var">Mesg</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Name</span> ⇒ <span class="id" title="var">M_Name</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Text</span> ⇒ <span class="id" title="var">M_Text</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Data</span> ⇒ <span class="id" title="var">M_Data</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Tag</span> ⇒ <span class="id" title="var">M_Tag</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Skey</span> ⇒ <span class="id" title="var">M_Skey</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Akey</span> ⇒ <span class="id" title="var">M_Akey</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">S_Mesg</span> ⇒ <span class="id" title="keyword">fun</span> <span class="id" title="var">m</span> ⇒ <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">pair_mesgs</span> (<span class="id" title="var">m</span> : <span class="id" title="var">Mesg</span>) (<span class="id" title="var">ms</span> : <span class="id" title="var">list</span> <span class="id" title="var">Mesg</span>) : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">ms</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| [] ⇒ <span class="id" title="var">m</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">m'</span> :: <span class="id" title="var">ms'</span> ⇒ <span class="id" title="var">m</span> ⋅ <span class="id" title="var">pair_mesgs</span> <span class="id" title="var">m'</span> <span class="id" title="var">ms'</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">instantiate_term</span> {<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>} (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span>)<br/>
+&nbsp;&nbsp;: <span class="id" title="var">sort_denote</span> <span class="id" title="var">s</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">t</span> <span class="id" title="tactic">in</span> <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span> <span class="id" title="keyword">return</span> <span class="id" title="var">sort_denote</span> <span class="id" title="var">s</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TVar</span> <span class="id" title="var">s</span> <span class="id" title="var">x</span> ⇒ <span class="id" title="var">eta</span> <span class="id" title="var">s</span> <span class="id" title="var">x</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TName</span> <span class="id" title="var">p</span> ⇒ <span class="id" title="var">p</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TText</span> <span class="id" title="var">t</span> ⇒ <span class="id" title="var">t</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TData</span> <span class="id" title="var">d</span> ⇒ <span class="id" title="var">d</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TTag</span> <span class="id" title="var">t</span> ⇒ <span class="id" title="var">t</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TSkey</span> <span class="id" title="var">k</span> ⇒ <span class="id" title="var">k</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TAkey</span> <span class="id" title="var">k</span> ⇒ <span class="id" title="var">k</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TAsMesg</span> <span class="id" title="var">s</span> <span class="id" title="var">t</span> ⇒ <span class="id" title="var">to_mesg</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TCat</span> <span class="id" title="var">t</span> <span class="id" title="var">ts</span> ⇒ <span class="id" title="var">pair_mesgs</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">map</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span>) <span class="id" title="var">ts</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TEnc</span> <span class="id" title="var">payload</span> <span class="id" title="var">k</span> ⇒ ⟨ <span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">payload</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">k</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TPubk</span> <span class="id" title="var">p</span> ⇒ <span class="id" title="var">K</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">p</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TPrivk</span> <span class="id" title="var">p</span> ⇒ <span class="id" title="var">ainv</span> (<span class="id" title="var">K</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">p</span>))<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TInvk</span> <span class="id" title="var">k</span> ⇒ <span class="id" title="var">Inv</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">k</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">THash</span> <span class="id" title="var">t</span> ⇒ # (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TLtk</span> <span class="id" title="var">p</span> <span class="id" title="var">q</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">EmbeddedTraceStrands.TermNat.ltk</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">p</span>) (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">q</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">instantiate_msg</span> (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) (<span class="id" title="var">t</span> : <span class="id" title="var">msg</span>) : <span class="id" title="var">Mesg</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Example</span> <span class="id" title="var">instantiate_ltk_is_directional</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">eta</span> <span class="id" title="var">p</span> <span class="id" title="var">q</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> (<span class="id" title="var">TLtk</span> <span class="id" title="var">p</span> <span class="id" title="var">q</span>) =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">EmbeddedTraceStrands.TermNat.ltk</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">p</span>) (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">q</span>).<br/>
+ 
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">instantiate_event</span> (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) (<span class="id" title="var">e</span> : <span class="id" title="var">event</span>) : <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">e</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">Send</span> <span class="id" title="var">t</span> ⇒ ⊕ (<span class="id" title="var">instantiate_msg</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">Recv</span> <span class="id" title="var">t</span> ⇒ ⊖ (<span class="id" title="var">instantiate_msg</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">instantiate_trace</span> (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) (<span class="id" title="var">tr</span> : <span class="id" title="var">list</span> <span class="id" title="var">event</span>) : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">map</span> (<span class="id" title="var">instantiate_event</span> <span class="id" title="var">eta</span>) <span class="id" title="var">tr</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+A message contains <span class="inlinecode">τ</span> when <span class="inlinecode">τ</span> is an ingredient of it. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">contains_tau</span> (<span class="id" title="var">m</span> : <span class="id" title="var">Mesg</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;τ ⊏ <span class="id" title="var">m</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">term_contains_tau</span> (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) (<span class="id" title="var">t</span> : <span class="id" title="var">msg</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">contains_tau</span> (<span class="id" title="var">instantiate_msg</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The following lemmas connect the syntactic well-formedness condition to the
+    semantic <span class="inlinecode">τ</span>-origination side condition used by bundle completeness.
+
+<div class="paragraph"> </div>
+
+    In the concrete CPSA term algebra, <span class="inlinecode">τ</span> is not produced by any ground
+    constructor used by protocol syntax.  The only way an instantiated protocol
+    message can contain <span class="inlinecode">τ</span> is through a variable of sort <span class="inlinecode"><span class="id" title="var">S_Mesg</span></span> whose
+    valuation maps it to a message containing <span class="inlinecode">τ</span>.  This is why
+    <span class="inlinecode"><span class="id" title="var">wf_trace_no_mesg_origination</span></span> only tracks <span class="inlinecode"><span class="id" title="var">S_Mesg</span></span> variables. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">pair_mesgs_contains_tau</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">m</span> <span class="id" title="var">ms</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">pair_mesgs</span> <span class="id" title="var">m</span> <span class="id" title="var">ms</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">m</span> ∨ <span class="id" title="tactic">∃</span> <span class="id" title="var">m'</span>, <span class="id" title="var">In</span> <span class="id" title="var">m'</span> <span class="id" title="var">ms</span> ∧ τ ⊏ <span class="id" title="var">m'</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">tau_not_in_basic</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">s</span> (<span class="id" title="var">v</span> : <span class="id" title="var">sort_denote</span> <span class="id" title="var">s</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">s</span> ≠ <span class="id" title="var">S_Mesg</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;¬ τ ⊏ <span class="id" title="var">to_mesg</span> <span class="id" title="var">v</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">tau_in_inv</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">Inv</span> <span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">m</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">tau_in_inv_intro</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">Inv</span> <span class="id" title="var">m</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">pair_mesgs_contains_tau_intro</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">m</span> <span class="id" title="var">ms</span> <span class="id" title="var">m'</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">m'</span> = <span class="id" title="var">m</span> ∨ <span class="id" title="var">In</span> <span class="id" title="var">m'</span> <span class="id" title="var">ms</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">m'</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">pair_mesgs</span> <span class="id" title="var">m</span> <span class="id" title="var">ms</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <span class="id" title="var">term_size</span> {<span class="id" title="var">s</span> : <span class="id" title="var">sort</span>} (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span>) : <span class="id" title="var">nat</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">t</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">TVar</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ⇒ 1<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TName</span> <span class="id" title="var">_</span> ⇒ 1<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TText</span> <span class="id" title="var">_</span> ⇒ 1<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TData</span> <span class="id" title="var">_</span> ⇒ 1<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TTag</span> <span class="id" title="var">_</span> ⇒ 1<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TSkey</span> <span class="id" title="var">_</span> ⇒ 1<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TAkey</span> <span class="id" title="var">_</span> ⇒ 1<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TAsMesg</span> <span class="id" title="var">_</span> <span class="id" title="var">t</span> ⇒ <span class="id" title="var">S</span> (<span class="id" title="var">term_size</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TCat</span> <span class="id" title="var">t</span> <span class="id" title="var">ts</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">S</span> (<span class="id" title="var">term_size</span> <span class="id" title="var">t</span> + <span class="id" title="var">fold_right</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">t</span> <span class="id" title="var">n</span> ⇒ <span class="id" title="var">term_size</span> <span class="id" title="var">t</span> + <span class="id" title="var">n</span>) 0 <span class="id" title="var">ts</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TEnc</span> <span class="id" title="var">payload</span> <span class="id" title="var">k</span> ⇒ <span class="id" title="var">S</span> (<span class="id" title="var">term_size</span> <span class="id" title="var">payload</span> + <span class="id" title="var">term_size</span> <span class="id" title="var">k</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TPubk</span> <span class="id" title="var">p</span> ⇒ <span class="id" title="var">S</span> (<span class="id" title="var">term_size</span> <span class="id" title="var">p</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TPrivk</span> <span class="id" title="var">p</span> ⇒ <span class="id" title="var">S</span> (<span class="id" title="var">term_size</span> <span class="id" title="var">p</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TInvk</span> <span class="id" title="var">k</span> ⇒ <span class="id" title="var">S</span> (<span class="id" title="var">term_size</span> <span class="id" title="var">k</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">THash</span> <span class="id" title="var">t</span> ⇒ <span class="id" title="var">S</span> (<span class="id" title="var">term_size</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;| <span class="id" title="var">TLtk</span> <span class="id" title="var">p</span> <span class="id" title="var">q</span> ⇒ <span class="id" title="var">S</span> (<span class="id" title="var">term_size</span> <span class="id" title="var">p</span> + <span class="id" title="var">term_size</span> <span class="id" title="var">q</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">term_size_in_list</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">t</span> : <span class="id" title="var">msg</span>) <span class="id" title="var">ts</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">t</span> <span class="id" title="var">ts</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term_size</span> <span class="id" title="var">t</span> ≤ <span class="id" title="var">fold_right</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">t</span> <span class="id" title="var">n</span> ⇒ <span class="id" title="var">term_size</span> <span class="id" title="var">t</span> + <span class="id" title="var">n</span>) 0 <span class="id" title="var">ts</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">mesg_vars_name_empty</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">S_Name</span>) <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">instantiated_tau_from_mesg_var_sized</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">s</span> <span class="id" title="var">eta</span> (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term_size</span> <span class="id" title="var">t</span> ≤ <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">to_mesg</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">eta</span> <span class="id" title="var">S_Mesg</span> <span class="id" title="var">x</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">instantiated_tau_from_mesg_var</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">s</span> <span class="id" title="var">eta</span> (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">to_mesg</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">eta</span> <span class="id" title="var">S_Mesg</span> <span class="id" title="var">x</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">instantiated_msg_tau_from_mesg_var</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">instantiate_msg</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">eta</span> <span class="id" title="var">S_Mesg</span> <span class="id" title="var">x</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Converse direction for the same invariant: once an <span class="inlinecode"><span class="id" title="var">S_Mesg</span></span> variable whose
+    valuation contains <span class="inlinecode">τ</span> appears in a syntactic message, the instantiated
+    message also contains <span class="inlinecode">τ</span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">mesg_var_tau_instantiates_tau_sized</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">s</span> (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span>) <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term_size</span> <span class="id" title="var">t</span> ≤ <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">eta</span> <span class="id" title="var">S_Mesg</span> <span class="id" title="var">x</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">to_mesg</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">mesg_var_tau_instantiates_tau</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">s</span> (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) (<span class="id" title="var">t</span> : <span class="id" title="var">cpsa_term</span> <span class="id" title="var">s</span>) <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">eta</span> <span class="id" title="var">S_Mesg</span> <span class="id" title="var">x</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">to_mesg</span> (<span class="id" title="var">instantiate_term</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">mesg_var_tau_instantiates_msg_tau</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) <span class="id" title="var">t</span> <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">eta</span> <span class="id" title="var">S_Mesg</span> <span class="id" title="var">x</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">instantiate_msg</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">wf_trace_send_var_previously_received</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">seen</span> <span class="id" title="var">prefix</span> <span class="id" title="var">t</span> <span class="id" title="var">suffix</span> <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_trace_no_mesg_origination</span> <span class="id" title="var">seen</span> (<span class="id" title="var">prefix</span> ++ <span class="id" title="var">Send</span> <span class="id" title="var">t</span> :: <span class="id" title="var">suffix</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">x</span> <span class="id" title="var">seen</span> ∨<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">r</span>, <span class="id" title="var">In</span> (<span class="id" title="var">Recv</span> <span class="id" title="var">r</span>) <span class="id" title="var">prefix</span> ∧ <span class="id" title="var">In</span> <span class="id" title="var">x</span> (<span class="id" title="var">mesg_vars_term</span> <span class="id" title="var">r</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Main syntactic consequence of <span class="inlinecode"><span class="id" title="var">wf_trace_no_mesg_origination</span></span>: a send whose
+    ground instance contains <span class="inlinecode">τ</span> must have obtained that <span class="inlinecode">τ</span> from an <span class="inlinecode"><span class="id" title="var">S_Mesg</span></span>
+    variable that was already present in an earlier receive.  Thus the role can
+    forward such a message, but cannot regularly originate it. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">wf_trace_send_tau_previously_received</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">eta</span> <span class="id" title="var">prefix</span> <span class="id" title="var">t</span> <span class="id" title="var">suffix</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_trace_no_mesg_origination</span> [] (<span class="id" title="var">prefix</span> ++ <span class="id" title="var">Send</span> <span class="id" title="var">t</span> :: <span class="id" title="var">suffix</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">instantiate_msg</span> <span class="id" title="var">eta</span> <span class="id" title="var">t</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">r</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> (<span class="id" title="var">Recv</span> <span class="id" title="var">r</span>) <span class="id" title="var">prefix</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;τ ⊏ <span class="id" title="var">instantiate_msg</span> <span class="id" title="var">eta</span> <span class="id" title="var">r</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Arguments</span> <span class="id" title="var">TVar</span> {<span class="id" title="var">s</span>} <span class="id" title="var">x</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'pubk' a" := (<span class="id" title="var">pubk</span> <span class="id" title="var">a</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 30) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'privk' a" := (<span class="id" title="var">privk</span> <span class="id" title="var">a</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 30) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'invk' k" := (<span class="id" title="var">invk</span> <span class="id" title="var">k</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 30) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'ltk' a b" := (<span class="id" title="var">ltk</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 31,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">a</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">b</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'cat{' x '}'" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="var">cat</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">x</span>) [])<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'cat{' x ';' .. ';' y ';' z '}'" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="var">cat_prepend</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">x</span>) ..<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">cat_prepend</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">y</span>) (<span class="id" title="var">cat</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">z</span>) [])) ..)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'enc{' x '}_' k" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="var">enc</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">x</span>) [] (<span class="id" title="var">as_msg</span> <span class="id" title="var">k</span>))<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 35,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">x</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">k</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">right</span> <span class="id" title="keyword">associativity</span>) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'enc{' x ';' .. ';' y ';' z '}_' k" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="var">TEnc</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">cat_prepend</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">x</span>) ..<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">cat_prepend</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">y</span>) (<span class="id" title="var">cat</span> (<span class="id" title="var">as_msg</span> <span class="id" title="var">z</span>) [])) ..)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">as_msg</span> <span class="id" title="var">k</span>))<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 35,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">x</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">y</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">z</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">k</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">right</span> <span class="id" title="keyword">associativity</span>) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'send' t" := (<span class="id" title="var">Send</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 40) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> &quot;'recv' t" := (<span class="id" title="var">Recv</span> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 40) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Record</span> <span class="id" title="var">role</span> : <span class="id" title="keyword">Type</span> := <span class="id" title="var">mkRole</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="id" title="var">role_name</span> : <span class="id" title="var">string</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">role_vars</span> : <span class="id" title="var">list</span> <span class="id" title="var">var_decl</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">role_trace</span> : <span class="id" title="var">list</span> <span class="id" title="var">event</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">role_non_orig</span> : <span class="id" title="var">list</span> <span class="id" title="var">msg</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">role_uniq_orig</span> : <span class="id" title="var">list</span> <span class="id" title="var">packed_tvar</span><br/>
+}.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">defrole</span><br/>
+&nbsp;&nbsp;(<span class="id" title="var">name</span> : <span class="id" title="var">string</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="var">vars</span> : <span class="id" title="var">list</span> <span class="id" title="var">var_decl</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="var">tr</span> : <span class="id" title="var">list</span> <span class="id" title="var">event</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="var">non</span> : <span class="id" title="var">list</span> <span class="id" title="var">msg</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="var">uniq</span> : <span class="id" title="var">list</span> <span class="id" title="var">packed_tvar</span>)<br/>
+&nbsp;&nbsp;: <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">role_name</span> := <span class="id" title="var">name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">role_vars</span> := <span class="id" title="var">vars</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">role_trace</span> := <span class="id" title="var">tr</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">role_non_orig</span> := <span class="id" title="var">non</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">role_uniq_orig</span> := <span class="id" title="var">uniq</span><br/>
+&nbsp;&nbsp;|}.<br/>
+<span class="id" title="keyword">Record</span> <span class="id" title="var">protocol</span> : <span class="id" title="keyword">Type</span> := <span class="id" title="var">mkProtocol</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="id" title="var">protocol_roles</span> : <span class="id" title="var">list</span> <span class="id" title="var">role</span><br/>
+}.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">wf_role_no_mesg_origination</span> (<span class="id" title="var">r</span> : <span class="id" title="var">role</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">wf_trace_no_mesg_origination</span> [] (<span class="id" title="var">role_trace</span> <span class="id" title="var">r</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <span class="id" title="var">wf_protocol_no_mesg_origination</span> (<span class="id" title="var">P</span> : <span class="id" title="var">protocol</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">r</span>, <span class="id" title="var">In</span> <span class="id" title="var">r</span> (<span class="id" title="var">protocol_roles</span> <span class="id" title="var">P</span>) → <span class="id" title="var">wf_role_no_mesg_origination</span> <span class="id" title="var">r</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">CPSA_Direct_Syntax</span>.<br/>
+</div>
+</main>
+</body>
+</html>

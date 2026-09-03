@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.Semantics</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">List</span> <span class="id" title="var">Lia</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Arith.Compare_dec</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Arith.PeanoNat</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">RoleSyntax</span> <span class="id" title="var">ChoiceRoles</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">DefaultInstances</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Direct_Syntax</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ChoiceRoles</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="var">CPSA_Semantics</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">role_prefix</span> (<span class="id" title="var">P</span> : <span class="id" title="var">protocol</span>) (<span class="id" title="var">tr</span> : <span class="id" title="var">list</span> <span class="id" title="var">sT</span>)  := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">r</span> <span class="id" title="var">eta</span> <span class="id" title="var">suffix</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">r</span> (<span class="id" title="var">protocol_roles</span> <span class="id" title="var">P</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">instantiate_trace</span> <span class="id" title="var">eta</span> (<span class="id" title="var">role_trace</span> <span class="id" title="var">r</span>) = <span class="id" title="var">tr</span> ++ <span class="id" title="var">suffix</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">thread</span> := <span class="id" title="var">list</span> <span class="id" title="var">sT</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">thread_pool</span> := <span class="id" title="var">list</span> <span class="id" title="var">thread</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">event_occurred</span> (<span class="id" title="var">T</span> : <span class="id" title="var">thread_pool</span>) (<span class="id" title="var">m</span> : <span class="id" title="var">sT</span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">m</span> (<span class="id" title="var">List.concat</span> <span class="id" title="var">T</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">event_occurred_in</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">T</span> : <span class="id" title="var">thread_pool</span>) (<span class="id" title="var">m</span> : <span class="id" title="var">sT</span>), <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">event_occurred</span> <span class="id" title="var">T</span> <span class="id" title="var">m</span> ↔ <span class="id" title="tactic">∃</span> <span class="id" title="var">t</span>, <span class="id" title="var">In</span> <span class="id" title="var">t</span> <span class="id" title="var">T</span> ∧ <span class="id" title="var">In</span> <span class="id" title="var">m</span> <span class="id" title="var">t</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;P '▷' tr" := (<span class="id" title="var">role_prefix</span> <span class="id" title="var">P</span> <span class="id" title="var">tr</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;T '⋈' tr" := (<span class="id" title="var">T</span> ++ [<span class="id" title="var">tr</span>])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 60) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;T1 '⋈' tr '⋈' T2" := (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">tr</span>] ++ <span class="id" title="var">T2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 60) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;T '↓' e" := (<span class="id" title="var">event_occurred</span> <span class="id" title="var">T</span> <span class="id" title="var">e</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;T '↓' '⊕' m" := (<span class="id" title="var">event_occurred</span> <span class="id" title="var">T</span> (⊕<span class="id" title="var">m</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;T '↓' '⊖' m" := (<span class="id" title="var">event_occurred</span> <span class="id" title="var">T</span> (⊖<span class="id" title="var">m</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Reserved Notation</span> &quot;P ⊨ T"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Reserved Notation</span> &quot;P '⊨ᶠ' T0 '→*' T"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 70, <span class="id" title="var">T0</span> <span class="id" title="tactic">at</span> <span class="id" title="var">next</span> <span class="id" title="keyword">level</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <span class="id" title="var">pool_reachable_from</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">P</span> : <span class="id" title="var">protocol</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T0</span> : <span class="id" title="var">thread_pool</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">thread_pool</span> → <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolBase</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T0</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnSend</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ [⊕<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T</span> ⋈ [⊕<span class="id" title="var">m</span>])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolExtendSend</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ <span class="id" title="var">tr</span> ++ [⊕<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T1</span> ⋈ (<span class="id" title="var">tr</span> ++ [⊕<span class="id" title="var">m</span>]) ⋈ <span class="id" title="var">T2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolSpawnRecv</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> ↓ ⊕<span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ [⊖<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T</span> ⋈ [⊖<span class="id" title="var">m</span>])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PoolExtendRecv</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">tr</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T1</span> ⋈ <span class="id" title="var">tr</span> ⋈ <span class="id" title="var">T2</span> ↓ ⊕<span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ▷ <span class="id" title="var">tr</span> ++ [⊖<span class="id" title="var">m</span>] →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> (<span class="id" title="var">T1</span> ⋈ (<span class="id" title="var">tr</span> ++ [⊖<span class="id" title="var">m</span>]) ⋈ <span class="id" title="var">T2</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">reachable_pool</span> <span class="id" title="var">P</span> := <span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> [].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;P ⊨ t" :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">reachable_pool</span> <span class="id" title="var">P</span> <span class="id" title="var">t</span>) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> &quot;P '⊨ᶠ' T0 '→*' T" :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">pool_reachable_from</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T</span>) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">pool_reachable_from_trans</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T0</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᶠ <span class="id" title="var">T0</span> →* <span class="id" title="var">T1</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᶠ <span class="id" title="var">T1</span> →* <span class="id" title="var">T2</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ᶠ <span class="id" title="var">T0</span> →* <span class="id" title="var">T2</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <span class="id" title="var">SemanticCorrespondence</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">represents_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">G</span> : <span class="id" title="var">bundle_type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T</span> : <span class="id" title="var">thread_pool</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">full_trace</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">list</span> <span class="id" title="var">sT</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">pool_strand</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">Σ</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_node_of</span> <span class="id" title="var">n</span> <span class="id" title="var">G</span> ↔<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">i</span> <span class="id" title="var">th</span> <span class="id" title="var">suffix</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">th</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand</span> <span class="id" title="var">n</span> = <span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> (<span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span>) = <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> = <span class="id" title="var">th</span> ++ <span class="id" title="var">suffix</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> &lt; <span class="id" title="var">length</span> <span class="id" title="var">th</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">represents_pool_canonical</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">G</span> : <span class="id" title="var">bundle_type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T</span> : <span class="id" title="var">thread_pool</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">full_trace</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">list</span> <span class="id" title="var">sT</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒ (<span class="id" title="var">i</span>, <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">extends_pool_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T</span> : <span class="id" title="var">thread_pool</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">full_trace</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">list</span> <span class="id" title="var">sT</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span> <span class="id" title="var">th</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">suffix</span>, <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> = <span class="id" title="var">th</span> ++ <span class="id" title="var">suffix</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represents_pool_change_nodes</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">G'</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">SameSet</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) (<span class="id" title="var">nodes</span> <span class="id" title="var">G'</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G'</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <span class="id" title="var">SemanticCorrespondence</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <span class="id" title="var">SemanticSoundness</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_middle</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> {<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>} (<span class="id" title="var">L</span> <span class="id" title="var">R</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">L</span> ++ [<span class="id" title="var">x</span>] ++ <span class="id" title="var">R</span>) (<span class="id" title="var">length</span> <span class="id" title="var">L</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">x</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_middle_cons</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> {<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>} (<span class="id" title="var">L</span> <span class="id" title="var">R</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">L</span> ++ <span class="id" title="var">x</span> :: <span class="id" title="var">R</span>) (<span class="id" title="var">length</span> <span class="id" title="var">L</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">x</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_snoc</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> {<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>} (<span class="id" title="var">L</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">L</span> ++ [<span class="id" title="var">x</span>]) (<span class="id" title="var">length</span> <span class="id" title="var">L</span>) = <span class="id" title="var">Some</span> <span class="id" title="var">x</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_replace_middle_neq</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> {<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>} (<span class="id" title="var">L</span> <span class="id" title="var">R</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> ≠ <span class="id" title="var">length</span> <span class="id" title="var">L</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">L</span> ++ [<span class="id" title="var">x</span>] ++ <span class="id" title="var">R</span>) <span class="id" title="var">i</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">L</span> ++ [<span class="id" title="var">y</span>] ++ <span class="id" title="var">R</span>) <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_replace_snoc_neq</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> {<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>} (<span class="id" title="var">L</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> ≠ <span class="id" title="var">length</span> <span class="id" title="var">L</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">L</span> ++ [<span class="id" title="var">x</span>]) <span class="id" title="var">i</span> = <span class="id" title="var">nth_error</span> (<span class="id" title="var">L</span> ++ [<span class="id" title="var">y</span>]) <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_snoc_neq</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> {<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>} (<span class="id" title="var">L</span> : <span class="id" title="var">list</span> <span class="id" title="var">A</span>) <span class="id" title="var">x</span> <span class="id" title="var">i</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> ≠ <span class="id" title="var">length</span> <span class="id" title="var">L</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">L</span> ++ [<span class="id" title="var">x</span>]) <span class="id" title="var">i</span> = <span class="id" title="var">nth_error</span> <span class="id" title="var">L</span> <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">extends_spawn</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">st</span> <span class="id" title="var">f</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> (<span class="id" title="var">T</span> ⋈ <span class="id" title="var">st</span>) <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represents_pool_spawn_not_in</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span>, <span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬<span class="id" title="var">In</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>, <span class="id" title="var">f</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>), 0) (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represents_pool_in</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span> <span class="id" title="var">th</span> <span class="id" title="var">k</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">k</span> &lt; <span class="id" title="var">length</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> ((<span class="id" title="var">i</span>, <span class="id" title="var">f</span> <span class="id" title="var">i</span>), <span class="id" title="var">k</span>) (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represents_pool_not_in_next</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span> <span class="id" title="var">th</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">In</span> ((<span class="id" title="var">i</span>, <span class="id" title="var">f</span> <span class="id" title="var">i</span>), <span class="id" title="var">length</span> <span class="id" title="var">th</span>) (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">event_occurred_source_node</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> ↓ ⊕<span class="id" title="var">m</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">n</span>, <span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) ∧ <span class="id" title="var">term</span> <span class="id" title="var">n</span> = ⊕<span class="id" title="var">m</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">extends_pool_trace_extend</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T1</span> <span class="id" title="var">th</span> <span class="id" title="var">T2</span> <span class="id" title="var">e</span> <span class="id" title="var">f</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>]] ++ <span class="id" title="var">T2</span>) <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span>] ++ <span class="id" title="var">T2</span>) <span class="id" title="var">f</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">term_at_extension</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">f</span> <span class="id" title="var">i</span> <span class="id" title="var">prefix</span> <span class="id" title="var">e</span> <span class="id" title="var">suffix</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">f</span> <span class="id" title="var">i</span> = (<span class="id" title="var">prefix</span> ++ [<span class="id" title="var">e</span>]) ++ <span class="id" title="var">suffix</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term</span> ((<span class="id" title="var">i</span>, <span class="id" title="var">f</span> <span class="id" title="var">i</span>), <span class="id" title="var">length</span> <span class="id" title="var">prefix</span>) = <span class="id" title="var">e</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represents_pool_spawn</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> <span class="id" title="var">e</span> <span class="id" title="var">L</span> <span class="id" title="var">C</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> (<span class="id" title="var">T</span> ++ [[<span class="id" title="var">e</span>]]) <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := ((<span class="id" title="var">length</span> <span class="id" title="var">T</span>, <span class="id" title="var">f</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>)), 0) :: <span class="id" title="var">nodes</span> <span class="id" title="var">G</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> := <span class="id" title="var">L</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> := <span class="id" title="var">C</span> |}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T</span> ++ [[<span class="id" title="var">e</span>]])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">f</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represents_pool_extend</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T1</span> <span class="id" title="var">th</span> <span class="id" title="var">T2</span> <span class="id" title="var">f</span> <span class="id" title="var">e</span> <span class="id" title="var">L</span> <span class="id" title="var">C</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">G</span> (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span>] ++ <span class="id" title="var">T2</span>) <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>]] ++ <span class="id" title="var">T2</span>) <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool_canonical</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := ((<span class="id" title="var">length</span> <span class="id" title="var">T1</span>, <span class="id" title="var">f</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>)), <span class="id" title="var">length</span> <span class="id" title="var">th</span>) :: <span class="id" title="var">nodes</span> <span class="id" title="var">G</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> := <span class="id" title="var">L</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> := <span class="id" title="var">C</span> |}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>]] ++ <span class="id" title="var">T2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">f</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">bundle_of_reachable_with_trace</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">full_trace</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">G</span>, <span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> ∧ <span class="id" title="var">represents_pool_canonical</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <span class="id" title="var">SemanticSoundness</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <span class="id" title="var">SemanticCompleteness</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">reachable_extends_pool_trace</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">full_trace</span>, <span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">bundle_of_reachable</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">P</span> <span class="id" title="var">T</span>, <span class="id" title="var">P</span> ⊨ <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">G</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> ∧ <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> ∧ <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">traceAtNode</span> (<span class="id" title="var">n</span> : <span class="id" title="var">node__t</span>) : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">n</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id" title="var">s</span>,<span class="id" title="var">i</span>) ⇒ <span class="id" title="var">firstn</span> (<span class="id" title="var">S</span> <span class="id" title="var">i</span>) (<span class="id" title="var">tr</span> <span class="id" title="var">s</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_firstn_exact</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> {<span class="id" title="var">X</span> : <span class="id" title="keyword">Type</span>} <span class="id" title="var">i</span> (<span class="id" title="var">xs</span> : <span class="id" title="var">list</span> <span class="id" title="var">X</span>) <span class="id" title="var">d</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">length</span> <span class="id" title="var">xs</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">firstn</span> (<span class="id" title="var">S</span> <span class="id" title="var">i</span>) <span class="id" title="var">xs</span>) <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> (<span class="id" title="var">nth</span> <span class="id" title="var">i</span> <span class="id" title="var">xs</span> <span class="id" title="var">d</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_firstn_before</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> {<span class="id" title="var">X</span> : <span class="id" title="keyword">Type</span>} <span class="id" title="var">k</span> <span class="id" title="var">i</span> (<span class="id" title="var">xs</span> : <span class="id" title="var">list</span> <span class="id" title="var">X</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">firstn</span> <span class="id" title="var">k</span> <span class="id" title="var">xs</span>) <span class="id" title="var">i</span> = <span class="id" title="var">nth_error</span> <span class="id" title="var">xs</span> <span class="id" title="var">i</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_traceAtNode_self</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> &lt; <span class="id" title="var">length</span> (<span class="id" title="var">tr</span> (<span class="id" title="var">strand</span> <span class="id" title="var">n</span>)) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">traceAtNode</span> <span class="id" title="var">n</span>) (<span class="id" title="var">index</span> <span class="id" title="var">n</span>) = <span class="id" title="var">Some</span> (<span class="id" title="var">term</span> <span class="id" title="var">n</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">length_traceAtNode</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> &lt; <span class="id" title="var">length</span> (<span class="id" title="var">tr</span> (<span class="id" title="var">strand</span> <span class="id" title="var">n</span>)) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">traceAtNode</span> <span class="id" title="var">n</span>) = <span class="id" title="var">S</span> (<span class="id" title="var">index</span> <span class="id" title="var">n</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">nth_error_traceAtNode_before</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">i</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">i</span> &lt; <span class="id" title="var">index</span> <span class="id" title="var">n</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> (<span class="id" title="var">traceAtNode</span> <span class="id" title="var">n</span>) <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term</span> (<span class="id" title="var">strand</span> <span class="id" title="var">n</span>, <span class="id" title="var">i</span>) = <span class="id" title="var">e</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">ofProtocol</span> (<span class="id" title="var">G</span> : <span class="id" title="var">bundle_type</span>) (<span class="id" title="var">P</span> : <span class="id" title="var">protocol</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>, <span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">role_prefix</span> <span class="id" title="var">P</span> (<span class="id" title="var">traceAtNode</span> <span class="id" title="var">n</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">non_originating_in_bundle</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">G</span> : <span class="id" title="var">bundle_type</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">t</span> : <span class="id" title="var">A</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">originates</span> <span class="id" title="var">t</span> <span class="id" title="var">n</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">tau_non_originating</span> (<span class="id" title="var">G</span> : <span class="id" title="var">bundle_type</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">non_originating_in_bundle</span> <span class="id" title="var">G</span> τ.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+A well-formed protocol is sufficient for the <span class="inlinecode">τ</span>-non-origination
+        hypothesis used in <span class="inlinecode"><span class="id" title="var">reachable_of_bundle</span></span>.
+
+<div class="paragraph"> </div>
+
+        If <span class="inlinecode">τ</span> originated at a positive bundle node, <span class="inlinecode"><span class="id" title="var">ofProtocol</span></span> identifies the
+        node prefix with a prefix of some instantiated role.  The corresponding
+        role event must be a send containing <span class="inlinecode">τ</span>.  By
+        <span class="inlinecode"><span class="id" title="var">wf_trace_send_tau_previously_received</span></span>, that <span class="inlinecode">τ</span> was already present in
+        an earlier receive on the same role instance; mapping the earlier receive
+        back to the bundle strand contradicts the definition of origination. 
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">wf_protocol_no_mesg_origination_tau_non_originating</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">P</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ofProtocol</span> <span class="id" title="var">G</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tau_non_originating</span> <span class="id" title="var">G</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">positive_tau_node_originates_somewhere</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term</span> <span class="id" title="var">n</span> = (⊕ τ) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">n0</span>, <span class="id" title="var">In</span> <span class="id" title="var">n0</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) ∧ <span class="id" title="var">originates</span> τ <span class="id" title="var">n0</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">IndBundle_node_in_bounds_without_tau_origin</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tau_non_originating</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> &lt; <span class="id" title="var">length</span> (<span class="id" title="var">tr</span> (<span class="id" title="var">strand</span> <span class="id" title="var">n</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">bundle_node_in_bounds_without_tau_origin</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tau_non_originating</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> &lt; <span class="id" title="var">length</span> (<span class="id" title="var">tr</span> (<span class="id" title="var">strand</span> <span class="id" title="var">n</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represented_node_event_occurred</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">n</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term</span> <span class="id" title="var">n</span> = <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">event_occurred</span> <span class="id" title="var">T</span> <span class="id" title="var">e</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represented_thread_stops_before_fresh_successor</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">pred</span> <span class="id" title="var">succ</span> <span class="id" title="var">i</span> <span class="id" title="var">th</span> <span class="id" title="var">suffix</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">In</span> <span class="id" title="var">succ</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pred</span> ⟹ <span class="id" title="var">succ</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand</span> <span class="id" title="var">pred</span> = <span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> (<span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span>) = <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> = <span class="id" title="var">th</span> ++ <span class="id" title="var">suffix</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">pred</span> &lt; <span class="id" title="var">length</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> <span class="id" title="var">th</span> = <span class="id" title="var">index</span> <span class="id" title="var">succ</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">traceAtNode_from_represented_successor</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">pred</span> <span class="id" title="var">succ</span> <span class="id" title="var">i</span> <span class="id" title="var">th</span> <span class="id" title="var">suffix</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pred</span> ⟹ <span class="id" title="var">succ</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand</span> <span class="id" title="var">pred</span> = <span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand</span> <span class="id" title="var">succ</span> = <span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> (<span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span>) = <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> = <span class="id" title="var">th</span> ++ <span class="id" title="var">suffix</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> <span class="id" title="var">th</span> = <span class="id" title="var">index</span> <span class="id" title="var">succ</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">succ</span> &lt; <span class="id" title="var">length</span> (<span class="id" title="var">tr</span> (<span class="id" title="var">strand</span> <span class="id" title="var">succ</span>)) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term</span> <span class="id" title="var">succ</span> = <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traceAtNode</span> <span class="id" title="var">succ</span> = <span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">full_trace_from_represented_successor</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">pred</span> <span class="id" title="var">succ</span> <span class="id" title="var">i</span> <span class="id" title="var">th</span> <span class="id" title="var">suffix</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pred</span> ⟹ <span class="id" title="var">succ</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nth_error</span> <span class="id" title="var">T</span> <span class="id" title="var">i</span> = <span class="id" title="var">Some</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand</span> <span class="id" title="var">pred</span> = <span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand</span> <span class="id" title="var">succ</span> = <span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> (<span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span>) = <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> = <span class="id" title="var">th</span> ++ <span class="id" title="var">suffix</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> <span class="id" title="var">th</span> = <span class="id" title="var">index</span> <span class="id" title="var">succ</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">succ</span> &lt; <span class="id" title="var">length</span> (<span class="id" title="var">tr</span> (<span class="id" title="var">strand</span> <span class="id" title="var">succ</span>)) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term</span> <span class="id" title="var">succ</span> = <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">suffix'</span>, <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span> = (<span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>]) ++ <span class="id" title="var">suffix'</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">traceAtNode_zero</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> = 0 →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> &lt; <span class="id" title="var">length</span> (<span class="id" title="var">tr</span> (<span class="id" title="var">strand</span> <span class="id" title="var">n</span>)) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">term</span> <span class="id" title="var">n</span> = <span class="id" title="var">e</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">traceAtNode</span> <span class="id" title="var">n</span> = [<span class="id" title="var">e</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represents_pool_spawn_any</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">n</span> <span class="id" title="var">e</span> <span class="id" title="var">new_trace</span> <span class="id" title="var">new_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand</span> <span class="id" title="var">n</span> = <span class="id" title="var">new_strand</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> <span class="id" title="var">new_strand</span> = <span class="id" title="var">new_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">new_trace</span> = [<span class="id" title="var">e</span>] ++ <span class="id" title="var">skipn</span> 1 <span class="id" title="var">new_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> = 0 →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">n</span> :: <span class="id" title="var">nodes</span> <span class="id" title="var">G</span>; <span class="id" title="var">intra</span> := <span class="id" title="var">intra</span> <span class="id" title="var">G</span>; <span class="id" title="var">inter</span> := <span class="id" title="var">inter</span> <span class="id" title="var">G</span> |}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T</span> ++ [[<span class="id" title="var">e</span>]])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">if</span> <span class="id" title="var">Nat.eq_dec</span> <span class="id" title="var">i</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">then</span> <span class="id" title="var">new_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">else</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">if</span> <span class="id" title="var">Nat.eq_dec</span> <span class="id" title="var">i</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">then</span> <span class="id" title="var">new_strand</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">else</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">i</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">extends_pool_trace_spawn_any</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">new_trace</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">new_trace</span> = [<span class="id" title="var">e</span>] ++ <span class="id" title="var">skipn</span> 1 <span class="id" title="var">new_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T</span> ++ [[<span class="id" title="var">e</span>]])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">if</span> <span class="id" title="var">Nat.eq_dec</span> <span class="id" title="var">i</span> (<span class="id" title="var">length</span> <span class="id" title="var">T</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">then</span> <span class="id" title="var">new_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">else</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">i</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">extends_pool_trace_extend_any</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">T1</span> <span class="id" title="var">th</span> <span class="id" title="var">T2</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span>] ++ <span class="id" title="var">T2</span>) <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="tactic">∃</span> <span class="id" title="var">suffix</span>, <span class="id" title="var">full_trace</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>) = (<span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>]) ++ <span class="id" title="var">suffix</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>]] ++ <span class="id" title="var">T2</span>) <span class="id" title="var">full_trace</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represents_pool_extend_any</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">T1</span> <span class="id" title="var">th</span> <span class="id" title="var">T2</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">n</span> <span class="id" title="var">e</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span>] ++ <span class="id" title="var">T2</span>) <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> (<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>]] ++ <span class="id" title="var">T2</span>) <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">In</span> <span class="id" title="var">n</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">G</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand</span> <span class="id" title="var">n</span> = <span class="id" title="var">pool_strand</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> (<span class="id" title="var">pool_strand</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>)) = <span class="id" title="var">full_trace</span> (<span class="id" title="var">length</span> <span class="id" title="var">T1</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">index</span> <span class="id" title="var">n</span> = <span class="id" title="var">length</span> <span class="id" title="var">th</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">n</span> :: <span class="id" title="var">nodes</span> <span class="id" title="var">G</span>; <span class="id" title="var">intra</span> := <span class="id" title="var">intra</span> <span class="id" title="var">G</span>; <span class="id" title="var">inter</span> := <span class="id" title="var">inter</span> <span class="id" title="var">G</span> |}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">T1</span> ++ [<span class="id" title="var">th</span> ++ [<span class="id" title="var">e</span>]] ++ <span class="id" title="var">T2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">reachable_of_bundle</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">P</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ofProtocol</span> <span class="id" title="var">G</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tau_non_originating</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ <span class="id" title="var">T</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Variant of <span class="inlinecode"><span class="id" title="var">reachable_of_bundle</span></span> that exposes the protocol
+        well-formedness condition instead of the lower-level bundle property
+        <span class="inlinecode"><span class="id" title="var">tau_non_originating</span></span>. 
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">reachable_of_wf_bundle</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">G</span> <span class="id" title="var">P</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ofProtocol</span> <span class="id" title="var">G</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊨ <span class="id" title="var">T</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <span class="id" title="var">SemanticCompleteness</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">CPSA_Semantics</span>.<br/>
+</div>
+</main>
+</body>
+</html>

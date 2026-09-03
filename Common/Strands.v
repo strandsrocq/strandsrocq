@@ -211,6 +211,8 @@ Module Type StrandSpaceSig (Import T : TermSig) (Import St : StrandSig T).
     Definition is_edge_of (n1 : node__t) (n2 : node__t) (C : edge_set__t) :=
       set_In (n1, n2) C.
 
+    Definition incident_to (n : node__t) (E : edge_set__t) :=
+      exists n', In (n, n') E \/ In (n', n) E.
   End Edges.
 
   (* Exporting notations *)
@@ -219,7 +221,89 @@ Module Type StrandSpaceSig (Import T : TermSig) (Import St : StrandSig T).
   Notation "n1 '⟹' n2" := (intrastrand n1 n2) (at level 60).
   Notation "n1 '⟹+' n2" := (intrastrand_trans n1 n2) (at level 50).
 
+  Section Decidability.
+    Lemma eq_edge__t_dec :
+      forall e e' : edge__t, { e = e' } + { e <> e' }.
+    Proof. decide equality. Qed.
+
+    Lemma interstrand_dec :
+      forall n n', { n ⟶ n' } + { ~ n ⟶ n' }.
+    Proof.
+      intros n n'.
+      unfold interstrand in *.
+      destruct (term n); destruct (term n'); try now right. apply A_eq_dec.
+    Qed.
+
+    Lemma intrastrand_dec :
+      forall n n', { n ⟹ n' } + { ~ n ⟹ n' }.
+    Proof.
+      intros.
+      unfold intrastrand in *.
+      repeat (decide equality).
+    Qed.
+  End Decidability.
+
+  Section IncidentToProperties.
+
+    Lemma edge_of_implies_incident_to :
+      forall n n' E, is_edge_of n n' E -> incident_to n E /\ incident_to n' E.
+    Proof.
+      intros n n' E Hedge.
+      split; [exists n'|exists n]; unfold is_edge_of in Hedge; auto.
+    Qed.
+
+    Lemma incident_to_union :
+      forall n L E, incident_to n (set_union eq_edge__t_dec L E) -> incident_to n L \/ incident_to n E.
+    Proof.
+      intros n L E [m [Hin|Hin]]; apply set_union_iff in Hin; destruct Hin as [Hin|Hin].
+      - left. exists m. now left.
+      - right. exists m. now left.
+      - left. exists m. now right.
+      - right. exists m. now right.
+    Qed.
+
+    Lemma incident_to_cons_inv :
+      forall n n1 n2 E,
+        incident_to n ((n1,n2) :: E) ->
+        n = n1 \/ n = n2 \/ incident_to n E.
+    Proof.
+      intros n n1 n2 E [m [[Heq|Hin]|[Heq|Hin]]].
+      - inversion Heq; auto.
+      - right. right. exists m. now left.
+      - inversion Heq; auto.
+      - right. right. exists m. now right.
+    Qed.
+
+  End IncidentToProperties.
+
+  Section InterstrandProperties.
+
+    Lemma interstrand_sign :
+      forall n n', n ⟶ n' ->
+      is_positive n /\ is_negative n'.
+    Proof.
+      unfold interstrand.
+      intros n n' Hinter.
+      unfold is_positive, is_negative.
+      destruct (term n) eqn:Hn; destruct (term n') eqn:Hn'; try easy.
+    Qed.
+
+    Lemma no_inter_to_positive :
+      forall C n,
+        (forall n1 n2, In (n1, n2) C -> n1 ⟶ n2) ->
+        is_positive n ->
+        forall p, ~ In (p, n) C.
+    Proof.
+      intros C n Hsub Hpos p Hin.
+      specialize (Hsub _ _ Hin) as Hinter.
+      apply interstrand_sign in Hinter as [_ Hneg].
+      now specialize (node_neg_pos_neq Hpos Hneg).
+    Qed.
+
+  End InterstrandProperties.
+
   Section IntrastrandProperties.
+    
     Lemma lt_intrastrand_index_0 :
       forall i i' s, i < i' -> (s,i) ⟹+ (s,i').
     Proof with (unfold intrastrand; simpl; rewrite Nat.add_1_r; reflexivity).
@@ -280,6 +364,30 @@ Module Type StrandSpaceSig (Import T : TermSig) (Import St : StrandSig T).
         contradiction.
       - assumption.
     Qed.
+
+    Lemma intrastrand_unique :
+      forall n n' n'', n ⟹ n'' -> n' ⟹ n'' -> n = n'.
+    Proof.
+      intros n n' n'' H H'.
+      injection H as Hs Hi. injection H' as Hs' Hi'.
+      rewrite <- Hi in Hi'. rewrite <- Hs in Hs'.
+      repeat rewrite Nat.add_1_r in Hi'.
+      specialize (eq_add_S (index n') (index n) Hi') as Hi''.
+      destruct n, n'; simpl in *; now subst.
+    Qed.
+
+    Lemma no_intra_to_zero :
+      forall L s,
+        (forall n1 n2, In (n1, n2) L -> n1 ⟹ n2) ->
+        forall p, ~ In (p, (s, 0)) L.
+    Proof.
+      intros L s Hsub p Hin.
+      specialize (Hsub _ _ Hin) as Hintra.
+      destruct p as [sp ip].
+      unfold intrastrand in Hintra. simpl in Hintra.
+      inversion Hintra. lia.
+    Qed.
+    
   End IntrastrandProperties.
 
   Section OriginatesProperties.
@@ -326,27 +434,6 @@ Module Type StrandSpaceSig (Import T : TermSig) (Import St : StrandSig T).
     Qed.
   End OriginatesProperties.
 
-  Section Decidability.
-    Lemma eq_edge__t_dec :
-      forall e e' : edge__t, { e = e' } + { e <> e' }.
-    Proof. decide equality. Qed.
-
-    Lemma interstrand_dec :
-      forall n n', { n ⟶ n' } + { ~ n ⟶ n' }.
-    Proof.
-      intros n n'.
-      unfold interstrand in *.
-      destruct (term n); destruct (term n'); try now right. apply A_eq_dec.
-    Qed.
-
-    Lemma intrastrand_dec :
-      forall n n', { n ⟹ n' } + { ~ n ⟹ n' }.
-    Proof.
-      intros.
-      unfold intrastrand in *.
-      repeat (decide equality).
-    Qed.
-  End Decidability.
 End StrandSpaceSig.
 
 (*

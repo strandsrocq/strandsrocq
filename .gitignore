@@ -86,6 +86,10 @@ setup.log
 # Dune generated files
 *.install
 
+# Generated documentation
+docs/coqdoc/
+docs/coqdoc-noproofs/
+
 # Local OPAM switch
 _opam/
 
@@ -123,7 +127,7 @@ main.pdf
 ## Generated if empty string is given at "Please type another file name for output:"
 .pdf
 
-## Bibliography auxiliary files (bibtex/biblatex/biber):
+## Biblioy auxiliary files (bibtex/biblatex/biber):
 *.bbl
 *.bcf
 *.blg
@@ -351,3 +355,4 @@ pythontex-files-*/
 # endfloat
 *.ttt
 *.fff
+.aider*

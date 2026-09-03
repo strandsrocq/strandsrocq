@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.ProtocolExamples</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">List</span> <span class="id" title="var">Lia</span> <span class="id" title="var">String</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">RoleSyntax</span> <span class="id" title="var">ChoiceRoles</span> <span class="id" title="var">Semantics</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">DefaultInstances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab9"></a><h1 class="section">CPSA direct syntax examples</h1>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="var">ProtocolExamples</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Direct_Syntax</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">ChoiceRoles</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Semantics</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <span class="id" title="var">ExampleProtocol</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Name</span> : <span class="id" title="var">Name</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Text</span> : <span class="id" title="var">Text</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Coercion</span> <span class="id" title="var">M_Akey</span> : <span class="id" title="var">Akey</span> &gt;-&gt; <span class="id" title="var">Mesg</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">a</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "a".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">b</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "b".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">n</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "n".<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">init_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "Initiator"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>; <span class="id" title="var">b</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">n</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">a</span>; <span class="id" title="var">n</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">a</span>; <span class="id" title="var">n</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">b</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span>{<span class="id" title="var">n</span>}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">resp_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "Responder"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">a</span>; <span class="id" title="var">b</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">n</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">a</span>; <span class="id" title="var">n</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">a</span>; <span class="id" title="var">n</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">b</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">instance_trace</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>) (<span class="id" title="var">t</span> : <span class="id" title="var">Text</span>) (<span class="id" title="var">A</span> <span class="id" title="var">B</span> : <span class="id" title="var">Name</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">instantiate_trace</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">eta</span> {{ <span class="id" title="var">n</span> := <span class="id" title="var">t</span> }} {{ <span class="id" title="var">a</span> := <span class="id" title="var">A</span> }} {{ <span class="id" title="var">b</span> := <span class="id" title="var">B</span> }})<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">role_trace</span> <span class="id" title="var">init_role</span>) = [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⊕ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⊖ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">vars_decl</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">role_vars</span> <span class="id" title="var">init_role</span> = [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">vd_sort</span> := <span class="id" title="var">S_Name</span>; <span class="id" title="var">vd_vars</span> := [<span class="id" title="var">a</span>; <span class="id" title="var">b</span>] |};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">vd_sort</span> := <span class="id" title="var">S_Text</span>; <span class="id" title="var">vd_vars</span> := [<span class="id" title="var">n</span>] |}].<br/>
+ 
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_protocol</span> : <span class="id" title="var">protocol</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">mkProtocol</span> [<span class="id" title="var">init_role</span>; <span class="id" title="var">resp_role</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">example_protocol_wf_no_mesg_origination</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">example_protocol</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Parameter</span> <span class="id" title="var">eta</span> : <span class="id" title="var">valuation</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Parameter</span> <span class="id" title="var">t</span> : <span class="id" title="var">Text</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Parameter</span> <span class="id" title="var">A</span> <span class="id" title="var">B</span> : <span class="id" title="var">Name</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">role_prefix_example</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_protocol</span> ▷ <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⊕ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⊖ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">event_occurred_example</span> : <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[[ ⊕ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊖ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ]; [⊖ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊕ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span> <span class="id" title="var">K</span> <span class="id" title="var">B</span>]]<br/>
+    ↓ <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;⊕ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span> <span class="id" title="var">K</span> <span class="id" title="var">B</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">reachable_pool_example</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_protocol</span> ⊨<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ ⊕ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊖ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ ⊖ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊕ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">reachable_pool_example_generated_bundle</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">G</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ ⊕ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊖ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ ⊖ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊕ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">G</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">G</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ ⊕ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊖ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ ⊖ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊕ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_init_trace</span> : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[ ⊕ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊖ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_resp_trace</span> : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[ ⊖ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span>; ⊕ ⟨ <span class="id" title="var">A</span> ⋅ <span class="id" title="var">t</span> ⟩<span class="id" title="var">_</span>(<span class="id" title="var">K</span> <span class="id" title="var">B</span>) ].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_full_trace</span> (<span class="id" title="var">i</span> : <span class="id" title="var">nat</span>) : <span class="id" title="var">list</span> <span class="id" title="var">sT</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">i</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ <span class="id" title="var">example_init_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| 1 ⇒ <span class="id" title="var">example_resp_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_init_strand</span> : <span class="id" title="var">Σ</span> := (0, <span class="id" title="var">example_init_trace</span>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_resp_strand</span> : <span class="id" title="var">Σ</span> := (1, <span class="id" title="var">example_resp_trace</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_init_send</span> : <span class="id" title="var">node__t</span> := (<span class="id" title="var">example_init_strand</span>, 0).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_init_recv</span> : <span class="id" title="var">node__t</span> := (<span class="id" title="var">example_init_strand</span>, 1).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_resp_recv</span> : <span class="id" title="var">node__t</span> := (<span class="id" title="var">example_resp_strand</span>, 0).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">example_resp_send</span> : <span class="id" title="var">node__t</span> := (<span class="id" title="var">example_resp_strand</span>, 1).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">reachable_pool_example_bundle</span> : <span class="id" title="var">bundle_type</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nodes</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_init_recv</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_resp_send</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_resp_recv</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_init_send</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">example_init_send</span>, <span class="id" title="var">example_init_recv</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">example_resp_recv</span>, <span class="id" title="var">example_resp_send</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">example_resp_send</span>, <span class="id" title="var">example_init_recv</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">example_init_send</span>, <span class="id" title="var">example_resp_recv</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">reachable_pool_example_pool</span> : <span class="id" title="var">thread_pool</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_init_trace</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_resp_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">reachable_pool_example_bundle_is_inductive</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">reachable_pool_example_bundle</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">reachable_pool_example_full_trace_extends</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">reachable_pool_example_pool</span> <span class="id" title="var">example_full_trace</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">reachable_pool_example_bundle_represents</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_bundle</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒ (<span class="id" title="var">i</span>, <span class="id" title="var">example_full_trace</span> <span class="id" title="var">i</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">reachable_pool_example_exhibited_bundle</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">reachable_pool_example_pool</span> <span class="id" title="var">example_full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">IndBundle</span> <span class="id" title="var">reachable_pool_example_bundle</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_bundle</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">reachable_pool_example_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">example_full_trace</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> ⇒ (<span class="id" title="var">i</span>, <span class="id" title="var">example_full_trace</span> <span class="id" title="var">i</span>)).<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">ExampleProtocol</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <span class="id" title="var">ChoiceProtocol</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">ca</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "ca".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cs</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "cs".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cn</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "cn".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">cpw</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Skey</span> := <span class="id" title="var">mkTVar</span> "cpw".<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">choice_client_pw_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "client-pw"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">cpw</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span>{<span class="id" title="var">cn</span>}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">choice_client_pub_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "client-pub"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">ca</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span>{<span class="id" title="var">cn</span>}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">choice_server_pw_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "server-pw"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">cpw</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">choice_server_pub_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "server-pub"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">ca</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">choice_client_roles</span> : <span class="id" title="var">list</span> <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">CHOICE</span> "client"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span>{<span class="id" title="var">cn</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACES</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">THEN</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "pw" [ <span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">cpw</span>) ];<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "pub" [ <span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">ca</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">choice_server_roles</span> : <span class="id" title="var">list</span> <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">CHOICE</span> "server"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACES</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">THEN</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "pw" [ <span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">cpw</span>) ];<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "pub" [ <span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">ca</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">choice_client_roles_expand</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">choice_client_roles</span> = [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">choice_client_pw_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">choice_client_pub_role</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+ 
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">choice_server_roles_expand</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">choice_server_roles</span> = [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">choice_server_pw_role</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">choice_server_pub_role</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+ 
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">nested_choice_roles</span> : <span class="id" title="var">list</span> <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">CHOICE</span> "nested-client"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span>{<span class="id" title="var">cn</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACES</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "authenticated" [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">THEN</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "pw" [ <span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">cpw</span>) ];<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> "pub" [ <span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">ca</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">nested_choice_roles_expand</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">nested_choice_roles</span> = [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "nested-client-authenticated-pw"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">cpw</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> <span class="id" title="var">vars</span>{<span class="id" title="var">cn</span>};<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "nested-client-authenticated-pub"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ca</span>; <span class="id" title="var">cs</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cn</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">cpw</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ca</span>; <span class="id" title="var">cn</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ca</span> <span class="id" title="var">cs</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">enc</span>{<span class="id" title="var">cn</span>}<span class="id" title="var">_</span>(<span class="id" title="var">pubk</span> <span class="id" title="var">ca</span>) ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span> []<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span> <span class="id" title="var">vars</span>{<span class="id" title="var">cn</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+ 
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">choice_protocol</span> : <span class="id" title="var">protocol</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">mkProtocol</span> (<span class="id" title="var">choice_client_roles</span> ++ <span class="id" title="var">choice_server_roles</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">choice_protocol_wf_no_mesg_origination</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">choice_protocol</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">ChoiceProtocol</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <span class="id" title="var">YahalomProtocol</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">ya</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "ya".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yb</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "yb".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">ys</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Name</span> := <span class="id" title="var">mkTVar</span> "ys".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yna</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "yna".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">ynb</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Text</span> := <span class="id" title="var">mkTVar</span> "ynb".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yk</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Skey</span> := <span class="id" title="var">mkTVar</span> "ky".<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yblob</span> : <span class="id" title="var">tvar</span> <span class="id" title="var">S_Mesg</span> := <span class="id" title="var">mkTVar</span> "yblob".<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yahalom_init_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "init"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ya</span>; <span class="id" title="var">yb</span>; <span class="id" title="var">ys</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">yna</span>; <span class="id" title="var">ynb</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">yk</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">yblob</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Mesg</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ya</span>; <span class="id" title="var">yna</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">enc</span>{<span class="id" title="var">yb</span>; <span class="id" title="var">yk</span>; <span class="id" title="var">yna</span>; <span class="id" title="var">ynb</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ya</span> <span class="id" title="var">ys</span>); <span class="id" title="var">yblob</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">yblob</span>; <span class="id" title="var">enc</span>{<span class="id" title="var">ynb</span>}<span class="id" title="var">_yk</span>} ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yahalom_resp_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "resp"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ya</span>; <span class="id" title="var">yb</span>; <span class="id" title="var">ys</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">yna</span>; <span class="id" title="var">ynb</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">yk</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">ya</span>; <span class="id" title="var">yna</span>};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<span class="id" title="var">yb</span>; <span class="id" title="var">enc</span>{<span class="id" title="var">ya</span>; <span class="id" title="var">yna</span>; <span class="id" title="var">ynb</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">yb</span> <span class="id" title="var">ys</span>)};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">enc</span>{<span class="id" title="var">ya</span>; <span class="id" title="var">yk</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">yb</span> <span class="id" title="var">ys</span>); <span class="id" title="var">enc</span>{<span class="id" title="var">ynb</span>}<span class="id" title="var">_yk</span>} ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yahalom_serv_role</span> : <span class="id" title="var">role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">DEFROLE</span> "serv"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">VARS</span> [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">ya</span>; <span class="id" title="var">yb</span>; <span class="id" title="var">ys</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Name</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">yna</span>; <span class="id" title="var">ynb</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Text</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id" title="var">yk</span>] <span class="id" title="var">IS</span> <span class="id" title="var">S_Skey</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">TRACE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="var">recv</span> <span class="id" title="var">cat</span>{<span class="id" title="var">yb</span>; <span class="id" title="var">enc</span>{<span class="id" title="var">ya</span>; <span class="id" title="var">yna</span>; <span class="id" title="var">ynb</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">yb</span> <span class="id" title="var">ys</span>)};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">send</span> <span class="id" title="var">cat</span>{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enc</span>{<span class="id" title="var">yb</span>; <span class="id" title="var">yk</span>; <span class="id" title="var">yna</span>; <span class="id" title="var">ynb</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">ya</span> <span class="id" title="var">ys</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enc</span>{<span class="id" title="var">ya</span>; <span class="id" title="var">yk</span>}<span class="id" title="var">_</span>(<span class="id" title="var">ltk</span> <span class="id" title="var">yb</span> <span class="id" title="var">ys</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NONORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">UNIQORIG</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span>{<span class="id" title="var">yk</span>}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">yahalom_protocol</span> : <span class="id" title="var">protocol</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">mkProtocol</span> [<span class="id" title="var">yahalom_init_role</span>; <span class="id" title="var">yahalom_resp_role</span>; <span class="id" title="var">yahalom_serv_role</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <span class="id" title="var">yahalom_protocol_wf_no_mesg_origination</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">yahalom_protocol</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">YahalomProtocol</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">ProtocolExamples</span>.<br/>
+</div>
+</main>
+</body>
+</html>

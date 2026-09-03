@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.Instances.Penetrator</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Init.Datatypes</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Arith</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Lists.List</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Lists.ListSet</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Lia</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Bool</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">String</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">Stdlib.Lists.List.ListNotations</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">Nat</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.Common</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">RelMinimal</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">DefaultInstances</span>.<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <span class="id" title="var">PenetratorStrands</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <span class="id" title="var">K__P</span> : <span class="id" title="var">Mesg</span> → <span class="id" title="keyword">Prop</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Penetrators (i.e., attackers) 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <span class="id" title="var">penetrator_strand</span> : <span class="id" title="var">Σ</span> → <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PT_M</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">m</span> : <span class="id" title="var">Mesg</span>) <span class="id" title="var">i</span>, <span class="id" title="var">isBasic</span> <span class="id" title="var">m</span> → <span class="id" title="var">K__P</span> <span class="id" title="var">m</span> → <span class="id" title="var">penetrator_strand</span> (<span class="id" title="var">i</span>, [⊕ <span class="id" title="var">m</span>])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PT_C</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">g</span> <span class="id" title="var">h</span> : <span class="id" title="var">Mesg</span>) <span class="id" title="var">i</span>, <span class="id" title="var">penetrator_strand</span> (<span class="id" title="var">i</span>, [⊖ <span class="id" title="var">g</span>; ⊖ <span class="id" title="var">h</span>; ⊕ <span class="id" title="var">g</span>⋅<span class="id" title="var">h</span>])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PT_S</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">g</span> <span class="id" title="var">h</span> : <span class="id" title="var">Mesg</span>) <span class="id" title="var">i</span>, <span class="id" title="var">penetrator_strand</span> (<span class="id" title="var">i</span>, [⊖ <span class="id" title="var">g</span>⋅<span class="id" title="var">h</span>; ⊕ <span class="id" title="var">g</span>; ⊕ <span class="id" title="var">h</span>])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PT_E</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">k</span> <span class="id" title="var">h</span> : <span class="id" title="var">Mesg</span>) <span class="id" title="var">i</span>, <span class="id" title="var">penetrator_strand</span> (<span class="id" title="var">i</span>, [⊖ <span class="id" title="var">k</span>; ⊖ <span class="id" title="var">h</span>; ⊕ ⟨<span class="id" title="var">h</span>⟩<span class="id" title="var">_k</span>])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PT_D</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">k</span> <span class="id" title="var">h</span> : <span class="id" title="var">Mesg</span>) <span class="id" title="var">i</span>, <span class="id" title="var">penetrator_strand</span> (<span class="id" title="var">i</span>, [⊖ <span class="id" title="var">k⁻¹</span>; ⊖ ⟨<span class="id" title="var">h</span>⟩<span class="id" title="var">_k</span>; ⊕ <span class="id" title="var">h</span>])<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">PT_H</span> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">m</span> : <span class="id" title="var">Mesg</span>) <span class="id" title="var">i</span>, <span class="id" title="var">penetrator_strand</span> (<span class="id" title="var">i</span>, [⊖ <span class="id" title="var">m</span>; ⊕ # <span class="id" title="var">m</span>]).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">strand_trace</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">i</span> <span class="id" title="var">t</span> <span class="id" title="var">s</span>, (<span class="id" title="var">i</span>,<span class="id" title="var">t</span>) = <span class="id" title="var">s</span> → <span class="id" title="var">t</span> = <span class="id" title="var">tr</span> <span class="id" title="var">s</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">penetrator_node</span> (<span class="id" title="var">n</span> : <span class="id" title="var">node__t</span>) := <span class="id" title="var">penetrator_strand</span> (<span class="id" title="var">strand</span> <span class="id" title="var">n</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">never_originates_regular</span> <span class="id" title="var">m</span> <span class="id" title="var">C</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>, <span class="id" title="var">is_node_of</span> <span class="id" title="var">n</span> <span class="id" title="var">C</span> → <span class="id" title="var">originates</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> → <span class="id" title="var">penetrator_node</span> <span class="id" title="var">n</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">originates_regular</span> <span class="id" title="var">m</span> <span class="id" title="var">C</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">n</span>, <span class="id" title="var">is_node_of</span> <span class="id" title="var">n</span> <span class="id" title="var">C</span> ∧ <span class="id" title="var">originates</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> ∧ ¬ <span class="id" title="var">penetrator_node</span> <span class="id" title="var">n</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">PenetratorStrands</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <span class="id" title="var">PenetratorBound</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <span class="id" title="var">B_is_bundle</span> : <span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Notation</span> <span class="id" title="var">E</span> := (<span class="id" title="var">edges</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proposition</span> <span class="id" title="var">penetrator_bound_set</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">K__P</span> : <span class="id" title="var">Mesg</span> → <span class="id" title="keyword">Prop</span>) (<span class="id" title="var">k__R</span> : <span class="id" title="var">Mesg</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">isBasic</span> <span class="id" title="var">k__R</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">K__P</span> <span class="id" title="var">k__R</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">never_originates_regular</span> <span class="id" title="var">K__P</span> <span class="id" title="var">k__R</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Nsubt</span> <span class="id" title="var">B</span> <span class="id" title="var">k__R</span> = <span class="id" title="var">nil</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proposition</span> <span class="id" title="var">penetrator_bound</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">K__P</span> <span class="id" title="var">k__R</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">isBasic</span> <span class="id" title="var">k__R</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">K__P</span> <span class="id" title="var">k__R</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">never_originates_regular</span> <span class="id" title="var">K__P</span> <span class="id" title="var">k__R</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">∀</span> <span class="id" title="var">p</span>, <span class="id" title="var">is_node_of</span> <span class="id" title="var">p</span> <span class="id" title="var">B</span> → <span class="id" title="var">penetrator_node</span> <span class="id" title="var">K__P</span> <span class="id" title="var">p</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ (<span class="id" title="var">k__R</span> ⊏ (<span class="id" title="var">uns_term</span> <span class="id" title="var">p</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">penetrator_never_learn_secure_decryption_key</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">K__P</span> <span class="id" title="var">s</span> <span class="id" title="var">h</span> <span class="id" title="var">k</span> <span class="id" title="var">k'</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">never_originates_regular</span> <span class="id" title="var">K__P</span> <span class="id" title="var">k'⁻¹</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">penetrator_strand</span> <span class="id" title="var">K__P</span> <span class="id" title="var">s</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊖ <span class="id" title="var">k⁻¹</span>; ⊖ ⟨<span class="id" title="var">h</span>⟩<span class="id" title="var">_k</span>; ⊕ <span class="id" title="var">h</span>] = <span class="id" title="var">tr</span> <span class="id" title="var">s</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_node_of</span> (<span class="id" title="var">s</span>,0) <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">isBasic</span> <span class="id" title="var">k'⁻¹</span>→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">K__P</span> <span class="id" title="var">k'⁻¹</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">k</span> ≠ <span class="id" title="var">k'</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">penetrator_never_learn_secure_encryption_key</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">K__P</span> <span class="id" title="var">s</span> <span class="id" title="var">h</span> <span class="id" title="var">k</span> <span class="id" title="var">k'</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">never_originates_regular</span> <span class="id" title="var">K__P</span> <span class="id" title="var">k'</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">penetrator_strand</span> <span class="id" title="var">K__P</span> <span class="id" title="var">s</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[⊖ <span class="id" title="var">k</span>; ⊖ <span class="id" title="var">h</span>; ⊕ ⟨<span class="id" title="var">h</span>⟩<span class="id" title="var">_k</span>] = <span class="id" title="var">tr</span> <span class="id" title="var">s</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_node_of</span> (<span class="id" title="var">s</span>,0) <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">isBasic</span> <span class="id" title="var">k'</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">K__P</span> <span class="id" title="var">k'</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">k</span> ≠ <span class="id" title="var">k'</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">PenetratorBound</span>.<br/>
+</div>
+</main>
+</body>
+</html>

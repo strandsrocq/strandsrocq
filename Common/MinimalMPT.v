@@ -296,7 +296,7 @@ Module MPT
   Section MinimalMPT.
     Import B.
     Variable p : A -> Prop.
-    Variable B : bundle_graph.
+    Variable B : bundle_type.
 
     Hypothesis B_is_bundle : is_bundle B.
     Local Notation E := (edges B).
@@ -483,7 +483,7 @@ Module MPT
   Section MinimalOriginatesMPT.
     Import B.
 
-    Variable B : bundle_graph.
+    Variable B : bundle_type.
     Hypothesis B_is_bundle : is_bundle B.
     Local Notation E := (edges B).
 

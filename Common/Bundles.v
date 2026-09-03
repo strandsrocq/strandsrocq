@@ -25,30 +25,30 @@ Module Type BundleSig
 
   Module Export BR := BundleRelations T St SSp.
 
-  Record bundle_graph := {
+  Record bundle_type := {
     nodes : set node__t;
     intra : edge_set__t;   (* corresponds to n1 ==> n2 *)
     inter : edge_set__t    (* corresponds to n1 --> n2 *)
   }.
 
-  Definition is_node_of n (B : bundle_graph) := set_In n (nodes B).
-  Definition is_strand_of s (B : bundle_graph) := forall n,
+  Definition is_node_of n (B : bundle_type) := set_In n (nodes B).
+  Definition is_strand_of s (B : bundle_type) := forall n,
     strand n = s ->
     index n < length (tr (strand n)) ->
     is_node_of n B.
-  Definition edges (B : bundle_graph) := set_union eq_edge__t_dec (intra B) (inter B).
-  Definition node_subset_of (N : set node__t) (B : bundle_graph) := 
+  Definition edges (B : bundle_type) := set_union eq_edge__t_dec (intra B) (inter B).
+  Definition node_subset_of (N : set node__t) (B : bundle_type) := 
     forall n, set_In n N -> is_node_of n B.
 
-  Definition is_sub (B : bundle_graph) : Prop :=
+  Definition is_sub (B : bundle_type) : Prop :=
     (** 0. edges are resp. subsets of [⟶] and [⟹] *)
     (forall n1 n2, is_edge_of n1 n2 (intra B) -> n1 ⟹ n2) /\
     (forall n1 n2, is_edge_of n1 n2 (inter B) -> n1 ⟶ n2) /\
     (** 0. edges should only relate nodes in [nodes B] *)
-    (forall n1 n2, is_edge_of n1 n2 (intra B) -> set_In n1 (nodes B) /\ set_In n2 (nodes B)) /\
-    (forall n1 n2, is_edge_of n1 n2 (inter B) -> set_In n1 (nodes B) /\ set_In n2 (nodes B)).
+    (forall n, incident_to n (intra B) -> is_node_of n B) /\
+    (forall n, incident_to n (inter B) -> is_node_of n B).
 
-  Definition is_bundle (B : bundle_graph) :=
+  Definition is_bundle (B : bundle_type) :=
     (** 1. [B] is finite *)
     (** comes for free, set is defined inductively *)
     is_sub B /\
@@ -60,13 +60,13 @@ Module Type BundleSig
     (** 4. the graph is acyclic, i.e., the transitive closure of [edges B] is *not* reflexive! *)
     (forall n, not (edges B ⊢ n ≺ n)).
 
-  Definition bundle_in_SS (B : bundle_graph) (SSp : Σ -> Prop) :=
+  Definition bundle_in_SS (B : bundle_type) (SSp : Σ -> Prop) :=
     forall n, is_node_of n B -> SSp (strand n).
-  Definition strandspace_bundle (B : bundle_graph) (SSp : Σ -> Prop) :=
+  Definition strandspace_bundle (B : bundle_type) (SSp : Σ -> Prop) :=
     is_bundle B /\ bundle_in_SS B SSp.
 
   Section BundleProperties.
-    Variable B : bundle_graph.
+    Variable B : bundle_type.
     Hypothesis B_is_bundle : is_bundle B.
 
     Lemma bundle_intrastrand_prefix_closed :
@@ -79,8 +79,8 @@ Module Type BundleSig
     destruct B_is_bundle as [[_ [_ [Hintranode _]]] [_ [Hintrab _]]].
     
     induction Hplus as [n n' Hintra|n n' n'' Hplus1 IHHplus1 Hplus2 IHHplus2].
-    - specialize (Hintrab n' n Hisnode Hintra).
-      unfold is_edge_of in Hintrab. specialize (Hintranode _ _ Hintrab) as [Hn Hn']. assumption.
+    - specialize (Hintrab n' n Hisnode Hintra). apply edge_of_implies_incident_to in Hintrab as [Hincident _]. 
+      now apply Hintranode.
     - apply IHHplus2 in Hisnode. apply IHHplus1. assumption.
     Qed.
 
@@ -120,7 +120,7 @@ Module Type BundleSig
   End BundleProperties.
 
   Section BundleRelationProperties.
-    Variable B : bundle_graph.
+    Variable B : bundle_type.
     Hypothesis B_is_bundle : is_bundle B.
 
     Local Notation E := (edges B).
@@ -159,16 +159,7 @@ Module Type BundleSig
     Proof.
       intros n n' Hlt1 Hlt2.
       destruct B_is_bundle as [_ [_ [_ Hacyclic]]].
-      destruct (eq_node__t_dec n n') as [Heq | Hneq].
-      - (* n = n' *) assumption.
-      - (* n <> n' *)
-        apply bundle_le_then_lt in Hlt1.
-        destruct Hlt1 as [Heq1 | Hprec1].
-        + contradiction.
-        + apply bundle_le_then_lt in Hlt2.
-          destruct Hlt2 as [Heq2 | Hprec2].
-          * symmetry. assumption.
-          * specialize (bundle_lt_multi Hprec1 Hprec2) as Hprec. specialize (Hacyclic n). contradiction.
+      eapply bundle_le_antisymm_acyclic; trivial.
     Qed.
 
     Definition partialorder T R := reflexive T R /\ antisymmetric T R /\ transitive T R.
@@ -254,7 +245,7 @@ Module Type BundleSig
   End BundleRelationProperties.
 
   Section BundleMinimal.
-    Variable B : bundle_graph.
+    Variable B : bundle_type.
     Hypothesis B_is_bundle : is_bundle B.
     Local Notation E := (edges B).
     
@@ -299,7 +290,7 @@ Module Type BundleSig
         unfold is_minimal in Hisminimal.
         specialize (Hisminimal Hin n2 Hin2).
         destruct (eq_node__t_dec n2 m) as [Heq|Hneq].
-        all: try (apply Hinter in Hcontra as [Hcontra _]; auto).
+        all: try (apply edge_of_implies_incident_to in Hcontra as [? ?]; now apply Hinter).
         + subst. rewrite Hn2 in Ht. discriminate Ht.
         + apply Hisminimal in Hneq. apply Hneq. now apply bundle_le_union.
     Qed.
@@ -331,7 +322,7 @@ Module Type BundleSig
       destruct (term m') as [t'|t'] eqn:Hm'; try contradiction.
       destruct (term m) as [t|t] eqn:Hm; try contradiction.
       repeat split.
-      - apply Hintersub in Hedge as [Hedge _]; auto.
+      - apply edge_of_implies_incident_to in Hedge as [Hedge _]. now apply Hintersub.
       - unfold is_positive. now rewrite Hm'.
       - apply (bundle_lt_one). apply set_union_intro; auto.
       - unfold uns_term. now rewrite Hm', Hm.
@@ -380,7 +371,7 @@ Module Type BundleSig
         now apply (bundle_lt_then_le) in Hmin'.
     Qed.
 
-    (* We partially instantiate has_minimal from RelMinimal with bundle stuff *)
+    (* We partially instantiate has_minimal from RelMinimal with bundle_type stuff *)
     Definition exists_minimal_bundle :=
       exists_minimal eq_node__t_dec (bundle_le_dec E) (bundle_le_antisymm B_is_bundle) (bundle_le_trans (E:=E)).
 
@@ -399,4 +390,3 @@ Module Bundle
 
   Include BundleSig T St SSp.
 End Bundle.
-

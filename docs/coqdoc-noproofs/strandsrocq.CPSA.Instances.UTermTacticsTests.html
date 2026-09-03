@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.Instances.UTermTacticsTests</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">DefaultInstances</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <span class="id" title="var">test</span> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">t</span> <span class="id" title="var">t'</span>:<span class="id" title="var">Text</span>) (<span class="id" title="var">n</span> <span class="id" title="var">n'</span>:<span class="id" title="var">Name</span>) (<span class="id" title="var">k</span> <span class="id" title="var">k'</span>:<span class="id" title="var">Skey</span>) (<span class="id" title="var">a</span> <span class="id" title="var">a'</span> <span class="id" title="var">b</span> <span class="id" title="var">b'</span>:<span class="id" title="var">Mesg</span>),<br/>
+&nbsp;&nbsp;(<span class="id" title="var">t</span> = <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">k</span> = <span class="id" title="var">k</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">a</span> = <span class="id" title="var">a</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">M_Text</span> <span class="id" title="var">t</span> = <span class="id" title="var">M_Text</span> <span class="id" title="var">t</span> ∧ <span class="id" title="var">t</span> = <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">t</span> = <span class="id" title="var">t</span> ∨ <span class="id" title="var">t</span> = <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">False</span> → <span class="id" title="var">t</span> = <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">t</span> = <span class="id" title="var">t'</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">M_Text</span> <span class="id" title="var">t</span> = <span class="id" title="var">M_Text</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">M_Text</span> <span class="id" title="var">t</span> = <span class="id" title="var">M_Text</span> <span class="id" title="var">t'</span> ∧ <span class="id" title="var">t</span> = <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> = <span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> = <span class="id" title="var">M_Skey</span> <span class="id" title="var">k'</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> = <span class="id" title="var">M_Text</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> ≠ <span class="id" title="var">M_Text</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">K</span> <span class="id" title="var">n</span> = <span class="id" title="var">K</span> <span class="id" title="var">n</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">K</span> <span class="id" title="var">n</span> = <span class="id" title="var">K</span> <span class="id" title="var">n'</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">a</span> ⋅ <span class="id" title="var">a'</span> = <span class="id" title="var">M_Text</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">a</span> ⋅ <span class="id" title="var">a'</span> = <span class="id" title="var">b</span> ⋅ <span class="id" title="var">b'</span>) →<br/>
+&nbsp;&nbsp;(~~<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> = <span class="id" title="var">M_Text</span> <span class="id" title="var">t</span>) →<br/>
+&nbsp;&nbsp;(#<span class="id" title="var">a</span> = #<span class="id" title="var">a'</span>) →<br/>
+&nbsp;&nbsp;(<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> ≠ <span class="id" title="var">M_Text</span> <span class="id" title="var">t</span>) ∧ (<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> = <span class="id" title="var">M_Skey</span> <span class="id" title="var">k'</span>) ∧ (<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> = <span class="id" title="var">M_Text</span> <span class="id" title="var">t</span>) ∧ (<span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span> = <span class="id" title="var">M_Skey</span> <span class="id" title="var">k</span>).<br/>
+</div>
+</main>
+</body>
+</html>

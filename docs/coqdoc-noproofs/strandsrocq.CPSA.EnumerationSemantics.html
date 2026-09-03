@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPSA Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="coqdoc-page">
+  <header class="page-header">
+    <p class="eyebrow">strandsrocq / CPSA</p>
+    <h1>CPSA Documentation</h1>
+    <p class="subtitle">
+      Syntax, semantics, examples, and concrete term instances for CPSA.
+    </p>
+  </header>
+<h1 class="libtitle">Library strandsrocq.CPSA.EnumerationSemantics</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">List</span> <span class="id" title="var">ListSet</span> <span class="id" title="var">Lia</span> <span class="id" title="var">Arith.PeanoNat</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.Common</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">Enumerate</span> <span class="id" title="var">BundleSizeInductionFixed</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">RoleSyntax</span> <span class="id" title="var">ChoiceRoles</span> <span class="id" title="var">Semantics</span> <span class="id" title="var">ComputableSemantics</span> <span class="id" title="var">LabelledSemantics</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="var">DefaultInstances</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Direct_Syntax</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">ChoiceRoles</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Semantics</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Computable_Semantics</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">CPSA_Labelled_Semantics</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <span class="id" title="var">BundleSinkInduction</span> := <span class="id" title="var">BundleSizeInductionFixed</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">strandsrocq.CPSA.Instances.EmbeddedTraceStrands.TermNat</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">strandsrocq.CPSA.Instances.EmbeddedTraceStrands.EmbeddedTraceInstance.EmbeddedTraceStrands</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">strandsrocq.CPSA.Instances.EmbeddedTraceStrands.EmbeddedTraceInstance.EmbeddedTraceStrandSpace</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">strandsrocq.CPSA.Instances.DefaultInstances.DefaultInstance.BundleInstance</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">strandsrocq.CPSA.Instances.DefaultInstances.DefaultInstance.BundleInductiveInstance</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab17"></a><h1 class="section">Compatible enumerations and labelled executions</h1>
+
+
+<div class="paragraph"> </div>
+
+    This file proves the scheduling conjecture from the paper without changing
+    the general enumeration and sink-induction developments.  An enumeration
+    is represented in the direction <span class="inlinecode"><span class="id" title="var">nat</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" title="var">node</span></span>: <span class="inlinecode"><span class="id" title="var">f</span></span> <span class="inlinecode"><span class="id" title="var">i</span></span> is the node scheduled
+    at position <span class="inlinecode"><span class="id" title="var">i</span></span>. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Module</span> <span class="id" title="var">CPSA_Enumeration_Semantics</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">causal_lt</span> (<span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span>) (<span class="id" title="var">n</span> <span class="id" title="var">n'</span> : <span class="id" title="var">node__t</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">edges</span> <span class="id" title="var">B</span> ⊢ <span class="id" title="var">n</span> ≺ <span class="id" title="var">n'</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">compatible_bundle_enumeration</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span>) (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">node__t</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Enumerate.compat_enum</span> (<span class="id" title="var">causal_lt</span> <span class="id" title="var">B</span>) <span class="id" title="var">f</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">remove_sink_node</span> := <span class="id" title="var">BundleSinkInduction.remove_node</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">compatible_bundle_enumeration_nodup</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">NoDup</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">compatible_last_in</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) = <span class="id" title="var">S</span> <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> (<span class="id" title="var">f</span> <span class="id" title="var">k</span>) (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">compatible_last_is_sink</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) = <span class="id" title="var">S</span> <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">sink</span> (<span class="id" title="var">f</span> <span class="id" title="var">k</span>) <span class="id" title="var">B</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">remove_sink_node_is_bundle</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">sink</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> (<span class="id" title="var">remove_sink_node</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">remove_sink_node_length</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">m</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">S</span> (<span class="id" title="var">length</span> (<span class="id" title="var">nodes</span> (<span class="id" title="var">remove_sink_node</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span>))) = <span class="id" title="var">length</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">removed_causal_lt_incl</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">n'</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">causal_lt</span> (<span class="id" title="var">remove_sink_node</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span>) <span class="id" title="var">n</span> <span class="id" title="var">n'</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">causal_lt</span> <span class="id" title="var">B</span> <span class="id" title="var">n</span> <span class="id" title="var">n'</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">compatible_remove_last</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) = <span class="id" title="var">S</span> <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">remove_sink_node</span> (<span class="id" title="var">f</span> <span class="id" title="var">k</span>) <span class="id" title="var">B</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">Enumerate.omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">map_labels_snoc_enum</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">st</span> <span class="id" title="var">ls</span> <span class="id" title="var">l</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">map</span> (<span class="id" title="var">label_dst</span> <span class="id" title="var">st</span>) <span class="id" title="var">ls</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Enumerate.list_of_enum</span> (<span class="id" title="var">Enumerate.omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>) <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">label_dst</span> <span class="id" title="var">st</span> <span class="id" title="var">l</span> = <span class="id" title="var">f</span> <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">map</span> (<span class="id" title="var">label_dst</span> <span class="id" title="var">st</span>) (<span class="id" title="var">ls</span> ++ [<span class="id" title="var">l</span>]) =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Enumerate.list_of_enum</span> <span class="id" title="var">f</span> (<span class="id" title="var">S</span> <span class="id" title="var">k</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <span class="id" title="var">enumeration_has_execution</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">B</span> : <span class="id" title="var">bundle_type</span>) (<span class="id" title="var">P</span> : <span class="id" title="var">protocol</span>) (<span class="id" title="var">f</span> : <span class="id" title="var">nat</span> → <span class="id" title="var">node__t</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">∃</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">ls</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inhabited</span> (<span class="id" title="var">P</span> ⊩ᵀ [] -[ <span class="id" title="var">ls</span> ]→* <span class="id" title="var">T</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">B</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">map</span> (<span class="id" title="var">label_dst</span> <span class="id" title="var">pool_strand</span>) <span class="id" title="var">ls</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Enumerate.list_of_enum</span> <span class="id" title="var">f</span> (<span class="id" title="var">length</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">enumeration_execution_snoc</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">P</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span> <span class="id" title="var">T</span> <span class="id" title="var">T'</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">ls</span> <span class="id" title="var">l</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">length</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) = <span class="id" title="var">S</span> <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊩ᵀ [] -[ <span class="id" title="var">ls</span> ]→* <span class="id" title="var">T</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">P</span> ⊩ᵀ <span class="id" title="var">T</span> -[ <span class="id" title="var">l</span> ]→ <span class="id" title="var">T'</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">extends_pool_trace</span> <span class="id" title="var">T'</span> <span class="id" title="var">full_trace</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">B</span> <span class="id" title="var">T'</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">map</span> (<span class="id" title="var">label_dst</span> <span class="id" title="var">pool_strand</span>) <span class="id" title="var">ls</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Enumerate.list_of_enum</span> (<span class="id" title="var">Enumerate.omit_at</span> <span class="id" title="var">f</span> <span class="id" title="var">k</span>) <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">label_dst</span> <span class="id" title="var">pool_strand</span> <span class="id" title="var">l</span> = <span class="id" title="var">f</span> <span class="id" title="var">k</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumeration_has_execution</span> <span class="id" title="var">B</span> <span class="id" title="var">P</span> <span class="id" title="var">f</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">same_nodes_after_remove</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">In</span> <span class="id" title="var">m</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">SameSet</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) (<span class="id" title="var">m</span> :: <span class="id" title="var">nodes</span> (<span class="id" title="var">remove_sink_node</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">removed_node_fresh</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬ <span class="id" title="var">In</span> <span class="id" title="var">m</span> (<span class="id" title="var">nodes</span> (<span class="id" title="var">remove_sink_node</span> <span class="id" title="var">m</span> <span class="id" title="var">B</span>)).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <span class="id" title="var">represented_added_node_to_original</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">B0</span> <span class="id" title="var">m</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">SameSet</span> (<span class="id" title="var">nodes</span> <span class="id" title="var">B</span>) (<span class="id" title="var">m</span> :: <span class="id" title="var">nodes</span> <span class="id" title="var">B0</span>) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{| <span class="id" title="var">nodes</span> := <span class="id" title="var">m</span> :: <span class="id" title="var">nodes</span> <span class="id" title="var">B0</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">intra</span> := <span class="id" title="var">intra</span> <span class="id" title="var">B0</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inter</span> := <span class="id" title="var">inter</span> <span class="id" title="var">B0</span> |}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">represents_pool</span> <span class="id" title="var">B</span> <span class="id" title="var">T</span> <span class="id" title="var">full_trace</span> <span class="id" title="var">pool_strand</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <span class="id" title="var">compatible_enumeration_has_labelled_execution_tau</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">P</span> <span class="id" title="var">f</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ofProtocol</span> <span class="id" title="var">B</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">tau_non_originating</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumeration_has_execution</span> <span class="id" title="var">B</span> <span class="id" title="var">P</span> <span class="id" title="var">f</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Paper-level formulation of the scheduling conjecture.  Protocol
+      well-formedness discharges the lower-level <span class="inlinecode"><span class="id" title="var">tau_non_originating</span></span>
+      condition, just as in <span class="inlinecode"><span class="id" title="var">reachable_of_wf_bundle</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Corollary</span> <span class="id" title="var">compatible_enumeration_has_labelled_execution</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">B</span> <span class="id" title="var">P</span> <span class="id" title="var">f</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">is_bundle</span> <span class="id" title="var">B</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">ofProtocol</span> <span class="id" title="var">B</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">wf_protocol_no_mesg_origination</span> <span class="id" title="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">compatible_bundle_enumeration</span> <span class="id" title="var">B</span> <span class="id" title="var">f</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">enumeration_has_execution</span> <span class="id" title="var">B</span> <span class="id" title="var">P</span> <span class="id" title="var">f</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <span class="id" title="var">CPSA_Enumeration_Semantics</span>.<br/>
+</div>
+</main>
+</body>
+</html>
