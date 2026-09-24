@@ -14,7 +14,7 @@ and is extended in:
 
 with an inductive characterization of bundles, a CPSA-style protocol syntax embedded in Rocq, a structured operational semantics for protocol execution, and correspondence theorems proving that reachable thread pools and bundles carry exactly the same information.
 
-The code that accompanies each paper is tagged: [`csf25`](https://github.com/strandsrocq/strandsrocq/tree/csf25) for the CSF 2025 paper and [`partial-order-semantics`](https://github.com/strandsrocq/strandsrocq/tree/partial-order-semantics) for the JLAMP one, whose artifact is also archived on [Zenodo](https://doi.org/10.5281/zenodo.22299361).
+The code that accompanies each paper is tagged: [`csf25`](https://github.com/strandsrocq/strandsrocq/tree/csf25) for the CSF 2025 paper and [`sep-2026-release`](https://github.com/strandsrocq/strandsrocq/tree/sep-2026-release) for the JLAMP one, archived on Zenodo with DOI [10.5281/zenodo.22939512](https://doi.org/10.5281/zenodo.22939512). The version first submitted to JLAMP is tagged [`partial-order-semantics`](https://github.com/strandsrocq/strandsrocq/tree/partial-order-semantics).
 This README describes the current version, and [Changes since the CSF 2025 paper](#changes-since-the-csf-2025-paper) lists where it departs from the first.
 
 # Installation and proof checking
