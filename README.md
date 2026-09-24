@@ -31,7 +31,8 @@ The process requires about 15 seconds on a machine with an Apple M4 Pro processo
 # Documentation
 
 - Our [CSF 2025 paper](https://arxiv.org/abs/2502.12848) explains the ideas and design principles behind StrandsRocq, and includes some examples;
-- The [documentation of the current version](https://strandsrocq.github.io/strandsrocq/) shows the statements and comments of every module, with identifiers linked to their definitions;
+- The [online documentation](https://strandsrocq.github.io/strandsrocq/) covers every module of the current version, without proofs, and links each identifier to its definition;
+    - A good **walkthrough** is its page on [SimpleAuth](https://strandsrocq.github.io/strandsrocq/strandsrocq.Original.Examples.simple_auth.SimpleAuth.html), the protocol of Section IV of the CSF 2025 paper, commented step by step;
 - An [online tutorial](https://strandsrocq.vercel.app/) walks through the SimpleAuth protocol of the CSF 2025 paper in the browser, running the code of the `csf25` version.
 
 ## Generating the documentation
