@@ -197,13 +197,8 @@ Module Type StrandSpaceSig (Import T : TermSig) (Import St : StrandSig T).
     (* At page 2: By abuse of language, we will still treat signed 𝔸s ordinary terms, for instance as having subterms. *)
     Definition occurs t n := t ⊏ (uns_term n).
 
-    (* These definitions are slightly imprecise in the S&P paper:
-    - we need to take the transitive closure ⟹+ because when they say precedes they do not intend immediately ...
-    *)
     Definition originates (t : A) (n : node__t) :=
       is_positive n /\ occurs t n /\ forall n', n' ⟹+ n -> ~ occurs t n'.
-    Definition uniquely_originates (t : A) :=
-      exists! n, originates t n.
 
     Definition edge__t : Set := node__t * node__t.
     Definition edge_set__t := set edge__t.
@@ -414,23 +409,6 @@ Module Type StrandSpaceSig (Import T : TermSig) (Import St : StrandSig T).
       repeat split; try easy.
       intros n' Hintra.
       apply intrastrand_index_lt in Hintra; lia.
-    Qed.
-
-    Lemma uniquely_originates_same_strand :
-      forall n n' t,
-        uniquely_originates t ->
-        originates t n ->
-        originates t n' ->
-        strand n = strand n'.
-    Proof.
-      intros n n' t Huniq Horign Horign'.
-      inversion Huniq as [n'' [_ Huniq']].
-      apply Huniq' in Horign.
-      apply Huniq' in Horign'.
-      rewrite Horign in Horign'.
-      rewrite (node_as_pair n) in Horign'.
-      rewrite (node_as_pair n') in Horign'.
-      now inversion Horign'.
     Qed.
   End OriginatesProperties.
 

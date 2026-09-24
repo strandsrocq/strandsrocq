@@ -3,6 +3,7 @@ Require Import Bundles.
 Require Import BundleInductive.
 Require Import MinimalMPT.
 Require Import StrandsTacticsFunctor.
+Require Import SanityTactics.
 Require Import Universe.
 
 Module MakeDefaultInstance
@@ -21,4 +22,5 @@ Module MakeDefaultInstance
   Module Export BundleInstance := Bundle T St SSp.
   Module Export BundleInductiveInstance := BundleInductive T St SSp BundleInstance.
   Module Export MPTInstance := MPT T St SSp BundleInstance.
+  Module Export SanityTacticsInstance := MakeSanityTactics T St SSp BundleInstance BundleInductiveInstance TT.
 End MakeDefaultInstance.

@@ -120,10 +120,7 @@ Module CPSA_Semantics.
   This would require to switch P ⊨ T to type and also exhibit a witness for T ↓ ⊕m ...
   Lemma bundle_of_reachable : 
     forall P T, P ⊨ T -> { G : bundle_type | IndBundle G }.
-  Proof.
-    intros P T Hreach.
-    induction Hreach.
-  Admitted. *)
+  *)
 
   Section SemanticCorrespondence.
 

@@ -13,8 +13,10 @@ Section initiator_guarantees.
   Variable s : Σ.
   Variables A B Na Nb : T.
   Variable Tname : T -> Prop.
+  Variable C : bundle_type.
 
   Hypothesis s_is_NS_init : NS_initiator_strand Tname A B Na Nb s.
+  Hypothesis s_strand_of_C : is_strand_of s C.
 
   (* A few easy/trivial facts *)
   Property term_of_s0 :
@@ -47,25 +49,29 @@ Section initiator_guarantees.
     apply mpti_then_originates; simpl; now rewrite <- Htrace.
   Qed.
 
-  Lemma originates_Na_implies_s0 :
-    uniquely_originates $Na ->
-      forall n, originates $Na n -> n = (s, 0).
+  Lemma is_node_of_s0_C :
+    is_node_of (s,0) C.
   Proof.
-    intros Na_uniquely_originates n Horig.
+    inversion s_is_NS_init.
+    apply s_strand_of_C; [easy | simpl; lia].
+  Qed.
+
+  Lemma originates_Na_implies_s0 :
+    originates_at_most_once_in C $Na ->
+      forall n, is_node_of n C -> originates $Na n -> n = (s, 0).
+  Proof.
+    intros Na_originates_at_most_once n Hnode Horig.
     destruct (eq_node__t_dec n (s,0)); try easy.
     specialize (Na_originates_in_s0) as Horig1; st_implication Horig1.
-    specialize (Na_uniquely_originates) as [nu [Horignu Huniq]].
-    specialize (Huniq _ Horig1) as Horig1'.
-    specialize (Huniq _ Horig) as Horig2'.
-    now subst.
+    specialize (Na_originates_at_most_once _ _ is_node_of_s0_C Hnode Horig1 Horig); now subst.
   Qed.
 
   Corollary originates_Na_implies_regular :
-    forall K__P, uniquely_originates $Na ->
-      forall n, originates $Na n -> ~penetrator_strand K__P (strand n).
+    forall K__P, originates_at_most_once_in C $Na ->
+      forall n, is_node_of n C -> originates $Na n -> ~penetrator_strand K__P (strand n).
   Proof.
-    intros K__P Na_uniquely_originates n Horig.
-    apply (originates_Na_implies_s0 Na_uniquely_originates) in Horig.
+    intros K__P Na_originates_at_most_once n Hnode Horig.
+    apply (originates_Na_implies_s0 Na_originates_at_most_once Hnode) in Horig.
     inversion s_is_NS_init.
     unfold not. intros Hp.
     now subst.

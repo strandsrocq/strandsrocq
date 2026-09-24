@@ -44,7 +44,8 @@ Section kmp_closure.
   (* This definition is taken as-is from the closure definition in the paper *)
   Definition is_closure (π : policy__t) (Π : closure__t) : Prop :=
     (* 1. fst Π includes π *) (forall KT ℓ JT, π ⊢ KT -[ℓ]-> JT -> Π ⊢ (KDn KT) =[ℓ]=> JT) /\
-    (* 2. ℜ is reflexive *) (forall (KT : KEY_DATA_T), Π ⊢ KT ∈ KT) /\
+    (* 2. ℜ is reflexive on the types the policy mentions *)
+    (forall KT, set_In KT (policy_types π) -> Π ⊢ KT ∈ KT) /\
     (* 3. (D, ℓ, D) belongs to fst Π *) (Π ⊢ D =[Enc]=> D /\ Π ⊢ D =[Dec]=> D) /\
     (* 4. enc/dec reach. rule *) (forall KT JT ZT, Π ⊢ KT =[Enc]=> JT /\ Π ⊢ KT =[Dec]=> ZT -> Π ⊢ ZT ∈ JT) /\
     (* 5. enc head enable *) (forall KT JT ZT, Π ⊢ KT =[Enc]=> JT /\ (Π ⊢ KT ∈ ZT \/ Π ⊢ ZT ∈ KT) -> Π ⊢ ZT =[Enc]=> JT) /\

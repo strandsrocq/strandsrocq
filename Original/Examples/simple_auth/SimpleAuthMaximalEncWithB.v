@@ -15,7 +15,7 @@ Section SimpleAuthSpec.
 
   This is the [SimpleAuth.v] protocol in which we define a maximal penetrator that can do everything except originating [SK A B] and
 
-  ** NOTE: This is the variant of [SimpleAuthMaximalEnc.v] that includes [B] instead of [A] in the ciphertext. The proofs are identical. We only needed to adapt the definition of [Ncp] and replace
+  NOTE: This is the variant of [SimpleAuthMaximalEnc.v] that includes [B] instead of [A] in the ciphertext. The proofs are identical. We only needed to adapt the definition of [Ncp] and replace
   [specialize (HnoForge ($Na ⋅ $A ) Hismpti).] with [specialize (HnoForge ($Na ⋅ $B ) Hismpti).] at line 156.
   [destruct (A_subterm_dec (⟨ $Na ⋅ $A ⟩_(SK A B)) t);] with [destruct (A_subterm_dec (⟨ $Na ⋅ $B ⟩_(SK A B)) t);] at line 177.
   [try rewrite Hand2.] with [try rewrite Hand1.] at line 234.
@@ -146,6 +146,9 @@ Section SimpleAuthSpec.
   Qed.
 End SimpleAuthSpec.
 
+(** * Proof of Security
+  We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
+
 Section SimpleAuthSecurity.
   (**
     Local assumptions to make the rest more easily readable.
@@ -158,8 +161,15 @@ Section SimpleAuthSecurity.
 
   Hypothesis s_is_SA_init : SA_initiator_strand A B Na s.
   Hypothesis s_strand_of_C : is_strand_of s C.
-  Hypothesis C_is_bundle : is_bundle C.
-  Hypothesis C_is_SA_bundle : bundle_in_SS C (SA_StrandSpace A B).
+  Hypothesis C_is_SA_bundle : strandspace_bundle C (SA_StrandSpace A B).
+
+  (* Some facts, for easier use of C_is_SA_bundle *)
+  Proposition C_is_bundle : is_bundle C.
+  Proof. now unfold strandspace_bundle in C_is_SA_bundle. Qed.
+
+  Proposition C_is_SA :
+    bundle_in_SS C (SA_StrandSpace A B).
+  Proof. now unfold strandspace_bundle in C_is_SA_bundle. Qed.
 
   (*
       NoForgeCipher is sufficient to prove that the attacker dees not originate the
@@ -182,11 +192,8 @@ Section SimpleAuthSecurity.
     specialize (exists_minimal_bundle C_is_bundle Hnil) as [m [Hin' Hmin]].
     apply (minimal_then_originates C_is_bundle #(SK A B) Hin') in Hmin.
     apply (Nsubtiff_inC_p C #(SK A B)) in Hin' as [Hin'' _].
-    now specialize (SK_AB_never_originates C_is_SA_bundle Hin'') as Hcontra.
+    now specialize (SK_AB_never_originates C_is_SA Hin'') as Hcontra.
   Qed.
-
-  (** * Proof of Security
-  We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
 
   (* ============================================================ *)
   (** ** Non-injective agreement *)
@@ -226,7 +233,7 @@ Section SimpleAuthSecurity.
     assert (Hin':=Hin).
     apply (Nc_iff_inC_Ncp) in Hin' as [HinC HNcp].
     inversion s_is_SA_init as [i Hstrace0].
-    specialize (C_is_SA_bundle m HinC) as His_SA.
+    specialize (C_is_SA m HinC) as His_SA.
     inversion His_SA as [s' Hpen|s' A' B' Na' Hini|s' A' B' Na' Hres].
 
     (** _Penetrator case_ *)
@@ -261,29 +268,31 @@ Section SimpleAuthSecurity.
 
   Proposition injectivity :
   forall U U',
-      uniquely_originates $Na ->
+      originates_at_most_once_in C $Na ->
       forall s' : Σ,
+        is_strand_of s' C ->
         SA_initiator_strand U U' Na s' ->
         s' = s.
   Proof.
-    intros U U' Huorig s' Hini'.
+    intros U U' Huorig s' Hstrand' Hini'.
     inversion Hini' as [Htrace'].
     specialize s_is_SA_init as Hini.
     inversion Hini as [Htrace].
-    inversion Huorig as [? [_ Horigx]].
-    assert (Horigx' := Horigx).
+    pose (s0 := s).
+    pose (s0' := s').
     specialize (mpti_then_originates $Na (s,0)) as Horig.
     specialize (mpti_then_originates $Na (s',0)) as Horig'.
-    pose (s0:=s); pose (s'0:=s').
     simplify_term_in Horig; st_implication Horig.
     simplify_term_in Horig'; st_implication Horig'.
-    specialize (Horigx' (s'0, 0) Horig'); specialize (Horigx (s0,0) Horig); subst.
-    now inversion Horigx'.
+    assert (is_node_of (s0,0) C) as Hnode by (apply s_strand_of_C; [easy | simpl; lia]).
+    assert (is_node_of (s0',0) C) as Hnode' by (apply Hstrand'; [easy | simpl; lia]).
+    specialize (Huorig _ _ Hnode Hnode' Horig Horig').
+    inversion Huorig; now subst.
   Qed.
 
   (** From [noninjective_agreement] and [injectivity] we obtain injective agreement as a corollary: *)
   Corollary injective_agreement :
-    uniquely_originates $Na ->
+    originates_at_most_once_in C $Na ->
       (
         exists s' : Σ,
           SA_responder_strand A B Na s' /\
@@ -292,6 +301,7 @@ Section SimpleAuthSecurity.
       /\
       (
         forall s'' : Σ,
+          is_strand_of s'' C ->
           SA_initiator_strand A B Na s'' ->
           s'' = s
       ).
@@ -302,3 +312,86 @@ Section SimpleAuthSecurity.
   Qed.
 
 End SimpleAuthSecurity.
+
+Section SimpleAuthWithBSanity.
+  (** * Sanity check: an honest run
+    We exhibit an honest protocol execution as a sanity check: the protocol executes and satisfies all of the assumptions of the security lemmas.
+  *)
+
+  Notation A := (Text 0).
+  Notation B := (Text 1).
+  Notation Na := (Text 2).
+  
+  Notation s_ini := (0, [ ⊕ $A ⋅ $B ⋅ $Na; ⊖ ⟨ $Na ⋅ $B ⟩_(SK A B) ]).
+  Notation s_res := (1, [ ⊖ $A ⋅ $B ⋅ $Na; ⊕ ⟨ $Na ⋅ $B ⟩_(SK A B) ]).
+
+  (** A single honest session: [A] sends its name, [B]'s name and the nonce, [B] answers with the nonce encrypted under the shared key.  The three lists are reversed because each [IndBundle] constructor conses onto their heads, so they are written in reverse construction order. *)
+  Definition C : bundle_type :=
+    {|
+      nodes := rev [
+        (s_ini,0);
+        (s_res,0);
+        (s_res,1);
+        (s_ini,1)
+      ];
+      intra := rev [
+        ((s_res,0),(s_res,1));
+        ((s_ini,0),(s_ini,1))
+        ];
+      inter := rev [
+        ((s_ini,0),(s_res,0));   (* A -> B : $A ⋅ $B ⋅ $Na         *)
+        ((s_res,1),(s_ini,1))    (* B -> A : ⟨ $Na ⋅ $B ⟩_(SK A B) *)
+        ]
+    |}.
+
+  (** The two strands are legitimate roles of the protocol. *)
+  Lemma s_ini_SA : SA_initiator_strand A B Na s_ini.
+  Proof. solve_role. Qed.
+
+  Lemma s_res_SA : SA_responder_strand A B Na s_res.
+  Proof. solve_role. Qed.
+
+  Create HintDb sanity.
+  #[local] Hint Constructors SA_StrandSpace : sanity.
+  #[local] Hint Resolve s_ini_SA s_res_SA : sanity.
+  
+  (** [C] is a bundle and every strand of [C] belongs to the strand space, so nothing in it is outside the protocol or the penetrator model. Together: [C] is a valid execution of SimpleAuthMaximalEncWithB. *)
+  Lemma C_is_strandspace_bundle: 
+    strandspace_bundle C (SA_StrandSpace A B).
+  Proof. solve_strandspace_bundle. Qed.
+
+  (** [s_ini] is a strand of C. This is the initiator point of view in the security lemma. *)
+  Lemma s_ini_strand_C : 
+    is_strand_of s_ini C.
+  Proof. solve_is_strand_of. Qed.
+
+  (** [Na] is originated at most once (in fact exactly once in [s_ini]) *)
+  Lemma C_Na_at_most_once : 
+    originates_at_most_once_in C $ Na.
+  Proof. solve_at_most_once_in. Qed.
+    
+  (** The conclusion is what we already know by construction since we have exactly one initiator and one responder in [C]. So, the important part is that the term typechecks, which is possible only if the four hypotheses of [injective_agreement] hold at once, i.e., the guarantee is not vacuous. *)
+  Lemma injective_agreement_sanity :
+    (
+      exists s' : Σ,
+        SA_responder_strand A B Na s' /\
+        is_strand_of s' C
+    )
+    /\
+    (
+      forall s'' : Σ,
+        is_strand_of s'' C ->
+        SA_initiator_strand A B Na s'' ->
+        s'' = s_ini
+    ).
+  Proof.
+    exact (
+      injective_agreement 
+        s_ini_SA 
+        s_ini_strand_C
+        C_is_strandspace_bundle 
+        C_Na_at_most_once
+      ).
+  Qed.
+
+End SimpleAuthWithBSanity.

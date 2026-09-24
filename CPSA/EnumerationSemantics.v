@@ -1,7 +1,7 @@
 From Stdlib Require Import List ListSet Lia Arith.PeanoNat.
 Import ListNotations.
 
-From strandsrocq.Common Require Import Enumerate BundleSizeInductionFixed.
+From strandsrocq.Common Require Import Enumerate BundleSizeInduction.
 From strandsrocq.CPSA Require Import
   RoleSyntax ChoiceRoles Semantics ComputableSemantics LabelledSemantics.
 From strandsrocq.CPSA.Instances Require Import DefaultInstances.
@@ -12,7 +12,7 @@ Import CPSA_Semantics.
 Import CPSA_Computable_Semantics.
 Import CPSA_Labelled_Semantics.
 
-Module BundleSinkInduction := BundleSizeInductionFixed
+Module BundleSinkInduction := BundleSizeInduction
   strandsrocq.CPSA.Instances.EmbeddedTraceStrands.TermNat
   strandsrocq.CPSA.Instances.EmbeddedTraceStrands.EmbeddedTraceInstance.EmbeddedTraceStrands
   strandsrocq.CPSA.Instances.EmbeddedTraceStrands.EmbeddedTraceInstance.EmbeddedTraceStrandSpace

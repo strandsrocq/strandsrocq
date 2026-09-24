@@ -10,7 +10,7 @@ Set Implicit Arguments.
 Section SimpleAuthSpec.
   (** * Example: A Simple Unilateral Authentication Protocol
 
-  ** NOTE: This is a FLAWED variant of [SimpleAuth.v] with no id in the payload.
+  NOTE: This is a FLAWED variant of [SimpleAuth.v] with no id in the payload.
   [[
   A -> B :  A ⋅ B ⋅ Na
   B -> A :  ⟨ Na ⟩_(SK A B)
@@ -50,6 +50,9 @@ Section SimpleAuthSpec.
   Proof. now unfold penetrator_key, K__P_AB. Qed.
 End SimpleAuthSpec.
 
+(** * Proof of Security
+  We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
+
 Section SimpleAuthSecurity.
   (**
     Local assumptions to make the rest more easily readable.
@@ -71,9 +74,6 @@ Section SimpleAuthSecurity.
   Proposition C_is_SA :
     forall n, is_node_of n C -> SA_StrandSpace (K__P_AB A B) (strand n).
   Proof. now unfold strandspace_bundle in C_is_SA_bundle. Qed.
-
-  (** * Proof of Security
-  We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
 
   (* ============================================================ *)
   (** ** Non-injective agreement
@@ -176,3 +176,87 @@ Section SimpleAuthSecurity.
   Abort. (* this proof is not valid, the protocol is flawed *)
 
 End SimpleAuthSecurity.
+
+Section SimpleAuthReflection.
+  (** * The reflection attack
+    We exhibit the reflection attack the aborted proof above runs into: [A] speaks to itself believing it speaks to [B], and the penetrator uses it as an encryption oracle.  No strand of [B] occurs in the bundle at all.
+  *)
+
+  Notation A  := (Text 0).
+  Notation B  := (Text 1).
+  Notation Na := (Text 2).
+
+  Notation s_ini  := (0, [ ⊕ $A ⋅ $B ⋅ $Na; ⊖ ⟨ $Na ⟩_(SK A B) ]).
+  (* [A] again, answering a request it believes comes from [B] *)
+  Notation s_res  := (1, [ ⊖ $B ⋅ $A ⋅ $Na; ⊕ ⟨ $Na ⟩_(SK B A) ]).
+  (* the penetrator only reorders the names, which needs no key *)
+  Notation s_sep1 := (2, [ ⊖ $A ⋅ $B ⋅ $Na; ⊕ $A ⋅ $B; ⊕ $Na ]).
+  Notation s_sep2 := (3, [ ⊖ $A ⋅ $B; ⊕ $A; ⊕ $B ]).
+  Notation s_cat1 := (4, [ ⊖ $B; ⊖ $A; ⊕ $B ⋅ $A ]).
+  Notation s_cat2 := (5, [ ⊖ $B ⋅ $A; ⊖ $Na; ⊕ $B ⋅ $A ⋅ $Na ]).
+
+  Definition C' : bundle_type :=
+    {|
+      nodes := rev [
+        (s_ini,0);
+        (s_sep1,0); (s_sep1,1); (s_sep1,2);
+        (s_sep2,0); (s_sep2,1); (s_sep2,2);
+        (s_cat1,0); (s_cat1,1); (s_cat1,2);
+        (s_cat2,0); (s_cat2,1); (s_cat2,2);
+        (s_res,0);  (s_res,1);
+        (s_ini,1)
+      ];
+      intra := rev [
+        ((s_sep1,0),(s_sep1,1)); ((s_sep1,1),(s_sep1,2));
+        ((s_sep2,0),(s_sep2,1)); ((s_sep2,1),(s_sep2,2));
+        ((s_cat1,0),(s_cat1,1)); ((s_cat1,1),(s_cat1,2));
+        ((s_cat2,0),(s_cat2,1)); ((s_cat2,1),(s_cat2,2));
+        ((s_res,0),(s_res,1));
+        ((s_ini,0),(s_ini,1))
+        ];
+      inter := rev [
+        ((s_ini,0),(s_sep1,0));   (* A   -> P : $A ⋅ $B ⋅ $Na   *)
+        ((s_sep1,1),(s_sep2,0));  (* P   -> P : $A ⋅ $B         *)
+        ((s_sep2,2),(s_cat1,0));  (* P   -> P : $B              *)
+        ((s_sep2,1),(s_cat1,1));  (* P   -> P : $A              *)
+        ((s_cat1,2),(s_cat2,0));  (* P   -> P : $B ⋅ $A         *)
+        ((s_sep1,2),(s_cat2,1));  (* P   -> P : $Na             *)
+        ((s_cat2,2),(s_res,0));   (* P   -> A : $B ⋅ $A ⋅ $Na   *)
+        ((s_res,1),(s_ini,1))     (* A   -> A : ⟨ $Na ⟩_(SK A B) *)
+        ]
+    |}.
+
+  Create HintDb sanity.
+  #[local] Hint Constructors SA_StrandSpace SA_initiator_strand SA_responder_strand
+                             penetrator_strand : sanity.
+
+  Lemma C'_is_strandspace_bundle :
+    strandspace_bundle C' (SA_StrandSpace (K__P_AB A B)).
+  Proof. solve_strandspace_bundle. Qed.
+
+  Lemma s_ini_strand_C' : is_strand_of s_ini C'.
+  Proof. solve_is_strand_of. Qed.
+
+  Lemma s_res_strand_C' : is_strand_of s_res C'.
+  Proof. solve_is_strand_of. Qed.
+
+  (** [A] runs both roles: initiator towards [B], and responder for [B]. *)
+  Lemma A_plays_both_roles :
+    (SA_initiator_strand A B Na s_ini /\ is_strand_of s_ini C')
+    /\ (SA_responder_strand B A Na s_res /\ is_strand_of s_res C').
+  Proof.
+    split; split;
+    [ apply SAS_Init | apply s_ini_strand_C' | apply SAS_Resp | apply s_res_strand_C' ].
+  Qed.
+
+  (** The oracle step: what [A] answers is exactly what [A] is waiting for. This holds because [(SK A B) = (SK B A)]. *)
+  Lemma the_answer_is_the_challenge :
+    uns_term (s_res, 1) = uns_term (s_ini, 1).
+  Proof. reflexivity. Qed.
+
+  (** And [B] is absent: no responder strand of [C'] has [B] answering [A], so the agreement the initiator expects does not hold here. *)
+  Lemma no_responder_for_B :
+    ~ (exists s, SA_responder_strand A B Na s /\ is_strand_of s C').
+  Proof. solve_no_strand. Qed.
+
+End SimpleAuthReflection.

@@ -66,10 +66,11 @@ Section SimpleAuthSpec.
   Proof. now unfold penetrator_key, K__P_AB. Qed.
 End SimpleAuthSpec.
 
+(** * Proof of Security
+  We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
+
 Section SimpleAuthSecurity.
-  (**
-    Local assumptions to make the rest more easily readable.
-  *)
+
   Variable s : Σ.
   Variable C : bundle_type.
 
@@ -87,9 +88,6 @@ Section SimpleAuthSecurity.
   Proposition C_is_SA :
     forall n, is_node_of n C -> SA_StrandSpace (K__P_AB A B) (strand n).
   Proof. now unfold strandspace_bundle in C_is_SA_bundle. Qed.
-
-  (** * Proof of Security
-  We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
 
   (* ============================================================ *)
   (** ** Non-injective agreement
@@ -205,9 +203,9 @@ Section SimpleAuthSecurity.
 
   (* ============================================================ *)
   (** ** Injective agreement
-  The second security property additionally states that each responder session correspond to different initiator session, i.e., that authentication is injective and cannot be reused in a replay attack. This property only holds if [Na] is freshly generated which, in the strand spaces model, is captured by the [uniquely_originates] definition. Formally:
+  The second security property additionally states that each responder session correspond to different initiator session, i.e., that authentication is injective and cannot be reused in a replay attack. This property only holds if [Na] is freshly generated which, in the strand spaces model, is captured by unique origination as defined in the S&P paper. In StrandsRocq this property is split in two parts and localized to a bundle. Typically we only require the relevant one [originates_at_most_once_in C] which tells that a given term cannot originate twice in bundle C, i.e., is fresh. The actual origination does not matter for injectivity. Formally:
   [[
-    uniquely_originates $Na ->
+    originates_at_most_once_in C $Na ->
     (
       exists s' : Σ,
         SA_responder_strand A B Na (tr s') /\
@@ -216,48 +214,51 @@ Section SimpleAuthSecurity.
     /\
     (
       forall s'' : Σ,
+        is_strand_of s'' C ->
         SA_initiator_strand A B Na (tr s'') ->
         s'' = s
     ).
   ]]
-  We first prove injectivity alone, i.e., if [Na] uniquely originates then there's a unique initiator trace agreeing on [Na]. This is somehow trivial and the proofs just applies the definition on [uniquely_originates]:
+  We first prove injectivity alone, i.e., if [Na] originates at most once in [C] then there is a unique initiator trace agreeing on [Na]. This is fairly trivial and the proof just applies the definition of [originates_at_most_once_in C]:
   *)
   Proposition injectivity :
-      uniquely_originates $Na ->
-        forall U U' s',
-          SA_initiator_strand U U' Na s' ->
-          s' = s.
+    originates_at_most_once_in C $Na ->
+      forall U U' s',
+        is_strand_of s' C ->
+        SA_initiator_strand U U' Na s' ->
+        s' = s.
   Proof.
-    intros Huorig U U' s' Hini'.
+    intros Huorig U U' s' Hstrand' Hini'.
     inversion Hini' as [i' Htrace'].
     specialize s_is_SA_init as Hini.
     inversion Hini as [i Htrace].
-    inversion Huorig as [n [_ Horigx]].
-    assert (Horigx' := Horigx).
-
-    specialize (Horigx (s, 0)); specialize (Horigx' (s', 0)).
+    pose (s0 := s).
+    pose (s0' := s').
     specialize (mpti_then_originates $Na (s, 0)) as Horig.
     specialize (mpti_then_originates $Na (s', 0)) as Horig'.
     simplify_term_in Horig; st_implication Horig.
     simplify_term_in Horig'; st_implication Horig'.
-    specialize (Horigx Horig); specialize (Horigx' Horig'); subst.
-    now inversion Horigx'.
+    assert (is_node_of (s0,0) C) as Hnode by (apply s_strand_of_C; [easy | simpl; lia]).
+    assert (is_node_of (s0',0) C) as Hnode' by (apply Hstrand'; [easy | simpl; lia]).
+    specialize (Huorig _ _ Hnode Hnode' Horig Horig').
+    inversion Huorig; now subst.
   Qed.
 
   (** From [noninjective_agreement] and [injectivity] we obtain injective agreement as a corollary: *)
   Corollary injective_agreement :
-      uniquely_originates $Na ->
-      (
-        exists s' : Σ,
-          SA_responder_strand A B Na s' /\
-          is_strand_of s' C
-      )
-      /\
-      (
-        forall s'' : Σ,
-          SA_initiator_strand A B Na s'' ->
-          s'' = s
-      ).
+    originates_at_most_once_in C $Na ->
+    (
+      exists s' : Σ,
+        SA_responder_strand A B Na s' /\
+        is_strand_of s' C
+    )
+    /\
+    (
+      forall s'' : Σ,
+        is_strand_of s'' C ->
+        SA_initiator_strand A B Na s'' ->
+        s'' = s
+    ).
   Proof.
     intros Huniq. split.
     - now apply noninjective_agreement.
@@ -265,3 +266,164 @@ Section SimpleAuthSecurity.
   Qed.
 
 End SimpleAuthSecurity.
+
+Section SimpleAuthSanity.
+  (** * Sanity check: an honest run
+    We exhibit an honest protocol execution as a sanity check: the protocol executes and satisfies all of the assumptions of the security lemmas.
+  *)
+
+  Notation A := (Text 0).
+  Notation B := (Text 1).
+  Notation Na := (Text 2).
+  
+  Notation s_ini := (0, [ ⊕ $A ⋅ $B ⋅ $Na; ⊖ ⟨ $Na ⋅ $A ⟩_(SK A B) ]).
+  Notation s_res := (1, [ ⊖ $A ⋅ $B ⋅ $Na; ⊕ ⟨ $Na ⋅ $A ⟩_(SK A B) ]).
+
+  (** A single honest session: [A] sends its name, [B]'s name and the nonce, [B] answers with the nonce encrypted under the shared key.  The three lists are reversed because each [IndBundle] constructor conses onto their heads, so they are written in reverse construction order. *)
+  Definition C : bundle_type :=
+    {|
+      nodes := rev [
+        (s_ini,0);
+        (s_res,0);
+        (s_res,1);
+        (s_ini,1)
+      ];
+      intra := rev [
+        ((s_res,0),(s_res,1));
+        ((s_ini,0),(s_ini,1))
+        ];
+      inter := rev [
+        ((s_ini,0),(s_res,0));   (* A -> B : $A ⋅ $B ⋅ $Na         *)
+        ((s_res,1),(s_ini,1))    (* B -> A : ⟨ $Na ⋅ $A ⟩_(SK A B) *)
+        ]
+    |}.
+
+  (** The two strands are legitimate roles of the protocol. *)
+  Lemma s_ini_SA : SA_initiator_strand A B Na s_ini.
+  Proof. solve_role. Qed.
+
+  Lemma s_res_SA : SA_responder_strand A B Na s_res.
+  Proof. solve_role. Qed.
+
+  Create HintDb sanity.
+  #[local] Hint Constructors SA_StrandSpace : sanity.
+  #[local] Hint Resolve s_ini_SA s_res_SA : sanity.
+  
+  (** [C] is a bundle and every strand of [C] belongs to the strand space, so nothing in it is outside the protocol or the penetrator model. Together: [C] is a valid execution of SimpleAuth. *)
+  Lemma C_is_strandspace_bundle: 
+    strandspace_bundle C (SA_StrandSpace (K__P_AB A B)).
+  Proof. solve_strandspace_bundle. Qed.
+
+  (** [s_ini] is a strand of C. This is the initiator point of view in the security lemma. *)
+  Lemma s_ini_strand_C : 
+    is_strand_of s_ini C.
+  Proof. solve_is_strand_of. Qed.
+
+  (** [Na] is originated at most once (in fact exactly once in [s_ini]) *)
+  Lemma C_Na_at_most_once : 
+    originates_at_most_once_in C $ Na.
+  Proof. solve_at_most_once_in. Qed.
+    
+  (** The conclusion is what we already know by construction since we have exactly one initiator and one responder in [C]. So, the important part is that the term typechecks, which is possible only if the four hypotheses of [injective_agreement] hold at once, i.e., the guarantee is not vacuous. *)
+  Lemma injective_agreement_sanity :
+    (
+      exists s' : Σ,
+        SA_responder_strand A B Na s' /\
+        is_strand_of s' C
+    )
+    /\
+    (
+      forall s'' : Σ,
+        is_strand_of s'' C ->
+        SA_initiator_strand A B Na s'' ->
+        s'' = s_ini
+    ).
+  Proof.
+    exact (
+      injective_agreement 
+        s_ini_SA 
+        s_ini_strand_C
+        C_is_strandspace_bundle 
+        C_Na_at_most_once
+      ).
+  Qed.
+
+End SimpleAuthSanity.
+
+Section SimpleAuthReplay.
+  (** * Sanity check: a replay attack
+    We exhibit an attack as a second sanity check: the guarantee fails exactly when its freshness hypothesis does, so the hypothesis is not decoration.
+  *)
+
+  Notation A := (Text 0).
+  Notation B := (Text 1).
+  Notation Na := (Text 2).
+
+  Notation s_res  := (1, [ ⊖ $A ⋅ $B ⋅ $Na; ⊕ ⟨ $Na ⋅ $A ⟩_(SK A B) ]).
+  Notation s_ini1 := (0, [ ⊕ $A ⋅ $B ⋅ $Na; ⊖ ⟨ $Na ⋅ $A ⟩_(SK A B) ]).
+  Notation s_ini2 := (2, [ ⊕ $A ⋅ $B ⋅ $Na; ⊖ ⟨ $Na ⋅ $A ⟩_(SK A B) ]).
+  (** The replay attack: *)
+  Notation s_pen  := (3, [ ⊖ ⟨ $Na ⋅ $A ⟩_(SK A B); ⊕ ⟨ $Na ⋅ $A ⟩_(SK A B); ⊕ ⟨ $Na ⋅ $A ⟩_(SK A B) ]).
+
+  (** [A] opens two sessions with the same nonce, [B] answers once, and the penetrator tees the answer to both. *)
+  Definition C' : bundle_type :=
+    {|
+      nodes := rev [
+        (s_ini1,0);
+        (s_res,0);
+        (s_res,1);
+        (s_pen,0);
+        (s_pen,1);
+        (s_pen,2);
+        (s_ini1,1);
+        (s_ini2,0);   (* A.2 message is ignored, nobody receives it *)
+        (s_ini2,1)
+      ];
+      intra := rev [
+        ((s_res,0),(s_res,1));
+        ((s_pen,0),(s_pen,1));
+        ((s_pen,1),(s_pen,2));
+        ((s_ini1,0),(s_ini1,1));
+        ((s_ini2,0),(s_ini2,1))
+        ];
+      inter := rev [
+        ((s_ini1,0),(s_res,0));   (* A.1 -> B   : $A ⋅ $B ⋅ $Na         *)
+        ((s_res,1),(s_pen,0));    (* B   -> P   : ⟨ $Na ⋅ $A ⟩_(SK A B) *)
+        ((s_pen,1),(s_ini1,1));   (* P   -> A.1 : ⟨ $Na ⋅ $A ⟩_(SK A B) *)
+        ((s_pen,2),(s_ini2,1))    (* P   -> A.2 : ⟨ $Na ⋅ $A ⟩_(SK A B) *)
+        ]
+    |}.
+
+  Create HintDb sanity.
+  #[local] Hint Constructors SA_StrandSpace SA_initiator_strand SA_responder_strand
+                             penetrator_strand : sanity.
+
+  (** Nothing here breaks the rules: [C'] is a bundle and every strand of it, the penetrator's included, belongs to the strand space. *)
+  Lemma C'_is_strandspace_bundle:
+    strandspace_bundle C' (SA_StrandSpace (K__P_AB A B)).
+  Proof. solve_strandspace_bundle. Qed.
+
+  Lemma s_ini1_strand_C' : is_strand_of s_ini1 C'.
+  Proof. solve_is_strand_of. Qed.
+
+  Lemma s_ini2_strand_C' : is_strand_of s_ini2 C'.
+  Proof. solve_is_strand_of. Qed.
+
+  (** [B] ran once: any responder strand of [C'] is [s_res]. *)
+  Lemma one_responder_only :
+    forall s, is_strand_of s C' -> SA_responder_strand A B Na s -> s = s_res.
+  Proof. solve_unique_strand. Qed.
+
+  (** The hypothesis that fails: [$Na] originates twice, once per initiator session. *)
+  Lemma Na_not_at_most_once :
+    ~ originates_at_most_once_in C' $Na.
+  Proof. refute_at_most_once_in (s_ini1,0) (s_ini2,0). Qed.
+
+  (** And the conjunct that freshness protects does fail: the initiator session is not unique.  Compare [injective_agreement_sanity], where the same conjunct holds because [$Na] originates once. *)
+  Lemma injectivity_fails :
+    ~ (forall s'', is_strand_of s'' C' -> SA_initiator_strand A B Na s'' -> s'' = s_ini1).
+  Proof.
+    intro H. specialize (H s_ini2 s_ini2_strand_C' (SAS_Init A B Na 2)). discriminate.
+  Qed.
+
+End SimpleAuthReplay.

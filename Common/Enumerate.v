@@ -3,7 +3,6 @@ From Stdlib Require Import Init.Datatypes.
 From Stdlib Require Import Arith.
 From Stdlib Require Import ListSet.
 From Stdlib Require Import Lists.List.
-(* From Stdlib Require Import Lists.List Stdlib.Lists.ListSet Stdlib.Bool.Bool Stdlib.Bool.Sumbool. *)
 From Stdlib Require Import Lia.
 From Stdlib Require Import Relations.
 From Stdlib Require Import Relations.Relation_Operators.
@@ -11,13 +10,6 @@ From Stdlib Require Import FunctionalExtensionality.
 Import Stdlib.Logic.Decidable.
 Require Import RelMinimal.
 Import Nat.
-
-(* 
-   Require Import Strands.
-   Require Import BundleRelations.
-   Require Import Bundles.
- *)
-
 
 Import Stdlib.Lists.List.ListNotations.
 
@@ -251,12 +243,6 @@ Module Enumerate.
       unfold injective_into_list.
       intros f l i [Hinj Hin] Hlen.  apply Hin. assumption.
     Qed.
-
-    (*     Lemma injective_into_list_cons_not_in : forall (f : nat -> A) l a,
-           injective_into_list f (length (a :: l)) (a :: l) -> ~ In a l.
-           Proof. 
-	      intros. intro. unfold injective_into_list in H.  unfold injective_from in H.  destruct H as [Hinj Hval].
-     *)   
 
     Definition surjective_onto_list (f : nat -> A) n l :=
       forall a, In a l -> exists i, i<n /\ f i = a.
@@ -637,11 +623,6 @@ Module Enumerate.
       - intros a H.  rewrite nodup_In in H.  assumption.
     Qed. 
     
-
-
-
-
-
     (** *
 
   A function f : N -> T *enumerates* a list l : list T up to n iff 
@@ -656,11 +637,6 @@ Module Enumerate.
 
     Definition enumerates (f : nat -> A) l n :=
       injective_into_list f n l /\ surjective_onto_list f n l. 
-    
-    (* Was:  (forall i, i<n -> In (f i) l) /\
-       (forall a, In a l -> exists i, i<n /\ f i=a) /\
-       forall i j, i<j -> j<n -> f i <> f j.
-     *)
 
     Fixpoint list_of_enum (f : nat -> A) n := 
       match n with
@@ -1483,9 +1459,6 @@ Module Enumerate.
         intros l f [Hcompat Henum].  apply enum_to_length_nodup with (f:=f).
         assumption.
       Qed.
-
-      (* Definition maximal a : Prop := forall b, R a b -> a = b.
-       *) 
 
       Lemma In_dec : forall a (l : list A), {In a l}+{~In a l}.
         intros a l.  induction l.

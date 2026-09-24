@@ -13,8 +13,10 @@ Section responder_guarantees.
   Variable s : Σ.
   Variables A B Na Nb : T.
   Variable Tname : T -> Prop.
+  Variable C : bundle_type.
 
   Hypothesis s_is_NSL_resp : NSL_responder_strand Tname A B Na Nb s.
+  Hypothesis s_strand_of_C : is_strand_of s C.
 
   (* A few easy/trivial facts *)
   Property term_of_c :
@@ -51,25 +53,24 @@ Section responder_guarantees.
   Qed.
 
   Lemma originates_Nb_implies_c :
-    $Na <> $Nb -> uniquely_originates $Nb ->
-    forall n, originates $Nb n -> n = (s, 1).
+    $Na <> $Nb -> originates_at_most_once_in C $Nb ->
+    forall n, is_node_of n C -> originates $Nb n -> n = (s, 1).
   Proof.
-    intros diff_nonces Nb_uniquely_originates n Horig.
+    intros diff_nonces Nb_originates_at_most_once n Hnode Horig.
     destruct (eq_node__t_dec n (s,1)); try easy.
     specialize (Nb_originates_in_c diff_nonces) as Horig1.
-    specialize (Nb_uniquely_originates) as [nu [Horignu Huniq]].
-    st_implication Horig1.
-    specialize (Huniq _ Horig1) as Horig1'.
-    specialize (Huniq _ Horig) as Horig2'.
-    now subst.
+    assert (is_node_of (s, 1) C) as Hnode1 by 
+      (inversion s_is_NSL_resp;
+      apply s_strand_of_C; [easy | simpl;lia]).
+    now specialize (Nb_originates_at_most_once _ _ Hnode Hnode1 Horig Horig1).
   Qed.
 
   Corollary originates_Nb_implies_regular :
-    forall K__P, $Na <> $Nb -> uniquely_originates $Nb ->
-      forall n, originates $Nb n -> ~penetrator_strand K__P (strand n).
+    forall K__P, $Na <> $Nb -> originates_at_most_once_in C $Nb ->
+      forall n, is_node_of n C -> originates $Nb n -> ~penetrator_strand K__P (strand n).
   Proof.
-    intros K__P diff_nonces Nb_uniquely_originates n Horig.
-    apply (originates_Nb_implies_c diff_nonces Nb_uniquely_originates) in Horig.
+    intros K__P diff_nonces Nb_originates_at_most_once n Hnode Horig.
+    apply (originates_Nb_implies_c diff_nonces Nb_originates_at_most_once Hnode) in Horig.
     inversion s_is_NSL_resp.
     unfold not. intros Hp.
     now subst.

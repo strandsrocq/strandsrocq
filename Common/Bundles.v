@@ -32,6 +32,21 @@ Module Type BundleSig
   }.
 
   Definition is_node_of n (B : bundle_type) := set_In n (nodes B).
+  (** [t] originates at no more than one node of [C]: uniqueness without existence.
+      This is the form the development actually uses: every site applies it to two
+      origination proofs to identify the nodes, and none needs a witness.  It is also
+      the only one of the two that can be assumed uniformly over a class of terms,
+      since [uniquely_originates_in] would additionally demand that every term of the
+      class originate in [C]. *)
+  Definition originates_at_most_once_in C t :=
+    forall n n', is_node_of n C -> is_node_of n' C ->
+      originates t n -> originates t n' -> n = n'.
+  (** Unique origination as in the strand space papers: [t] originates in [C], and at
+      exactly one node.  Prefer [originates_at_most_once_in] unless a witness is
+      genuinely needed.  Keep both relative to [C]: over all strands the property is
+      unsatisfiable, as [(0, [⊕ t])] and [(1, [⊕ t])] both originate [t]. *)
+  Definition uniquely_originates_in C t :=
+    (exists n, is_node_of n C /\ originates t n) /\ originates_at_most_once_in C t.
   Definition is_strand_of s (B : bundle_type) := forall n,
     strand n = s ->
     index n < length (tr (strand n)) ->

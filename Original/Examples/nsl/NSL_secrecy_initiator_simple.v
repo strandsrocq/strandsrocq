@@ -128,10 +128,10 @@ Section secrecy_initiator_guarantee.
   #[local] Hint Resolve NSp_encrypt_protected2: core.
 
   Lemma NS_no_minimal :
-    uniquely_originates $Na ->
+    originates_at_most_once_in C $Na ->
       forall m, In m NS -> ~is_minimal (bundle_le E) m NS.
   Proof.
-    intros Na_uniquely_originates m Hin Hmin.
+    intros Na_originates_at_most_once m Hin Hmin.
     assert (Hin':=Hin).
     apply (NS_iff_inC_NSp) in Hin' as [HinC HNSp].
     pose (C_is_NSL' := C_is_NSL).
@@ -146,8 +146,9 @@ Section secrecy_initiator_guarantee.
 
       + specialize (Na_originates_in_n__20 Na (t:=$Na) m) as Horig2.
         st_implication Horig2.
-        apply (originates_Na_implies_s0 (s:=s) (A:=A) (B:=B) (Nb:=Nb) (Tname:=Tname)) in Horig2; try easy.
-        inversion Horig2. rewrite H0 in Htrace. now destruct s_is_NSL_init.
+        rewrite (node_as_pair m) in HinC. rewrite Hand0 in HinC.
+        apply (originates_Na_implies_s0 (s:=s) (A:=A) (B:=B) (Nb:=Nb) (C:=C) (Tname:=Tname)) in Horig2; try easy.
+        inversion Horig2. rewrite H0 in Htrace. now destruct s_is_NSL_init. 
 
       + now apply (NSp_encrypt_protected1 k) in Hand.
 
@@ -171,11 +172,12 @@ Section secrecy_initiator_guarantee.
       destruct (T_eq_dec Na0 Na); try tauto. *)
       specialize (mpti_then_originates $Na m) as Horig.
       simplify_term_in Horig. st_implication Horig.
-      apply (originates_Na_implies_s0 (s:=s) (A:=A) (B:=B) (Nb:=Nb) (Tname:=Tname)) in Horig; try easy.
+      apply (originates_Na_implies_s0 (s:=s) (A:=A) (B:=B) (Nb:=Nb) (C:=C) (Tname:=Tname)) in Horig; try easy.
       rewrite (node_as_pair m) in Horig.
       inversion Horig as [Hstrand]. rewrite Hstrand in H0.
       rewrite <-H3 in H0. inversion H0. subst; auto.
       simplify_prop in Hand using decidability.
+    
     - (* responder *)
       inversion Hres; apply (f_equal tr) in H0; simpl in H0.
       specialize (minimal_NS_then_mpt H0 Hin Hmin) as Hmpti.
@@ -189,19 +191,18 @@ Section secrecy_initiator_guarantee.
       simplify_term_in Horig.
       (* push not in Hand0 using Terms_decidability. *)
       st_implication Horig.
-      apply (originates_Na_implies_s0 (s:=s) (A:=A) (B:=B) (Nb:=Nb) (Tname:=Tname)) in Horig.
-      rewrite (node_as_pair m) in Horig.
+      apply (originates_Na_implies_s0 (s:=s) (A:=A) (B:=B) (Nb:=Nb) (C:=C) (Tname:=Tname)) in Horig; try easy.      rewrite (node_as_pair m) in Horig.
       inversion Horig as [Hstrand]. rewrite Hstrand in H0.
       rewrite <-H0 in H3. inversion H3. all: auto.
   Qed.
 
   Proposition initiator_secrecy:
-    uniquely_originates $Na ->
+    originates_at_most_once_in C $Na ->
     forall m, is_node_of m C ->
       $Na ⊏ uns_term m ->
         protected (uns_term m).
   Proof.
-    intros Na_uniquely_originates m Hin Hmin.
+    intros Na_originates_at_most_once m Hin Hmin.
     destruct (protected_dec (uns_term m)); auto.
     assert (In m NS). { apply (N_iff_inC_p). auto. }
     specialize (NS_no_minimal) as Hnomin.
@@ -210,18 +211,18 @@ Section secrecy_initiator_guarantee.
     - (* empty *) now rewrite Hemp in H.
     - (* nonempty *)
       specialize (RelMinimal.exists_minimal eq_node__t_dec (bundle_le_dec E) (bundle_le_antisymm C_is_bundle) (bundle_le_trans (E:=E)) Hnemp) as [m' [Hin' Hmin']].
-      now specialize (Hnomin Na_uniquely_originates m' Hin').
+      now specialize (Hnomin Na_originates_at_most_once m' Hin').
   Qed.
 
   Corollary secrecy_of_Na_neq:
-    uniquely_originates $Na ->
+    originates_at_most_once_in C $Na ->
       forall m,
         is_node_of m C ->
-            $Na ⊏ uns_term m ->
-              $Na <> uns_term m.
+          $Na <> uns_term m.
   Proof.
-    intros Na_uniquely_originates m Hin Hmin HNa_eq_m.
-    specialize (initiator_secrecy Na_uniquely_originates m Hin Hmin) as Hsub.
+    intros Na_originates_at_most_once m Hin HNa_eq_m.
+    assert ($Na ⊏ uns_term m) as Hmin by (rewrite <- HNa_eq_m; apply eq_then_sub).
+    specialize (initiator_secrecy Na_originates_at_most_once m Hin Hmin) as Hsub.
     all: rewrite <- HNa_eq_m in Hsub.
     all: now simpl in Hsub.
   Qed.

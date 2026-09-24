@@ -168,7 +168,7 @@ Module PaperExamples.
     Qed.
 
     (** The yes-or-no protocol used for the operational examples in
-        Section 4.3.  Choice has disappeared by this point: the protocol is
+        Section 5.  Choice has disappeared by this point: the protocol is
         just a list of ordinary roles. *)
     Definition yes_no_protocol : protocol :=
       mkProtocol (yes_no_questioner_roles ++ yes_no_answerer_roles).
@@ -207,7 +207,7 @@ Module PaperExamples.
     Definition yes_no_question : Mesg :=
       ⟨ Q ⋅ Y ⋅ N ⟩_(K A).
 
-    (** The pool [T2] in Section 4.3: the question has been sent by the
+    (** The pool [T2] in Section 5.1: the question has been sent by the
         questioner and received by the answerer, but the answerer has not yet
         committed to yes or no. *)
     Definition yes_no_T2 : thread_pool :=
@@ -328,7 +328,7 @@ Module PaperExamples.
 
     (** From the same uncommitted pool [T2], the answerer may take the yes
         branch.  This is the formal counterpart of the left branch in the
-        Section 4.3 discussion. *)
+        Section 5.2 discussion. *)
     Theorem paper_yes_no_yes_pool_reachable_from_T2 :
       yes_no_protocol ⊨ᶠ yes_no_T2 →* yes_no_yes_pool.
     Proof.
@@ -528,7 +528,7 @@ Module PaperExamples.
       - exact paper_yes_no_prefix_questioner_no.
     Defined.
 
-    (** Labelled version of the yes-answer execution shown in Section 4.5.
+    (** Labelled version of the yes-answer execution shown in Section 7.2.
         The labels make explicit the nodes created by the four steps and the
         two communication sources:
 
@@ -574,7 +574,7 @@ Compute paper_yes_no_yes_labels.
      *)
 
     (** Concrete bundle extracted from the executable yes-branch derivation.
-        This is the form to inspect when comparing the Section 4.3 yes trace
+        This is the form to inspect when comparing the Section 5.1 yes trace
         with the bundle construction theorem. *)
     Definition paper_yes_no_yes_computed_bundle : bundle_type :=
       computed_bundle_of
@@ -643,7 +643,7 @@ Compute paper_yes_no_no_computed_bundle.
 
   End YesOrNoProtocol.
 
-  (** ** Paper Section 7.3: Concurrent Yahalom worked example *)
+  (** ** Paper Section 8: Concurrent Yahalom worked example *)
 
   Section ConcurrentYahalom.
 
@@ -1241,7 +1241,7 @@ Compute paper_yes_no_no_computed_bundle.
 
     (** Bundle computed from the executable Concurrent Yahalom reachability
         witness.  This is the concrete bundle used for the worked example in
-        Section 7.3: the thread pool supplies the strands, and the indexed
+        Section 8: the thread pool supplies the strands, and the indexed
         receives in [paper_concurrent_yahalom_poolT] supply the communication
         edges. *)
     Definition paper_concurrent_yahalom_computed_bundle : bundle_type :=
@@ -1260,13 +1260,13 @@ Compute paper_yes_no_no_computed_bundle.
 >>
 *)
 
-    (** Named strands used to state the Section 7.3 edge set in the same
+    (** Named strands used to state the Section 8 edge set in the same
         initiator/responder/server terminology as the paper. *)
     Definition cy_init_strand : Σ := (0, cy_init_trace).
     Definition cy_resp_strand : Σ := (1, cy_resp_trace).
     Definition cy_serv_strand : Σ := (2, cy_serv_trace).
 
-    (** Section 7.3 communication edges computed from the executable
+    (** Section 8 communication edges computed from the executable
         reachability witness.  They are listed in reverse construction order,
         because each new receive edge is consed onto the bundle edge list. *)
     Example paper_concurrent_yahalom_computed_bundle_inter_edges :

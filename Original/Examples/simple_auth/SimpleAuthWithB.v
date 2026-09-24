@@ -10,7 +10,7 @@ Set Implicit Arguments.
 Section SimpleAuthWithBSpec.
   (** * Example: A Simple Unilateral Authentication Protocol
 
-    ** NOTE: This is a variant of [SimpleAuth.v] that includes [B] instead of [A] in the ciphertext. The proofs are identical. We only need to adapt the definition of [Ncp] and replace [try rewrite Hand2.] with [try rewrite Hand1.] at line 191.
+    NOTE: This is a variant of [SimpleAuth.v] that includes [B] instead of [A] in the ciphertext. The proofs are identical. We only need to adapt the definition of [Ncp] and replace [try rewrite Hand2.] with [try rewrite Hand1.] at line 191.
     [[
     A -> B :  A ⋅ B ⋅ Na
     B -> A :  ⟨ Na ⋅ B ⟩_(SK A B)
@@ -57,6 +57,9 @@ Section SimpleAuthWithBSpec.
   Proof. now unfold penetrator_key, K__P_AB. Qed.
 End SimpleAuthWithBSpec.
 
+(** * Proof of Security
+  We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
+
 Section SimpleAuthWithBSecurity.
   (**
     Local assumptions to make the rest more easily readable.
@@ -79,8 +82,6 @@ Section SimpleAuthWithBSecurity.
     forall n, is_node_of n C -> SA_StrandSpace (K__P_AB A B) (strand n).
   Proof. now unfold strandspace_bundle in C_is_SA_bundle. Qed.
 
-  (** * Proof of Security
-  We now prove unilateral authentication properties of the protocol from the initiator perspective.  *)
   Definition Ncp (t : 𝔸) := (⟨ $Na ⋅ $B ⟩_(SK A B)) ⊏ t.
   #[local] Hint Unfold Ncp uns term uns_term : core.
 
@@ -176,9 +177,9 @@ Section SimpleAuthWithBSecurity.
 
   (* ============================================================ *)
   (** ** Injective agreement
-  The second security property additionally states that each responder session correspond to different initiator session, i.e., that authentication is injective and cannot be reused in a replay attack. This property only holds if [Na] is freshly generated which, in the strand spaces model, is captured by the [uniquely_originates] definition. Formally:
+  The second security property additionally states that each responder session correspond to different initiator session, i.e., that authentication is injective and cannot be reused in a replay attack. This property only holds if [Na] is freshly generated which, in the strand spaces model, is captured by unique origination as defined in the S&P paper. In StrandsRocq this property is split in two parts and localized to a bundle. Typically we only require the relevant one [originates_at_most_once_in C] which tells that a given term cannot originate twice in bundle C, i.e., is fresh. The actual origination does not matter for injectivity. Formally:
   [[
-    uniquely_originates $Na ->
+    originates_at_most_once_in C $Na ->
     (
       exists s' : Σ,
         SA_responder_strand A B Na (tr s') /\
@@ -191,33 +192,34 @@ Section SimpleAuthWithBSecurity.
         s'' = s
     ).
   ]]
-  We first prove injectivity alone, i.e., if [Na] uniquely originates then there's a unique initiator trace agreeing on [Na]. This is somehow trivial and the proofs just applies the definition on [uniquely_originates]:
+  We first prove injectivity alone, i.e., if [Na] originates at most once in [C] then there is a unique initiator trace agreeing on [Na]. This is fairly trivial and the proof just applies the definition of [originates_at_most_once_in C]:
   *)
   Proposition injectivity :
-      uniquely_originates $Na ->
+      originates_at_most_once_in C $Na ->
         forall U U' s',
+          is_strand_of s' C ->
           SA_initiator_strand U U' Na s' ->
           s' = s.
   Proof.
-    intros Huorig U U' s' Hini'.
+    intros Huorig U U' s' Hstrand' Hini'.
     inversion Hini' as [i' Htrace'].
     specialize s_is_SA_init as Hini.
     inversion Hini as [i Htrace].
-    inversion Huorig as [n [_ Horigx]].
-    assert (Horigx' := Horigx).
-
-    specialize (Horigx (s, 0)); specialize (Horigx' (s', 0)).
+    pose (s0 := s).
+    pose (s0' := s').
     specialize (mpti_then_originates $Na (s, 0)) as Horig.
     specialize (mpti_then_originates $Na (s', 0)) as Horig'.
     simplify_term_in Horig; st_implication Horig.
     simplify_term_in Horig'; st_implication Horig'.
-    specialize (Horigx Horig); specialize (Horigx' Horig'); subst.
-    now inversion Horigx'.
+    assert (is_node_of (s0,0) C) as Hnode by (apply s_strand_of_C; [easy | simpl; lia]).
+    assert (is_node_of (s0',0) C) as Hnode' by (apply Hstrand'; [easy | simpl; lia]).
+    specialize (Huorig _ _ Hnode Hnode' Horig Horig').
+    inversion Huorig; now subst.
   Qed.
 
   (** From [noninjective_agreement] and [injectivity] we obtain injective agreement as a corollary: *)
   Corollary injective_agreement :
-      uniquely_originates $Na ->
+      originates_at_most_once_in C $Na ->
       (
         exists s' : Σ,
           SA_responder_strand A B Na s' /\
@@ -226,6 +228,7 @@ Section SimpleAuthWithBSecurity.
       /\
       (
         forall s'' : Σ,
+          is_strand_of s'' C ->
           SA_initiator_strand A B Na s'' ->
           s'' = s
       ).
@@ -236,3 +239,86 @@ Section SimpleAuthWithBSecurity.
   Qed.
 
 End SimpleAuthWithBSecurity.
+
+Section SimpleAuthWithBSanity.
+  (** * Sanity check: an honest run
+    We exhibit an honest protocol execution as a sanity check: the protocol executes and satisfies all of the assumptions of the security lemmas.
+  *)
+
+  Notation A := (Text 0).
+  Notation B := (Text 1).
+  Notation Na := (Text 2).
+  
+  Notation s_ini := (0, [ ⊕ $A ⋅ $B ⋅ $Na; ⊖ ⟨ $Na ⋅ $B ⟩_(SK A B) ]).
+  Notation s_res := (1, [ ⊖ $A ⋅ $B ⋅ $Na; ⊕ ⟨ $Na ⋅ $B ⟩_(SK A B) ]).
+
+  (** A single honest session: [A] sends its name, [B]'s name and the nonce, [B] answers with the nonce encrypted under the shared key.  The three lists are reversed because each [IndBundle] constructor conses onto their heads, so they are written in reverse construction order. *)
+  Definition C : bundle_type :=
+    {|
+      nodes := rev [
+        (s_ini,0);
+        (s_res,0);
+        (s_res,1);
+        (s_ini,1)
+      ];
+      intra := rev [
+        ((s_res,0),(s_res,1));
+        ((s_ini,0),(s_ini,1))
+        ];
+      inter := rev [
+        ((s_ini,0),(s_res,0));   (* A -> B : $A ⋅ $B ⋅ $Na         *)
+        ((s_res,1),(s_ini,1))    (* B -> A : ⟨ $Na ⋅ $B ⟩_(SK A B) *)
+        ]
+    |}.
+
+  (** The two strands are legitimate roles of the protocol. *)
+  Lemma s_ini_SA : SA_initiator_strand A B Na s_ini.
+  Proof. solve_role. Qed.
+
+  Lemma s_res_SA : SA_responder_strand A B Na s_res.
+  Proof. solve_role. Qed.
+
+  Create HintDb sanity.
+  #[local] Hint Constructors SA_StrandSpace : sanity.
+  #[local] Hint Resolve s_ini_SA s_res_SA : sanity.
+  
+  (** [C] is a bundle and every strand of [C] belongs to the strand space, so nothing in it is outside the protocol or the penetrator model. Together: [C] is a valid execution of SimpleAuthWithB. *)
+  Lemma C_is_strandspace_bundle: 
+    strandspace_bundle C (SA_StrandSpace (K__P_AB A B)).
+  Proof. solve_strandspace_bundle. Qed.
+
+  (** [s_ini] is a strand of C. This is the initiator point of view in the security lemma. *)
+  Lemma s_ini_strand_C : 
+    is_strand_of s_ini C.
+  Proof. solve_is_strand_of. Qed.
+
+  (** [Na] is originated at most once (in fact exactly once in [s_ini]) *)
+  Lemma C_Na_at_most_once : 
+    originates_at_most_once_in C $ Na.
+  Proof. solve_at_most_once_in. Qed.
+    
+  (** The conclusion is what we already know by construction since we have exactly one initiator and one responder in [C]. So, the important part is that the term typechecks, which is possible only if the four hypotheses of [injective_agreement] hold at once, i.e., the guarantee is not vacuous. *)
+  Lemma injective_agreement_sanity :
+    (
+      exists s' : Σ,
+        SA_responder_strand A B Na s' /\
+        is_strand_of s' C
+    )
+    /\
+    (
+      forall s'' : Σ,
+        is_strand_of s'' C ->
+        SA_initiator_strand A B Na s'' ->
+        s'' = s_ini
+    ).
+  Proof.
+    exact (
+      injective_agreement 
+        s_ini_SA 
+        s_ini_strand_C
+        C_is_strandspace_bundle 
+        C_Na_at_most_once
+      ).
+  Qed.
+
+End SimpleAuthWithBSanity.

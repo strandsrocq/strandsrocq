@@ -23,12 +23,13 @@ Section secrecy_guarantee.
 
   (* Assume a given policy π and its induced strand space Σ *)
   Variable π : policy__t.
+  Variable Fresh : 𝔸 -> Prop.
   Variable B : bundle_type.
   Local Notation E := (edges B).
 
   Hypothesis B_is_bundle : is_bundle B.
-  Hypothesis B_is_KMP : bundle_in_SS B (KMP_StrandSpace π).
-
+  Hypothesis B_is_KMP : bundle_in_SS B (KMP_StrandSpace π Fresh).
+  Hypothesis fresh_sound : fresh_sound_for Fresh B.
   (*
     Terms have initial type.
     If a key k is s.t. K_d k, then its initial type is the type assigned when it originated; Any other term m (incl. keys such that ~ K_d m) have initial type D.
@@ -66,12 +67,15 @@ Section secrecy_guarantee.
     intros m.
     destruct m eqn:Hm; unfold initial_type, is_node_of in *;
     unfold bundle_in_SS, is_node_of in B_is_KMP;
-    induction (nodes B) as [|n' nl IHnl] ; try easy.
-    assert (forall n : node__t, set_In n nl -> KMP_StrandSpace π (strand n)) as B_is_KMP' by (st_implication B_is_KMP).
+    remember (nodes B) as l eqn:Hl;
+    assert (Hincl : incl l (nodes B)) by (rewrite Hl; apply incl_refl);
+    clear Hl; revert Hincl; induction l as [|n' nl IHnl]; intros Hincl; try easy.
+    assert (forall n : node__t, set_In n nl -> KMP_StrandSpace π Fresh (strand n)) as B_is_KMP' by (st_implication B_is_KMP).
+    assert (Hincl' : incl nl (nodes B)) by (intros x Hx; apply Hincl; now right).
     split.
     - intros Hd n KT mk Hmk Hin Htr. destruct Hin as [Hneq | Hin].
       + subst. unfold initial_type_rec. rewrite <- Htr. destruct (K_eq_dec k k) as [? | ?]; destruct (K_d_dec k) as [_ | Hnk]; destruct (K_m_dec mk) as [_ | Hnmk]; try easy.
-      + destruct (IHnl B_is_KMP') as [IHnld _]. specialize (IHnld Hd n KT mk Hmk Hin Htr) as IHnldn. simpl.
+      + destruct (IHnl B_is_KMP' Hincl') as [IHnld _]. specialize (IHnld Hd n KT mk Hmk Hin Htr) as IHnldn. simpl.
         destruct (tr (strand n')) as [|s0 sl] eqn:Htrn'; try easy.
         destruct s0 as [a|a]; try easy.
         destruct a; try easy.
@@ -101,20 +105,30 @@ Section secrecy_guarantee.
               }
               assert (strand n = strand n') as Heqnn'.
               {
-                inversion Hreg as [kr mkr KTr [_ [_ [n'' [Horign'' Heq]]]]|?|?|?|?];
+                inversion Hreg as [kr mkr KTr [_ [_ [Hfresh _]]]|?|?|?|?];
                 subst; try (now rewrite <-H2 in Htr).
 
                 inversion Htr. inversion Htrn'; subst.
                 rewrite H1.
                 apply (f_equal tr) in H1; simpl in H1; rewrite <-H0 in H1; inversion H1; subst.
-                specialize (Heq (strand n, 0) Horig) as Heqn; specialize (Heq (strand n', 0) Horig') as Heqn'.
-                rewrite Heqn in Heqn'. now inversion Heqn'.
+                apply fresh_sound in Hfresh. 
+                assert (is_node_of n B) as HnB by (apply Hincl'; exact Hin).
+                assert (is_node_of n' B) as Hn'B by (apply Hincl; now left).
+                assert (is_node_of (strand n, 0) B) as Hn0.
+                { destruct n as [sn ix]; simpl in *; destruct ix as [|ix]; [exact HnB|].
+                  apply (index_lt_strand_implies_is_node_of B_is_bundle (sn, 0) (sn, S ix));
+                  simpl; [lia | reflexivity | exact HnB]. }
+                assert (is_node_of (strand n', 0) B) as Hn'0.
+                { destruct n' as [sn' ix']; simpl in *; destruct ix' as [|ix']; [exact Hn'B|].
+                  apply (index_lt_strand_implies_is_node_of B_is_bundle (sn', 0) (sn', S ix'));
+                  simpl; [lia | reflexivity | exact Hn'B]. }
+                specialize (Hfresh _ _ Hn0 Hn'0 Horig Horig'); now inversion Hfresh.
               }
               rewrite Heqnn' in Htr; rewrite Htrn' in Htr; now inversion Htr.
           -- inversion Hpen' as [t0 i Htrace|g i Htrace|g i Htrace|g h i Htrace|g h i Htrace|k' i Hpenkey Htrace|k' h i Htrace|k' h i Htrace]; apply (f_equal tr) in Htrace; simpl in Htrace; now rewrite <- Htrace in Htrn'.
         * inversion Hpen as [t0 i Htrace|g i Htrace|g i Htrace|g h i Htrace|g h i Htrace|k' i Hpenkey Htrace|k' h i Htrace|k' h i Htrace]; apply (f_equal tr) in Htrace; simpl in Htrace; now rewrite <- Htrace in Htr.
     - intros Hnk.
-      destruct (IHnl B_is_KMP') as [_ IHnlnd]. specialize (IHnlnd Hnk). simpl.
+      destruct (IHnl B_is_KMP' Hincl') as [_ IHnlnd]. specialize (IHnlnd Hnk). simpl.
       destruct (tr (strand n')) as [|s0 sl] eqn:Htrn'; try easy.
       destruct s0 as [a|a]; try easy.
       destruct a; try easy.
@@ -269,6 +283,20 @@ Section secrecy_guarantee.
     - simpl. destruct (IHt1); destruct (IHt2); try tauto.
   Qed.
 
+  (* Why the encrypt and decrypt roles take a key payload and no text one: a text
+     carries no type.  Its initial type is [D] and it is protected under every
+     closure, so it can never be the reason a key leaks, and the unwrap role cannot
+     consume it either.  A datum is therefore modelled by a key the penetrator
+     knows, whose initial type is likewise [D].  That is not a restriction but the
+     opposite: such a value can also be offered to unwrap, which a text never could,
+     so the penetrator has strictly more moves than before. *)
+  Lemma texts_are_always_protected :
+    ϕ_ℜ_closes_π -> forall t : T, protected $t.
+  Proof.
+    intros Hclos t. simpl. rewrite (initial_type_char $t).
+    apply (proj1 (proj2 Hclos)); now left.
+  Qed.
+
   Definition KMP_p (t : 𝔸) : Prop := ~protected t.
 
   (* We prove decidability of KMP_p based on protected decidability *)
@@ -287,9 +315,11 @@ Section secrecy_guarantee.
   Lemma no_minimal_is_regular :
     ϕ_ℜ_closes_π ->
       forall m,
-        set_In m N_KMP -> is_minimal (bundle_le E) m N_KMP -> ~KMP_strand π (strand m).
+        set_In m N_KMP -> is_minimal (bundle_le E) m N_KMP -> ~KMP_strand π Fresh (strand m).
   Proof.
     intros ϕ_ℜ_closes_π m Hin Hmin Hreg.
+    assert (set_In (D, D) ℜ) as HreflD
+      by (apply (proj1 (proj2 ϕ_ℜ_closes_π)); now left).
     specialize initial_type_char as Hit.
     assert (Hin':=Hin); apply N_iff_inC_p_KMP in Hin' as [Hinm HpKMP].
 
@@ -307,24 +337,45 @@ Section secrecy_guarantee.
       unfold wf_cipher_master, wf_cipher_nonmaster in *.
       st_implication Hand0.
       apply Hand3. split; try easy. exists D, KT. repeat split; try easy. now apply Hcl.
+    - (* Decrypt case *)
+      (* Decryption now returns a key, so this case is no longer trivial: it is the
+         mirror of the unwrap case below, with the same rule chain. *)
+      apply Hand4.
+      unfold wf_cipher_master, wf_cipher_nonmaster in *.
+      st_implication Hand0.
+      destruct Hand1 as [KT1' [KT2' [Henc [Hk1 Hk2]]]].
+      (* We now apply the rules: 5 twice (eh), 6 (et), 4 (ed) *)
+      specialize (Hcl_eh KT2' KT1' (initial_type #k)) as Hit1; st_implication Hit1.
+      specialize (Hcl_eh (initial_type #k) KT1' KT) as Hit2; st_implication Hit2.
+      specialize (Hcl_et KT1' KT (initial_type #m')) as Het; st_implication Het.
+      specialize (Hcl KT Dec D) as Hcl'; st_implication Hcl'.
+      specialize (Hcl_ed KT (initial_type #m') D) as Hreach; st_implication Hreach.
     - (* Wrap case *)
       (* simplify_prop in Hmpti. *)
       unfold wf_cipher_master, wf_cipher_nonmaster in *.
       st_implication Hand1. st_implication Hand0.
-      apply Hand5. split; try easy. exists KT1, KT2. repeat split; try easy. now apply Hcl.
+      apply Hand5. split; try easy. exists KT1, KT2. repeat split; try easy.
+      + now apply Hcl.
+      + (* the wrapped key need not be a device key any more, so this conjunct is no
+           longer vacuous: it is what the incoming handle already guarantees *)
+        now intros Hnd; apply Hand3.
     - (* Unwrap case *)
       (* simplify_prop in Hmpti. *)
       apply Hand4.
       unfold wf_cipher_master, wf_cipher_nonmaster in *.
       st_implication Hand0.
-      split; try easy; intros _.
-      destruct Hand1 as [KT1' [KT2' [Henc [Hk1 Hk2]]]].
-      (* We now apply the rules: 5 twice (eh), 6 (et), 4 (ed) *)
-      specialize (Hcl_eh KT2' KT1' (initial_type #k2)) as Hit12; st_implication Hit12.
-      specialize (Hcl_eh (initial_type #k2) KT1' KT2) as Hit12'; st_implication Hit12'.
-      specialize (Hcl_et KT1' KT2 (initial_type #k1)) as Het; st_implication Het.
-      specialize (Hcl KT2 Dec KT1) as Hcl'; st_implication Hcl'.
-      specialize (Hcl_ed KT2 (initial_type # k1) KT1) as Hreach; st_implication Hreach.
+      split; [ | split ]; try easy.
+      + intros _.
+        destruct Hand1 as [KT1' [KT2' [Henc [Hk1 Hk2]]]].
+        (* We now apply the rules: 5 twice (eh), 6 (et), 4 (ed) *)
+        specialize (Hcl_eh KT2' KT1' (initial_type #k2)) as Hit12; st_implication Hit12.
+        specialize (Hcl_eh (initial_type #k2) KT1' KT2) as Hit12'; st_implication Hit12'.
+        specialize (Hcl_et KT1' KT2 (initial_type #k1)) as Het; st_implication Het.
+        specialize (Hcl KT2 Dec KT1) as Hcl'; st_implication Hcl'.
+        specialize (Hcl_ed KT2 (initial_type # k1) KT1) as Hreach; st_implication Hreach.
+      + (* the imported key need not be a device key any more *)
+        intros Hnd; split;
+        [ now apply Hand2 | rewrite (initial_type_char $KT1); exact HreflD ].
   Qed.
 
   Lemma KMP_never_originates_mk :
@@ -348,6 +399,8 @@ Section secrecy_guarantee.
         set_In m N_KMP -> is_minimal (bundle_le E) m N_KMP -> ~penetrator_node K__P_md m.
   Proof.
     intros ϕ_ℜ_closes_π m Hin Hmin Hpen.
+    assert (set_In (D, D) ℜ) as HreflD
+      by (apply (proj1 (proj2 ϕ_ℜ_closes_π)); now left).
     (* specialize trace_of_s as Hstr.
     specialize B_is_bundle as Hbundle. *)
     specialize initial_type_char as Hit.

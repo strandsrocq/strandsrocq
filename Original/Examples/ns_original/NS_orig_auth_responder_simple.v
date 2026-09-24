@@ -116,12 +116,12 @@ Section auth_responder_guarantee.
      not agree on the respective identities: B talks to A but A thinks she is talking
      to B'. *)
   Proposition noninjective_agreement :
-    $Na <> $Nb -> uniquely_originates $Nb ->
+    $Na <> $Nb -> originates_at_most_once_in C $Nb ->
       exists (s : Σ) (B' : T),
         NS_initiator_strand Tname A B' Na Nb s /\
         is_strand_of s C.
   Proof.
-    intros diff_nonces Nb_uniquely_originates.
+    intros diff_nonces Nb_originates_at_most_once.
     specialize (NS_has_minimal) as [m [Hin Hmin]]; try easy.
     assert (Hin':=Hin).
     apply (NS_iff_inC_NSp) in Hin' as [HinC HNSp].
@@ -141,7 +141,7 @@ Section auth_responder_guarantee.
       + simplify_prop in Hand using decidability.
         specialize (index_0_positive_originates m (t:=$Nb)) as Horig1.
         unfold is_positive in Horig1; st_implication Horig1.
-        specialize (originates_Nb_implies_c (s:=s) (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NS_resp diff_nonces Nb_uniquely_originates Horig1)  as Horigs.
+        specialize (originates_Nb_implies_c (s:=s) (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NS_resp s_strand_of_C diff_nonces Nb_originates_at_most_once HinC Horig1)  as Horigs.
         rewrite Horigs in Htrace; simpl in Htrace.
         inversion s_is_NS_resp. apply (f_equal tr) in H0; simpl in H0.
         now rewrite <-Htrace in H0.
@@ -174,7 +174,7 @@ Section auth_responder_guarantee.
 
       1,2,3: specialize (index_0_positive_originates m (t:=$Nb)) as Horig1;
         unfold is_positive in Horig1; st_implication Horig1;
-        specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NS_resp diff_nonces Nb_uniquely_originates Horig1) as Horigs;
+        specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NS_resp s_strand_of_C diff_nonces Nb_originates_at_most_once HinC Horig1) as Horigs;
         st_implication Horigs; specialize (Horigs m Horig1).
 
       exists (strand m). exists B0. split; try tauto.
@@ -191,21 +191,21 @@ Section auth_responder_guarantee.
 
       specialize (mpti_then_originates ($ Nb) m) as Horig1.
       simplify_term_in Horig1. st_implication Horig1. intuition.
-      specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NS_resp diff_nonces Nb_uniquely_originates) as Horigs.
-      specialize (Horigs m Horig1).
+      specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NS_resp s_strand_of_C diff_nonces Nb_originates_at_most_once) as Horigs.
+      specialize (Horigs m HinC Horig1).
       rewrite Horigs in H0; simpl in H0.
       inversion H0; subst; tauto.
   Qed.
 
-  (* Proposition 4.8 - injective agreement **)
-  Proposition injective_agreement :
-    $Na <> $Nb -> uniquely_originates $Nb ->
-    uniquely_originates $Na ->
+  (* Proposition 4.8 -  injective agreement as in the original strand spaces paper **)
+  Proposition injective_agreement_orig :
+    $Na <> $Nb -> originates_at_most_once_in C $Nb ->
+    originates_at_most_once_in C $Na ->
       exists !s B',
         NS_initiator_strand Tname A B' Na Nb s /\
         is_strand_of s C.
   Proof.
-    intros diff_nonces Nb_uniquely_originates Huorig.
+    intros diff_nonces Nb_originates_at_most_once Huorig.
     specialize (noninjective_agreement) as [s0 [B' [Hinis Hstrand]]]. all: try easy.
     exists s0. unfold unique. split.
     - exists B'. split; try easy.
@@ -218,17 +218,243 @@ Section auth_responder_guarantee.
       pose (s'' := s').
       destruct Hinis.
       destruct Hinis'.
+      assert (is_node_of (s0',0) C) as Hnode by (apply Hstrand; [easy | simpl; lia]).
+      assert (is_node_of (s'',0) C) as Hnode' by (apply Hstrand'; [easy | simpl; lia]).
       specialize (index_0_positive_originates (s'',0) (t:=$Na)) as Horig'.
       specialize (index_0_positive_originates (s0',0) (t:=$Na)) as Horig.
       assert ($Na ⊏ uns_term (s'', 0) /\ $Na ⊏ uns_term (s0', 0) /\ is_positive (s'',0) /\ is_positive (s0',0) /\ index (s'',0) = 0 /\ index (s0',0) = 0). {
         unfold is_positive. repeat simplify_term. tauto.
       }
       st_implication Horig; st_implication Horig'.
-      inversion Huorig as [? Huni].
-      destruct Huni as [_ Horigx].
-      assert (Horigx' := Horigx).
-      specialize (Horigx' (s'',0) Horig'); specialize (Horigx (s0',0) Horig).
-      subst. now inversion Horigx'.
+      specialize (Huorig _ _ Hnode Hnode' Horig Horig').
+      inversion Huorig; now subst.
+  Qed.
+
+  (* We now prove standard injective agreement with no extra assumptions
+     with respect to non-injective agreement *)
+  Proposition injectivity :
+    $Na <> $Nb -> originates_at_most_once_in C $Nb ->
+      forall U U' s',
+        is_strand_of s' C ->
+        NS_responder_strand Tname U U' Na Nb s' ->
+        s' = s.
+  Proof.
+    intros Hdiff Huorig U U' s' Hstrand' Hini'.
+    specialize s_is_NS_resp as Hini.
+    pose (s1 := s).
+    pose (s1' := s').
+    destruct Hini.
+    destruct Hini'.
+    assert (originates $Nb (s1, 1)) as Horig. {
+      apply (mpti_then_originates $Nb (s1,1)).
+      simplify_term. split. unfold not. intros.
+      simplify_prop in H1; subst. split; auto 10.
+    }
+    assert (originates $Nb (s1', 1)) as Horig'. {
+      apply (mpti_then_originates $Nb (s1',1)).
+      simplify_term. split. unfold not. intros.
+      simplify_prop in H1; subst. split; auto 10.
+    }
+    assert (is_node_of (s1,1) C) as Hnode by (apply s_strand_of_C; [easy | simpl; lia]).
+    assert (is_node_of (s1',1) C) as Hnode' by (apply Hstrand'; [easy | simpl; lia]).
+    specialize (Huorig _ _ Hnode Hnode' Horig Horig').
+    inversion Huorig; now subst.
+  Qed.
+
+  Corollary injective_agreement :
+    $Na <> $Nb -> originates_at_most_once_in C $Nb ->
+    (
+      exists (s : Σ) (B' : T),
+        NS_initiator_strand Tname A B' Na Nb s /\
+        is_strand_of s C
+    )
+    /\
+    (
+      forall s',
+        is_strand_of s' C ->
+        NS_responder_strand Tname A B Na Nb s' ->
+        s' = s
+    ).
+  Proof.
+    intros Hdiff Huniq. split.
+    - now apply noninjective_agreement.
+    - now apply injectivity.
   Qed.
 
 End auth_responder_guarantee.
+
+Section NSResponderSanity.
+  (** * Sanity check: Lowe's attack
+    We exhibit the Lowe attack to the original Needham-Schroeder protocol
+    as a sanity check: the protocol executes and satisfies all of the assumptions 
+    of the security lemmas that, in fact, do not constraint B's identifier.
+    So the attack is actually accounted for in the agreement result.
+  *)
+
+  Notation A  := (Text 0).
+  Notation B  := (Text 1).
+  Notation Na := (Text 2).
+  Notation Nb := (Text 3).
+  Notation P  := (Text 4). (* The Penetrator's participant *)
+  Notation Tname := (fun t => t = Text 0 \/ t = Text 1 \/ t = Text 4).
+
+  (* The initiator runs a session with [P], the penetrator *)
+  Notation s_ini := (0, [
+      ⊕ ⟨ $Na ⋅ $A ⟩_(PK P);
+      ⊖ ⟨ $Na ⋅ $Nb ⟩_(PK A);   (* Here [P] is missing, which allows the attack *)
+      ⊕ ⟨ $Nb ⟩_(PK P) ]).
+  (* The responder believes [A] wants to establish the session with them *)
+  Notation s_res := (1, [
+      ⊖ ⟨ $Na ⋅ $A ⟩_(PK B);
+      ⊕ ⟨ $Na ⋅ $Nb ⟩_(PK A);   (* Here [B] is missing, which allows the attack *)
+      ⊖ ⟨ $Nb ⟩_(PK B) ]).
+  Notation s_pen_K1 := (2, [
+      ⊕ #(inv (PK P)) ]).          (* [P] knows their inverse key *)
+      
+  Notation s_pen_K2 := (3, [
+      ⊕ # (PK B) ]).                (* [P] knows [B]'s public key *)
+
+  Notation s_pen_D1 := (4, [
+      ⊖ #(inv (PK P)); 
+      ⊖ ⟨ $Na ⋅ $A ⟩_(PK P);
+      ⊕ $Na ⋅ $A ]).            (* Decrypt the first message *)
+      
+  Notation s_pen_E1 := (5, [
+      ⊖ # (PK B); 
+      ⊖ $Na ⋅ $A; 
+      ⊕ ⟨ $Na ⋅ $A ⟩_(PK B) ]). (* Re-encrypt under PK B *)
+      
+  Notation s_pen_D2 := (6, [
+      ⊖ #(inv (PK P)); 
+      ⊖ ⟨ $Nb ⟩_(PK P); 
+      ⊕ $Nb ]).                 (* Decrypt the last message *)
+
+  Notation s_pen_E2 := (7, [
+      ⊖ # (PK B); 
+      ⊖ $Nb; 
+      ⊕ ⟨ $Nb ⟩_(PK B) ]).      (* Re-encrypt under PK B *)
+
+  (** The Low attack.  The lists are reversed because each [IndBundle] constructor conses onto their heads. *)
+  Definition C : bundle_type :=
+    {|
+      nodes := rev [
+        (s_pen_K1,0);   (* P -> P : inv (PK P)            *)
+        (s_pen_D1,0);
+        (s_pen_K2,0);   (* P -> P : PK B                  *)
+        (s_pen_E1,0);
+        (s_pen_D2,0);
+        (s_pen_E2,0);    
+        (s_ini,0);      (* A -> P : ⟨ $Na ⋅ $A ⟩_(PK P)   *)
+        (s_pen_D1,1);
+        (s_pen_D1,2);   (* P -> P : $Na ⋅ $A              *)
+        (s_pen_E1,1);
+        (s_pen_E1,2);   (* P -> B : ⟨ $Na ⋅ $A ⟩_(PK B)   *)
+        (s_res,0);
+        (s_res,1);      (* B -> A : ⟨ $Na ⋅ $Nb ⟩_(PK A)  *)
+        (s_ini,1);
+        (s_ini,2);      (* A -> P : ⟨ $Nb ⟩_(PK P)        *)
+        (s_pen_D2,1);
+        (s_pen_D2,2);   (* P -> P : $Nb                   *)
+        (s_pen_E2,1);
+        (s_pen_E2,2);   (* P -> B : ⟨ $Nb ⟩_(PK B)        *)
+        (s_res,2)
+      ];
+      intra := rev [
+        ((s_pen_D1,0),(s_pen_D1,1));
+        ((s_pen_D1,1),(s_pen_D1,2));
+        ((s_pen_E1,0),(s_pen_E1,1));
+        ((s_pen_E1,1),(s_pen_E1,2));
+        ((s_res,0),(s_res,1));
+        ((s_ini,0),(s_ini,1));
+        ((s_ini,1),(s_ini,2));
+        ((s_pen_D2,0),(s_pen_D2,1));
+        ((s_pen_D2,1),(s_pen_D2,2));
+        ((s_pen_E2,0),(s_pen_E2,1));
+        ((s_pen_E2,1),(s_pen_E2,2));
+        ((s_res,1),(s_res,2))
+        ];
+      inter := rev [
+        ((s_pen_K1,0),(s_pen_D1,0));  (* P -> P : inv (PK P)            *)
+        ((s_pen_K2,0),(s_pen_E1,0));  (* P -> P : PK B                  *)
+        ((s_pen_K1,0),(s_pen_D2,0));  (* P -> P : inv (PK P)            *)
+        ((s_pen_K2,0),(s_pen_E2,0));  (* P -> P : PK B                  *)
+        ((s_ini,0),(s_pen_D1,1));     (* A -> P : ⟨ $Na ⋅ $A ⟩_(PK P)   *)
+        ((s_pen_D1,2),(s_pen_E1,1));  (* P -> P : $Na ⋅ $A              *)
+        ((s_pen_E1,2),(s_res,0));     (* P -> B : ⟨ $Na ⋅ $A ⟩_(PK B)   *)
+        ((s_res,1),(s_ini,1));        (* B -> A : ⟨ $Na ⋅ $Nb ⟩_(PK A)  *)
+        ((s_ini,2),(s_pen_D2,1));     (* A -> P : ⟨ $Nb ⟩_(PK P)        *)
+        ((s_pen_D2,2),(s_pen_E2,1));  (* P -> P : $Nb                   *)
+        ((s_pen_E2,2),(s_res,2))      (* P -> B : ⟨ $Nb ⟩_(PK B)        *)
+        ]
+    |}.
+
+  (** The roles carry a premise: [Tname] must hold of the two names and not of the
+      nonces.  This is where the choice of [Tname] is validated, since an empty one
+      would leave the roles uninhabited and the whole guarantee vacuous. *)
+  Lemma s_ini_NS : NS_initiator_strand Tname A P Na Nb s_ini.
+  Proof. solve_role. Qed.
+  Lemma s_res_NS : NS_responder_strand Tname A B Na Nb s_res.
+  Proof. solve_role. Qed.
+  Lemma s_pen_K1_NS : penetrator_strand (K__P_A A) s_pen_K1.
+  Proof. solve_role. Qed.
+  Lemma s_pen_K2_NS : penetrator_strand (K__P_A A) s_pen_K2.
+  Proof. solve_role. Qed.
+  Lemma s_pen_E1_NS : penetrator_strand (K__P_A A) s_pen_E1.
+  Proof. solve_role. Qed.
+  Lemma s_pen_E2_NS : penetrator_strand (K__P_A A) s_pen_E2.
+  Proof. solve_role. Qed.
+  Lemma s_pen_D1_NS : penetrator_strand (K__P_A A) s_pen_D1.
+  Proof. solve_role. Qed.
+  Lemma s_pen_D2_NS : penetrator_strand (K__P_A A) s_pen_D2.
+  Proof. solve_role. Qed.
+    
+  Create HintDb sanity.
+  #[local] Hint Constructors NS_StrandSpace penetrator_strand : sanity.
+  #[local] Hint Resolve s_ini_NS s_res_NS s_pen_D1_NS s_pen_D2_NS s_pen_E1_NS s_pen_E2_NS s_pen_K1_NS s_pen_K2_NS: sanity.
+
+  Lemma C_is_bundle : is_bundle C.
+  Proof. ind_bundle. Qed.
+
+  Lemma s_res_strand_C : is_strand_of s_res C.
+  Proof. solve_is_strand_of. Qed.
+
+  Lemma C_is_NS : bundle_in_SS C (NS_StrandSpace Tname (K__P_A A)).
+  Proof. solve_bundle_in_SS. Qed.
+
+  (** [$Nb] is originated at most once, in fact exactly once at [(s_res,1)]. *)
+  Lemma C_Nb_at_most_once : originates_at_most_once_in C $Nb.
+  Proof. solve_at_most_once_in. Qed.
+
+  Lemma Na_neq_Nb : $Na <> $Nb.
+  Proof. discriminate. Qed.
+
+  (** The conclusion is what we already know by construction since we have exactly one
+      initiator and one responder in [C]. So, the important part is that the term
+      typechecks, which is possible only if the six hypotheses of [injective_agreement]
+      hold at once, i.e., the guarantee is not vacuous. *)
+  Lemma injective_agreement_sanity :
+    (
+      exists (s0 : Σ) (B' : T),
+        NS_initiator_strand Tname A B' Na Nb s0 /\
+        is_strand_of s0 C
+    )
+    /\
+    (
+      forall s' : Σ,
+        is_strand_of s' C ->
+        NS_responder_strand Tname A B Na Nb s' ->
+        s' = s_res
+    ).
+  Proof.
+    exact (
+      injective_agreement
+        s_res_NS
+        s_res_strand_C
+        C_is_bundle
+        C_is_NS
+        Na_neq_Nb
+        C_Nb_at_most_once
+      ).
+  Qed.
+
+End NSResponderSanity.

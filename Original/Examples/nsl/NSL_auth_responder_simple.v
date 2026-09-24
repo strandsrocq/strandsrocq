@@ -115,12 +115,12 @@ Section auth_responder_guarantee.
 
   (* Proposition 4.2 *)
   Proposition noninjective_agreement :
-    $Na <> $Nb -> uniquely_originates $Nb ->
+    $Na <> $Nb -> originates_at_most_once_in C $Nb ->
       exists s : Σ,
         NSL_initiator_strand Tname A B Na Nb s /\
         is_strand_of s C.
   Proof.
-    intros diff_nonces Nb_uniquely_originates.
+    intros diff_nonces Nb_originates_at_most_once.
     specialize (NS_has_minimal) as [m [Hin Hmin]]; try easy.
     assert (Hin':=Hin).
     apply (NS_iff_inC_NSp) in Hin' as [HinC HNSp].
@@ -140,7 +140,7 @@ Section auth_responder_guarantee.
       + simplify_prop in Hand using decidability.
         specialize (index_0_positive_originates m (t:=$Nb)) as Horig1.
         unfold is_positive in Horig1; st_implication Horig1.
-        specialize (originates_Nb_implies_c (s:=s) (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NSL_resp diff_nonces Nb_uniquely_originates Horig1)  as Horigs.
+        specialize (originates_Nb_implies_c (s:=s) (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NSL_resp s_strand_of_C diff_nonces Nb_originates_at_most_once HinC Horig1)  as Horigs.
         rewrite Horigs in Htrace; simpl in Htrace.
         inversion s_is_NSL_resp. apply (f_equal tr) in H0; simpl in H0.
         now rewrite <-Htrace in H0.
@@ -173,7 +173,8 @@ Section auth_responder_guarantee.
 
       + specialize (index_0_positive_originates m (t:=$Nb)) as Horig1.
         unfold is_positive in Horig1; st_implication Horig1.
-        specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NSL_resp diff_nonces Nb_uniquely_originates Horig1) as Horigs.
+        specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NSL_resp 
+        s_strand_of_C diff_nonces Nb_originates_at_most_once HinC Horig1) as Horigs.
         st_implication Horigs; specialize (Horigs m Horig1).
       + exists (strand m). split; try tauto.
         specialize (last_node_implies_is_strand_of C_is_bundle m) as Hsof. rewrite <-H0 in Hsof.
@@ -189,8 +190,8 @@ Section auth_responder_guarantee.
 
       specialize (mpti_then_originates ($ Nb) m) as Horig1.
       simplify_term_in Horig1. st_implication Horig1. intuition.
-      specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NSL_resp diff_nonces Nb_uniquely_originates) as Horigs.
-      specialize (Horigs m Horig1).
+      specialize (originates_Nb_implies_c (s:=s') (A:=A) (B:=B) (Na:=Na) (Nb:=Nb) (Tname:=Tname) s_is_NSL_resp s_strand_of_C diff_nonces Nb_originates_at_most_once) as Horigs.
+      specialize (Horigs m HinC Horig1).
       rewrite Horigs in H0; simpl in H0.
       inversion H0; subst; tauto.
   Qed.
@@ -198,13 +199,13 @@ Section auth_responder_guarantee.
   (* Proposition 4.8 -  injective agreement as in the original strand spaces paper **)
   Proposition injective_agreement_orig :
     $Na <> $Nb ->
-    uniquely_originates $Nb ->
-    uniquely_originates $Na ->
+    originates_at_most_once_in C $Nb ->
+    originates_at_most_once_in C $Na ->
       exists !s : Σ,
         NSL_initiator_strand Tname A B Na Nb s /\
         is_strand_of s C.
   Proof.
-    intros diff_nonces Nb_uniquely_originates Huorig.
+    intros diff_nonces Nb_originates_at_most_once Huorig.
     specialize (noninjective_agreement) as [s0 [Hinis Hstrand]]. all: try easy.
     exists s0. unfold unique. split; try easy.
     intros s' [Hinis' Hstrand'].
@@ -218,26 +219,23 @@ Section auth_responder_guarantee.
       unfold is_positive. repeat simplify_term. tauto.
     }
     st_implication Horig; st_implication Horig'.
-    inversion Huorig as [? Huni].
-    destruct Huni as [_ Horigx].
-    assert (Horigx' := Horigx).
-    specialize (Horigx' (s'',0) Horig'); specialize (Horigx (s0',0) Horig).
-    subst. now inversion Horigx'.
+    assert (is_node_of (s0',0) C) as Hnode by (apply Hstrand; [easy | simpl; lia]).
+    assert (is_node_of (s'',0) C) as Hnode' by (apply Hstrand'; [easy | simpl; lia]).
+    specialize (Huorig _ _ Hnode Hnode' Horig Horig').
+    inversion Huorig; now subst.
   Qed.
 
   (* We now prove standard injective agreement with no extra assumptions
      with respect to non-injective agreement *)
   Proposition injectivity :
-    $Na <> $Nb -> uniquely_originates $Nb ->
+    $Na <> $Nb -> originates_at_most_once_in C $Nb ->
       forall U U' s',
+        is_strand_of s' C ->
         NSL_responder_strand Tname U U' Na Nb s' ->
         s' = s.
   Proof.
-    intros Hdiff Huorig U U' s' Hini'.
+    intros Hdiff Huorig U U' s' Hstrand' Hini'.
     specialize s_is_NSL_resp as Hini.
-    inversion Huorig as [n [_ Horigx]].
-    assert (Horigx' := Horigx).
-
     pose (s1 := s).
     pose (s1' := s').
     destruct Hini.
@@ -252,12 +250,14 @@ Section auth_responder_guarantee.
       simplify_term. split. unfold not. intros.
       simplify_prop in H1; subst. split; auto 10.
     }
-    specialize (Horigx _ Horig); specialize (Horigx' _ Horig'); subst.
-    now inversion Horigx'.
+    assert (is_node_of (s1,1) C) as Hnode by (apply s_strand_of_C; [easy | simpl; lia]).
+    assert (is_node_of (s1',1) C) as Hnode' by (apply Hstrand'; [easy | simpl; lia]).
+    specialize (Huorig _ _ Hnode Hnode' Horig Horig').
+    inversion Huorig; now subst.
  Qed.
 
  Corollary injective_agreement :
-  $Na <> $Nb -> uniquely_originates $Nb ->
+  $Na <> $Nb -> originates_at_most_once_in C $Nb ->
   (
     exists s : Σ,
         NSL_initiator_strand Tname A B Na Nb s /\
@@ -266,6 +266,7 @@ Section auth_responder_guarantee.
   /\
   (
     forall s',
+      is_strand_of s' C ->
       NSL_responder_strand Tname A B Na Nb s' ->
       s' = s
   ).

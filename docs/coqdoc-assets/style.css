@@ -1,13 +1,20 @@
 :root {
   color-scheme: light;
-  --bg: #f8f7f2;
-  --paper: #fffefb;
-  --ink: #222426;
-  --muted: #64625c;
-  --line: #ddd7ca;
-  --accent: #1f6f78;
-  --accent-soft: #e4f1f2;
-  --code-bg: #f1efe8;
+  --bg: #f1f1f4;
+  --paper: #ffffff;
+  --ink: #1b1b1f;
+  --muted: #5b5b69;
+  --heading: #260085;
+  --link: #2a3fd1;
+  --idref: #260086;
+  --keyword: #c2410c;
+  --var: #3803bc;
+  --band: #e8e5ff;
+  --band-soft: #f3f1ff;
+  --rule: #e3e1ea;
+  --code-bg: linear-gradient(0deg, #fdf6f2, #fff6f3, #fff5f3, #fcf1f0, #faf7f7);
+  --mono: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
 }
 
 * {
@@ -20,146 +27,292 @@ body {
   color: var(--ink);
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.6;
 }
+
+/* Top bar */
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 22px;
+  padding: 12px max(16px, calc((100% - 980px) / 2 + 40px));
+  background: var(--heading);
+}
+
+.topbar a {
+  color: #ffffff;
+  opacity: 0.85;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.topbar a:hover {
+  opacity: 1;
+}
+
+.topbar .brand {
+  margin-right: auto;
+  opacity: 1;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Page */
 
 .coqdoc-page {
-  width: min(1080px, calc(100% - 32px));
-  margin: 32px auto;
-  padding: 36px 44px 52px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 40px 64px;
   background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 18px 45px rgba(35, 32, 24, 0.08);
-}
-
-.page-header {
-  margin-bottom: 34px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--line);
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-h1, h2, h3 {
-  line-height: 1.2;
-}
-
-h1 {
-  margin: 0;
-  font-size: 2.2rem;
-}
-
-.subtitle {
-  max-width: 760px;
-  margin: 14px 0 0;
-  color: var(--muted);
-  font-size: 1.05rem;
-}
-
-h2 {
-  margin-top: 2.2rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--line);
+  min-height: calc(100vh - 50px);
 }
 
 a {
-  color: var(--accent);
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.18em;
+  color: var(--link);
+  text-decoration: none;
 }
 
-code, .code, .id, .var, .constructor, .notation {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+a:hover {
+  text-decoration: underline;
 }
 
-pre, code {
-  background: var(--code-bg);
+.coqdoc-page h1,
+.coqdoc-page h2,
+.coqdoc-page h3,
+.coqdoc-page h4 {
+  color: var(--heading);
 }
 
-pre {
+h1.libtitle {
+  margin: 4px 0 28px;
+  color: var(--heading);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* Rocq code */
+
+.code {
+  display: block;
+  margin: 12px 0 28px;
+  padding: 14px 20px;
   overflow-x: auto;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  background: var(--code-bg);
+  border-radius: 10px;
+  color: #000000;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.7;
 }
 
-.doc {
+.code > br:first-child,
+.code > br:last-child {
+  display: none;
+}
+
+.id {
+  display: inline;
+}
+
+.code .comment {
   color: var(--muted);
 }
 
-span.id[title="keyword"],
-.keyword {
-  color: #8b3d4f;
+.id[title="keyword"] {
+  color: var(--keyword);
   font-weight: 700;
 }
 
-span.id[title="constructor"],
-.constructor {
-  color: #775e00;
+.id[title="constructor"] {
+  color: var(--keyword);
+  font-weight: 600;
 }
 
-span.id[title="definition"],
-span.id[title="lemma"],
-span.id[title="inductive"] {
-  color: #185c63;
+.id[title="var"],
+.id[title="variable"],
+.id[title="binder"] {
+  color: var(--var);
 }
 
-#toc, .toc {
-  margin: 24px 0 32px;
-  padding: 16px 20px;
-  background: var(--accent-soft);
-  border: 1px solid #c9e4e7;
+a.idref,
+a.modref {
+  color: var(--idref);
+  text-decoration: none;
+  border-radius: 3px;
+}
+
+a.idref:hover,
+a.modref:hover {
+  color: var(--link);
+  background: rgba(38, 0, 134, 0.07);
+  text-decoration: none;
+}
+
+/* Comments */
+
+.doc {
+  max-width: 46em;
+  margin: 0 0 8px;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.paragraph {
+  height: 0.75em;
+}
+
+.inlinecode {
+  display: inline;
+  font-family: var(--mono);
+}
+
+.doc .inlinecode {
+  color: var(--idref);
+  font-size: 0.9em;
+}
+
+.doc .inlinecode .id {
+  color: inherit;
+  font-weight: inherit;
+}
+.doc pre {
+  padding: 12px 16px;
+  overflow-x: auto;
+  background: #f7f6fb;
   border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 14px;
 }
 
-.doc-index section {
-  margin-top: 28px;
+.doc ul,
+.doc ol {
+  padding-left: 1.4em;
 }
 
-.file-tree {
-  margin: 12px 0 0;
-  padding: 0;
+/* Section headings written in comments */
+
+.doc h1.section {
+  margin: 40px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--band);
+  color: var(--heading);
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+.doc h2.section {
+  margin: 32px 0 10px;
+  padding: 8px 12px;
+  background: var(--band);
+  border-radius: 6px;
+  color: var(--heading);
+  font-size: 1.2rem;
+  line-height: 1.35;
+}
+
+.doc h3.section {
+  margin: 26px 0 8px;
+  padding: 6px 12px;
+  background: var(--band-soft);
+  border-radius: 6px;
+  color: var(--heading);
+  font-size: 1.05rem;
+}
+
+.doc h4.section {
+  margin: 20px 0 6px;
+  color: var(--heading);
+  font-size: 1rem;
+}
+
+/* Table of contents and index of identifiers */
+
+#toc h2 {
+  margin: 14px 0 2px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+ul.doclist {
+  margin: 2px 0;
+  padding-left: 1.3em;
   list-style: none;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  overflow: hidden;
 }
 
-.file-tree li {
+ul.doclist li {
+  margin: 2px 0;
+}
+
+.coqdoc-page > table {
+  margin: 8px 0 20px;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.coqdoc-page > table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Landing page */
+
+.doc-index .lead {
+  max-width: 46em;
+  margin: -12px 0 12px;
+  color: var(--muted);
+}
+
+.doc-index h2 {
+  margin: 36px 0 4px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--band);
+  color: var(--heading);
+  font-size: 1.35rem;
+}
+
+.doc-index dl {
   margin: 0;
-  padding: 10px 14px;
-  border-top: 1px solid var(--line);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.94rem;
 }
 
-.file-tree li:first-child {
-  border-top: 0;
+.doc-index dt {
+  margin: 18px 0 6px;
 }
 
-.file-tree li:nth-child(odd) {
-  background: #fbfaf6;
+.doc-index dt b {
+  color: var(--heading);
+  font-family: var(--mono);
+  font-size: 0.95rem;
+}
+
+.doc-index dd {
+  margin: 0 0 8px 1.6em;
+  line-height: 2;
+}
+
+.doc-index dd a {
+  margin-right: 0.9em;
+  color: var(--keyword);
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 @media (max-width: 700px) {
   .coqdoc-page {
-    width: 100%;
-    margin: 0;
-    padding: 24px 18px 36px;
-    border-radius: 0;
-    border-left: 0;
-    border-right: 0;
+    padding: 22px 16px 40px;
   }
 
-  h1 {
-    font-size: 1.75rem;
+  h1.libtitle {
+    font-size: 1.6rem;
+  }
+
+  .code {
+    padding: 12px 14px;
+    font-size: 13px;
   }
 }

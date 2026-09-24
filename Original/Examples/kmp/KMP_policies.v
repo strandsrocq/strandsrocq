@@ -44,6 +44,11 @@ Section kmp_policies.
     red; intros. destruct (set_In_dec policy__t_el_eq_dec x y); subst.
     left; auto. right; auto.
   Defined.
+  (* The key data types the policy mentions, plus [D].  A policy is a finite list,
+     so this is finite too, which is what lets the closure be a finite object. *)
+  Definition policy_types (π : policy__t) : set KEY_DATA_T :=
+    D :: flat_map (fun e => match e with (KT, _, JT) => [KDn KT; JT] end) π.
+
 End kmp_policies.
 
 (* Membership notation for policies *)

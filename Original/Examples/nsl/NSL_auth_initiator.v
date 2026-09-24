@@ -81,12 +81,12 @@ Section auth_initiator_guarantee.
 
   (* Proposition 4.2 *)
   Proposition noninjective_agreement :
-    uniquely_originates $Na ->
+    originates_at_most_once_in C $Na ->
       exists s : Σ,
         NSL_responder_strand Tname A B Na Nb s /\
         forall i, i < 2 -> is_node_of (s,i) C.
   Proof.
-    intros Na_uniquely_originates.
+    intros Na_originates_at_most_once.
     specialize (NS_has_minimal) as [m [Hin Hmin]]; try easy.
     assert (Hin':=Hin).
     apply (NS_iff_inC_NSp) in Hin' as [HinC HNSp].
@@ -100,7 +100,7 @@ Section auth_initiator_guarantee.
       all: specialize (minimal_NS_then_mpt Htrace Hin Hmin) as Hmpti; autounfold in Hmpti; simpl in Hmpti.
       all: simplify_prop in Hmpti using decidability.
       (* We use the nonce secrecy as in the paper *)
-      specialize (initiator_secrecy s_is_NSL_init s_strand_of_C C_is_bundle C_is_NSL Na_uniquely_originates (strand m, 1)) as Hsecrecy.
+      specialize (initiator_secrecy s_is_NSL_init s_strand_of_C C_is_bundle C_is_NSL Na_originates_at_most_once (strand m, 1)) as Hsecrecy.
       specialize (index_lt_strand_implies_is_node_of C_is_bundle (strand m,1) m) as Hnodeof.
       st_implication Hnodeof.
       simplify_term_in Hsecrecy.
@@ -126,13 +126,13 @@ Section auth_initiator_guarantee.
   (* injective agreement as done in the original strand spaces paper for the responder **)
   Proposition injective_agreement_orig :
     $Na <> $Nb ->
-    uniquely_originates $Na ->
-    uniquely_originates $Nb ->
+    originates_at_most_once_in C $Na ->
+    originates_at_most_once_in C $Nb ->
       exists !s : Σ,
         NSL_responder_strand Tname A B Na Nb s /\
         forall i, i < 2 -> is_node_of (s,i) C.
   Proof.
-    intros diff_nonces Na_uniquely_originates Nb_uniquely_originates.
+    intros diff_nonces Na_originates_at_most_once Nb_originates_at_most_once.
     specialize (noninjective_agreement) as [s0 [Hinis Hstrand]]. all: try easy.
     exists s0. unfold unique. split; try easy.
     intros s' [Hinis' Hstrand'].
@@ -151,50 +151,51 @@ Section auth_initiator_guarantee.
       simplify_term. split. unfold not. intros.
       simplify_prop in H1; subst; now rewrite Hor in *. split; auto 10.
     }
-    inversion Nb_uniquely_originates as [? Huni].
-    destruct Huni as [_ Horigx].
-    assert (Horigx' := Horigx).
-    specialize (Horigx' (s'',1) Horig'); specialize (Horigx (s0',1) Horig).
-    subst; now inversion Horigx'.
+    specialize (Hstrand 1). st_implication Hstrand.
+    specialize (Hstrand' 1). st_implication Hstrand'.
+    specialize (Nb_originates_at_most_once _ _ Hstrand Hstrand' Horig Horig').
+    inversion Nb_originates_at_most_once; now subst.
   Qed.
 
   (* We now prove standard injective agreement with no extra assumptions
      with respect to non-injective agreement *)
   Proposition injectivity :
-      uniquely_originates $Na ->
+      originates_at_most_once_in C $Na ->
         forall U U' Nb' s',
+          is_strand_of s' C ->
           NSL_initiator_strand Tname U U' Na Nb' s' ->
           s' = s.
   Proof.
-    intros Huorig U U' Nb' s' Hini'.
+    intros Huorig U U' Nb' s' Hstrand Hini'.
     inversion Hini' as [i' Htrace'].
     specialize s_is_NSL_init as Hini.
     inversion Hini as [i Htrace].
-    inversion Huorig as [n [_ Horigx]].
-    assert (Horigx' := Horigx).
-
-    specialize (Horigx (s, 0)); specialize (Horigx' (s', 0)).
+    pose (s0 := s).
+    pose (s0' := s').
     specialize (mpti_then_originates $Na (s, 0)) as Horig.
     specialize (mpti_then_originates $Na (s', 0)) as Horig'.
     simplify_term_in Horig; st_implication Horig.
     simplify_term_in Horig'; st_implication Horig'.
-    specialize (Horigx Horig); specialize (Horigx' Horig'); subst.
-    now inversion Horigx'.
+    assert (is_node_of (s0,0) C) as Hnode by (apply s_strand_of_C; [easy | simpl; lia]).
+    assert (is_node_of (s0',0) C) as Hnode' by (apply Hstrand; [easy | simpl; lia]).
+    specialize (Huorig _ _ Hnode Hnode' Horig Horig').
+    inversion Huorig; now subst.
   Qed.
 
   Corollary injective_agreement :
-      uniquely_originates $Na ->
-      (
-        exists s : Σ,
-          NSL_responder_strand Tname A B Na Nb s /\
-          forall i, i < 2 -> is_node_of (s,i) C
-      )
-      /\
-      (
-        forall s',
-          NSL_initiator_strand Tname A B Na Nb s' ->
-          s' = s
-      ).
+    originates_at_most_once_in C $Na ->
+    (
+      exists s : Σ,
+        NSL_responder_strand Tname A B Na Nb s /\
+        forall i, i < 2 -> is_node_of (s,i) C
+    )
+    /\
+    (
+      forall s',
+        is_strand_of s' C ->
+        NSL_initiator_strand Tname A B Na Nb s' ->
+        s' = s
+    ).
   Proof.
     intros Huniq. split.
     - now apply noninjective_agreement.
