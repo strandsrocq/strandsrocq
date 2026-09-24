@@ -1,5 +1,7 @@
 ![StrandsRocq](assets/logo.png)
 
+> 📣 **September 2026 Release**: the partial order semantics of the JLAMP paper, unique origination relative to a bundle, and a witness for every guarantee. See the [release notes](https://github.com/strandsrocq/strandsrocq/releases/tag/sep-2026-release).
+
 This repository contains a Rocq mechanization of strand spaces.
 It includes the full mechanization of the strand framework, new general results about strands, and case studies with a number of variants.
 StrandsRocq originally appeared in:
