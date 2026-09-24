@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrandsRocq Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="brand" href="index.html">StrandsRocq</a>
+  <a href="toc.html">Contents</a>
+  <a href="identifiers.html">Index</a>
+  <a href="https://github.com/strandsrocq/strandsrocq">GitHub</a>
+</nav>
+<main class="coqdoc-page">
+<h1 class="libtitle">Library strandsrocq.Common.DefaultInstanceFunctor</h1>
+
+<div class="code">
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.Strands.html#"><span class="id" title="library">Strands</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.Bundles.html#"><span class="id" title="library">Bundles</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.BundleInductive.html#"><span class="id" title="library">BundleInductive</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.MinimalMPT.html#"><span class="id" title="library">MinimalMPT</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.StrandsTacticsFunctor.html#"><span class="id" title="library">StrandsTacticsFunctor</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.SanityTactics.html#"><span class="id" title="library">SanityTactics</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.Universe.html#"><span class="id" title="library">Universe</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="MakeDefaultInstance" class="idref" href="#MakeDefaultInstance"><span class="id" title="module">MakeDefaultInstance</span></a><br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">U</span> : <a class="idref" href="strandsrocq.Common.Universe.html#UniverseSig"><span class="id" title="module">UniverseSig</span></a>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">T</span> : <a class="idref" href="strandsrocq.Common.Strands.html#TermSig"><span class="id" title="module">TermSig</span></a>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">St</span> : <a class="idref" href="strandsrocq.Common.Strands.html#StrandSig"><span class="id" title="module">StrandSig</span></a> <span class="id" title="module">T</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">SSp</span> : <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig"><span class="id" title="module">StrandSpaceSig</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">TT</span> : <a class="idref" href="strandsrocq.Common.StrandsTacticsFunctor.html#TermTacticsSig"><span class="id" title="module">TermTacticsSig</span></a>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Export</span> <span class="id" title="module">U</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Export</span> <span class="id" title="module">T</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Export</span> <span class="id" title="module">St</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Export</span> <span class="id" title="module">SSp</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <span class="id" title="keyword">Export</span> <a id="MakeDefaultInstance.StrandTactics" class="idref" href="#MakeDefaultInstance.StrandTactics"><span class="id" title="module">StrandTactics</span></a> := <a class="idref" href="strandsrocq.Common.StrandsTacticsFunctor.html#MakeStrandsTactics"><span class="id" title="module">MakeStrandsTactics</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span> <span class="id" title="module">TT</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <span class="id" title="keyword">Export</span> <a id="MakeDefaultInstance.BundleInstance" class="idref" href="#MakeDefaultInstance.BundleInstance"><span class="id" title="module">BundleInstance</span></a> := <a class="idref" href="strandsrocq.Common.Bundles.html#Bundle"><span class="id" title="module">Bundle</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <span class="id" title="keyword">Export</span> <a id="MakeDefaultInstance.BundleInductiveInstance" class="idref" href="#MakeDefaultInstance.BundleInductiveInstance"><span class="id" title="module">BundleInductiveInstance</span></a> := <a class="idref" href="strandsrocq.Common.BundleInductive.html#BundleInductive"><span class="id" title="module">BundleInductive</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span> <a class="idref" href="strandsrocq.Common.DefaultInstanceFunctor.html#MakeDefaultInstance.BundleInstance"><span class="id" title="module">BundleInstance</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <span class="id" title="keyword">Export</span> <a id="MakeDefaultInstance.MPTInstance" class="idref" href="#MakeDefaultInstance.MPTInstance"><span class="id" title="module">MPTInstance</span></a> := <a class="idref" href="strandsrocq.Common.MinimalMPT.html#MPT"><span class="id" title="module">MPT</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span> <a class="idref" href="strandsrocq.Common.DefaultInstanceFunctor.html#MakeDefaultInstance.BundleInstance"><span class="id" title="module">BundleInstance</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <span class="id" title="keyword">Export</span> <a id="MakeDefaultInstance.SanityTacticsInstance" class="idref" href="#MakeDefaultInstance.SanityTacticsInstance"><span class="id" title="module">SanityTacticsInstance</span></a> := <a class="idref" href="strandsrocq.Common.SanityTactics.html#MakeSanityTactics"><span class="id" title="module">MakeSanityTactics</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span> <a class="idref" href="strandsrocq.Common.DefaultInstanceFunctor.html#MakeDefaultInstance.BundleInstance"><span class="id" title="module">BundleInstance</span></a> <a class="idref" href="strandsrocq.Common.DefaultInstanceFunctor.html#MakeDefaultInstance.BundleInductiveInstance"><span class="id" title="module">BundleInductiveInstance</span></a> <span class="id" title="module">TT</span>.<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="strandsrocq.Common.DefaultInstanceFunctor.html#MakeDefaultInstance"><span class="id" title="module">MakeDefaultInstance</span></a>.<br/>
+</div>
+</main>
+</body>
+</html>

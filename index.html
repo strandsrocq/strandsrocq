@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrandsRocq Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="brand" href="index.html">StrandsRocq</a>
+  <a href="toc.html">Contents</a>
+  <a href="identifiers.html">Index</a>
+  <a href="https://github.com/strandsrocq/strandsrocq">GitHub</a>
+</nav>
+<main class="coqdoc-page doc-index">
+<h1 class="libtitle">StrandsRocq</h1>
+<p class="lead">A Rocq mechanization of strand spaces, with a CPSA-style operational semantics and the case studies of the CSF 2025 paper. The pages show statements and comments, without proof bodies.</p>
+
+<h2>Framework</h2>
+<dl>
+<dt><b>Common</b>: Strands, bundles and their inductive characterization, and the tactics shared by the whole development.</dt>
+<dd><a href="strandsrocq.Common.BundleInductive.html">BundleInductive</a> <a href="strandsrocq.Common.BundleRelations.html">BundleRelations</a> <a href="strandsrocq.Common.BundleSizeInduction.html">BundleSizeInduction</a> <a href="strandsrocq.Common.Bundles.html">Bundles</a> <a href="strandsrocq.Common.DefaultInstanceFunctor.html">DefaultInstanceFunctor</a> <a href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html">EmbeddedTraceStrandsFunctor</a> <a href="strandsrocq.Common.Enumerate.html">Enumerate</a> <a href="strandsrocq.Common.LogicalFacts.html">LogicalFacts</a> <a href="strandsrocq.Common.MinimalMPT.html">MinimalMPT</a> <a href="strandsrocq.Common.RelMinimal.html">RelMinimal</a> <a href="strandsrocq.Common.SanityTactics.html">SanityTactics</a> <a href="strandsrocq.Common.Strands.html">Strands</a> <a href="strandsrocq.Common.StrandsTacticsFunctor.html">StrandsTacticsFunctor</a> <a href="strandsrocq.Common.Universe.html">Universe</a> <a href="strandsrocq.Common.UniverseNat.html">UniverseNat</a> </dd>
+</dl>
+
+<h2>Partial order and operational semantics</h2>
+<dl>
+<dt><b>CPSA</b>: CPSA-style protocol syntax, the operational semantics, and its correspondence with bundles.</dt>
+<dd><a href="strandsrocq.CPSA.ChoiceRoles.html">ChoiceRoles</a> <a href="strandsrocq.CPSA.ComputableSemantics.html">ComputableSemantics</a> <a href="strandsrocq.CPSA.EnumerationSemantics.html">EnumerationSemantics</a> <a href="strandsrocq.CPSA.LabelledSemantics.html">LabelledSemantics</a> <a href="strandsrocq.CPSA.PaperExamples.html">PaperExamples</a> <a href="strandsrocq.CPSA.PenetratorProtocol.html">PenetratorProtocol</a> <a href="strandsrocq.CPSA.ProtocolExamples.html">ProtocolExamples</a> <a href="strandsrocq.CPSA.RoleSyntax.html">RoleSyntax</a> <a href="strandsrocq.CPSA.Semantics.html">Semantics</a> </dd>
+<dt><b>CPSA/Instances</b>: Terms, penetrator, and default instances for the CPSA development.</dt>
+<dd><a href="strandsrocq.CPSA.Instances.DefaultInstances.html">DefaultInstances</a> <a href="strandsrocq.CPSA.Instances.EmbeddedTraceStrands.html">EmbeddedTraceStrands</a> <a href="strandsrocq.CPSA.Instances.Penetrator.html">Penetrator</a> <a href="strandsrocq.CPSA.Instances.UTermTacticsTests.html">UTermTacticsTests</a> <a href="strandsrocq.CPSA.Instances.UTerms.html">UTerms</a> <a href="strandsrocq.CPSA.Instances.UTermsTactics.html">UTermsTactics</a> </dd>
+</dl>
+
+<h2>The CSF 2025 development</h2>
+<dl>
+<dt><b>Original/Instances</b>: Terms, penetrator, and default instances for the case studies.</dt>
+<dd><a href="strandsrocq.Original.Instances.DefaultInstances.html">DefaultInstances</a> <a href="strandsrocq.Original.Instances.EmbeddedTraceStrands.html">EmbeddedTraceStrands</a> <a href="strandsrocq.Original.Instances.Penetrator.html">Penetrator</a> <a href="strandsrocq.Original.Instances.UTermTacticsTests.html">UTermTacticsTests</a> <a href="strandsrocq.Original.Instances.UTerms.html">UTerms</a> <a href="strandsrocq.Original.Instances.UTermsTactics.html">UTermsTactics</a> </dd>
+<dt><b>Original/Examples/simple_auth</b>: A simple unilateral authentication protocol and its variants.</dt>
+<dd><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html">SimpleAuth</a> <a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html">SimpleAuthDual</a> <a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html">SimpleAuthDualBProtected</a> <a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthFlawed.html">SimpleAuthFlawed</a> <a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc.html">SimpleAuthMaximalEnc</a> <a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html">SimpleAuthMaximalEncComposition</a> <a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB.html">SimpleAuthMaximalEncWithB</a> <a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthUntyped.html">SimpleAuthUntyped</a> <a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthWithB.html">SimpleAuthWithB</a> </dd>
+<dt><b>Original/Examples/nsl</b>: The Needham-Schroeder-Lowe protocol: authentication and secrecy.</dt>
+<dd><a href="strandsrocq.Original.Examples.nsl.NSL_auth_initiator.html">NSL_auth_initiator</a> <a href="strandsrocq.Original.Examples.nsl.NSL_auth_responder.html">NSL_auth_responder</a> <a href="strandsrocq.Original.Examples.nsl.NSL_auth_responder_simple.html">NSL_auth_responder_simple</a> <a href="strandsrocq.Original.Examples.nsl.NSL_initiator.html">NSL_initiator</a> <a href="strandsrocq.Original.Examples.nsl.NSL_protocol.html">NSL_protocol</a> <a href="strandsrocq.Original.Examples.nsl.NSL_responder.html">NSL_responder</a> <a href="strandsrocq.Original.Examples.nsl.NSL_sanity.html">NSL_sanity</a> <a href="strandsrocq.Original.Examples.nsl.NSL_secrecy_initiator.html">NSL_secrecy_initiator</a> <a href="strandsrocq.Original.Examples.nsl.NSL_secrecy_initiator_simple.html">NSL_secrecy_initiator_simple</a> <a href="strandsrocq.Original.Examples.nsl.NSL_secrecy_responder.html">NSL_secrecy_responder</a> <a href="strandsrocq.Original.Examples.nsl.NSL_secrecy_responder_simple.html">NSL_secrecy_responder_simple</a> </dd>
+<dt><b>Original/Examples/ns_original</b>: The original Needham-Schroeder protocol.</dt>
+<dd><a href="strandsrocq.Original.Examples.ns_original.NS_orig_auth_responder_simple.html">NS_orig_auth_responder_simple</a> <a href="strandsrocq.Original.Examples.ns_original.NS_orig_initiator.html">NS_orig_initiator</a> <a href="strandsrocq.Original.Examples.ns_original.NS_orig_protocol.html">NS_orig_protocol</a> <a href="strandsrocq.Original.Examples.ns_original.NS_orig_responder.html">NS_orig_responder</a> </dd>
+<dt><b>Original/Examples/kmp</b>: Key management policies.</dt>
+<dd><a href="strandsrocq.Original.Examples.kmp.KMP_closure.html">KMP_closure</a> <a href="strandsrocq.Original.Examples.kmp.KMP_closure_improved.html">KMP_closure_improved</a> <a href="strandsrocq.Original.Examples.kmp.KMP_policies.html">KMP_policies</a> <a href="strandsrocq.Original.Examples.kmp.KMP_policy_examples.html">KMP_policy_examples</a> <a href="strandsrocq.Original.Examples.kmp.KMP_policy_examples_improved.html">KMP_policy_examples_improved</a> <a href="strandsrocq.Original.Examples.kmp.KMP_protocol.html">KMP_protocol</a> <a href="strandsrocq.Original.Examples.kmp.KMP_runs.html">KMP_runs</a> <a href="strandsrocq.Original.Examples.kmp.KMP_sanity.html">KMP_sanity</a> <a href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html">KMP_sanity_improved</a> <a href="strandsrocq.Original.Examples.kmp.KMP_secrecy.html">KMP_secrecy</a> <a href="strandsrocq.Original.Examples.kmp.KMP_secrecy_closure_improved.html">KMP_secrecy_closure_improved</a> </dd>
+</dl>
+</main>
+</body>
+</html>

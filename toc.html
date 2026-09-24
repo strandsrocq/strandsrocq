@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrandsRocq Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="brand" href="index.html">StrandsRocq</a>
+  <a href="toc.html">Contents</a>
+  <a href="identifiers.html">Index</a>
+  <a href="https://github.com/strandsrocq/strandsrocq">GitHub</a>
+</nav>
+<main class="coqdoc-page">
+<h1 class="libtitle">Contents</h1>
+<div id="toc">
+<h2><a href="strandsrocq.Common.BundleInductive.html">Library strandsrocq.Common.BundleInductive</a></h2>
+<h2><a href="strandsrocq.Common.BundleRelations.html">Library strandsrocq.Common.BundleRelations</a></h2>
+<h2><a href="strandsrocq.Common.BundleSizeInduction.html">Library strandsrocq.Common.BundleSizeInduction</a></h2>
+<h2><a href="strandsrocq.Common.Bundles.html">Library strandsrocq.Common.Bundles</a></h2>
+<h2><a href="strandsrocq.Common.DefaultInstanceFunctor.html">Library strandsrocq.Common.DefaultInstanceFunctor</a></h2>
+<h2><a href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html">Library strandsrocq.Common.EmbeddedTraceStrandsFunctor</a></h2>
+<h2><a href="strandsrocq.Common.Enumerate.html">Library strandsrocq.Common.Enumerate</a></h2>
+<h2><a href="strandsrocq.Common.LogicalFacts.html">Library strandsrocq.Common.LogicalFacts</a></h2>
+<h2><a href="strandsrocq.Common.MinimalMPT.html">Library strandsrocq.Common.MinimalMPT</a></h2>
+<h2><a href="strandsrocq.Common.RelMinimal.html">Library strandsrocq.Common.RelMinimal</a></h2>
+<h2><a href="strandsrocq.Common.SanityTactics.html">Library strandsrocq.Common.SanityTactics</a></h2>
+<ul class="doclist">
+<li><ul class="doclist">
+<li><a href="strandsrocq.Common.SanityTactics.html#lab1">Building the bundle</a>
+
+</li>
+<li><a href="strandsrocq.Common.SanityTactics.html#lab2">Discharging the guarantee's hypotheses</a>
+
+</li>
+</ul>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Common.Strands.html">Library strandsrocq.Common.Strands</a></h2>
+<h2><a href="strandsrocq.Common.StrandsTacticsFunctor.html">Library strandsrocq.Common.StrandsTacticsFunctor</a></h2>
+<h2><a href="strandsrocq.Common.Universe.html">Library strandsrocq.Common.Universe</a></h2>
+<h2><a href="strandsrocq.Common.UniverseNat.html">Library strandsrocq.Common.UniverseNat</a></h2>
+<h2><a href="strandsrocq.CPSA.ChoiceRoles.html">Library strandsrocq.CPSA.ChoiceRoles</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.ChoiceRoles.html#lab3">CPSA choice expansion for shared-prefix roles</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.ComputableSemantics.html">Library strandsrocq.CPSA.ComputableSemantics</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.ComputableSemantics.html#lab4">Computable CPSA semantics</a>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.ComputableSemantics.html#lab5">Indexed pool occurrences</a>
+
+</li>
+<li><a href="strandsrocq.CPSA.ComputableSemantics.html#lab6">Type-level pool reachability</a>
+
+</li>
+<li><a href="strandsrocq.CPSA.ComputableSemantics.html#lab7">Bundle-producing reachability</a>
+
+</li>
+<li><a href="strandsrocq.CPSA.ComputableSemantics.html#lab8">Communication edges</a>
+
+</li>
+<li><a href="strandsrocq.CPSA.ComputableSemantics.html#lab9">Bundle soundness and extraction</a>
+
+</li>
+<li><a href="strandsrocq.CPSA.ComputableSemantics.html#lab10">Example</a>
+
+</li>
+</ul>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.EnumerationSemantics.html">Library strandsrocq.CPSA.EnumerationSemantics</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.EnumerationSemantics.html#lab11">Compatible enumerations and labelled executions</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.LabelledSemantics.html">Library strandsrocq.CPSA.LabelledSemantics</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.LabelledSemantics.html#lab12">Type-level labelled CPSA semantics</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.PaperExamples.html">Library strandsrocq.CPSA.PaperExamples</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.PaperExamples.html#lab13">Paper examples</a>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.PaperExamples.html#lab14">Paper Section 4: yes-or-no protocol and choice</a>
+
+</li>
+<li><a href="strandsrocq.CPSA.PaperExamples.html#lab15">Paper Section 8: Concurrent Yahalom worked example</a>
+
+</li>
+</ul>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.PenetratorProtocol.html">Library strandsrocq.CPSA.PenetratorProtocol</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.PenetratorProtocol.html#lab16">CPSA penetrator protocol</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.ProtocolExamples.html">Library strandsrocq.CPSA.ProtocolExamples</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.ProtocolExamples.html#lab17">CPSA direct syntax examples</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.RoleSyntax.html">Library strandsrocq.CPSA.RoleSyntax</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.RoleSyntax.html#lab18">CPSA direct syntax</a>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.RoleSyntax.html#lab19">Well-formed role traces</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.CPSA.RoleSyntax.html#lab20">Mesg variables appearing in a term.</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.Semantics.html">Library strandsrocq.CPSA.Semantics</a></h2>
+<h2><a href="strandsrocq.CPSA.Instances.DefaultInstances.html">Library strandsrocq.CPSA.Instances.DefaultInstances</a></h2>
+<h2><a href="strandsrocq.CPSA.Instances.EmbeddedTraceStrands.html">Library strandsrocq.CPSA.Instances.EmbeddedTraceStrands</a></h2>
+<h2><a href="strandsrocq.CPSA.Instances.Penetrator.html">Library strandsrocq.CPSA.Instances.Penetrator</a></h2>
+<h2><a href="strandsrocq.CPSA.Instances.UTermTacticsTests.html">Library strandsrocq.CPSA.Instances.UTermTacticsTests</a></h2>
+<h2><a href="strandsrocq.CPSA.Instances.UTerms.html">Library strandsrocq.CPSA.Instances.UTerms</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.CPSA.Instances.UTerms.html#lab21">CPSA term algebra</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.CPSA.Instances.UTermsTactics.html">Library strandsrocq.CPSA.Instances.UTermsTactics</a></h2>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_closure.html">Library strandsrocq.Original.Examples.kmp.KMP_closure</a></h2>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_closure_improved.html">Library strandsrocq.Original.Examples.kmp.KMP_closure_improved</a></h2>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_policies.html">Library strandsrocq.Original.Examples.kmp.KMP_policies</a></h2>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_policy_examples.html">Library strandsrocq.Original.Examples.kmp.KMP_policy_examples</a></h2>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_policy_examples_improved.html">Library strandsrocq.Original.Examples.kmp.KMP_policy_examples_improved</a></h2>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_protocol.html">Library strandsrocq.Original.Examples.kmp.KMP_protocol</a></h2>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_runs.html">Library strandsrocq.Original.Examples.kmp.KMP_runs</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_runs.html#lab22">The honest run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_runs.html#lab23">The type confusion run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_runs.html#lab24">The key injection run</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_sanity.html">Library strandsrocq.Original.Examples.kmp.KMP_sanity</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_sanity.html#lab25">The honest run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_sanity.html#lab26">The type confusion run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_sanity.html#lab27">The key injection run</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html">Library strandsrocq.Original.Examples.kmp.KMP_sanity_improved</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#lab28">The honest run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#lab29">The type confusion run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#lab30">The key injection run</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_secrecy.html">Library strandsrocq.Original.Examples.kmp.KMP_secrecy</a></h2>
+<h2><a href="strandsrocq.Original.Examples.kmp.KMP_secrecy_closure_improved.html">Library strandsrocq.Original.Examples.kmp.KMP_secrecy_closure_improved</a></h2>
+<h2><a href="strandsrocq.Original.Examples.ns_original.NS_orig_auth_responder_simple.html">Library strandsrocq.Original.Examples.ns_original.NS_orig_auth_responder_simple</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.ns_original.NS_orig_auth_responder_simple.html#lab31">Sanity check: Lowe's attack</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.ns_original.NS_orig_initiator.html">Library strandsrocq.Original.Examples.ns_original.NS_orig_initiator</a></h2>
+<h2><a href="strandsrocq.Original.Examples.ns_original.NS_orig_protocol.html">Library strandsrocq.Original.Examples.ns_original.NS_orig_protocol</a></h2>
+<h2><a href="strandsrocq.Original.Examples.ns_original.NS_orig_responder.html">Library strandsrocq.Original.Examples.ns_original.NS_orig_responder</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_auth_initiator.html">Library strandsrocq.Original.Examples.nsl.NSL_auth_initiator</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_auth_responder.html">Library strandsrocq.Original.Examples.nsl.NSL_auth_responder</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_auth_responder_simple.html">Library strandsrocq.Original.Examples.nsl.NSL_auth_responder_simple</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_initiator.html">Library strandsrocq.Original.Examples.nsl.NSL_initiator</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_protocol.html">Library strandsrocq.Original.Examples.nsl.NSL_protocol</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_responder.html">Library strandsrocq.Original.Examples.nsl.NSL_responder</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_sanity.html">Library strandsrocq.Original.Examples.nsl.NSL_sanity</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.nsl.NSL_sanity.html#lab32">Sanity check: an honest run</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.nsl.NSL_sanity.html#lab33">Initiator authentication, from <span class="inlinecode"><span class="id" title="var">NSL_auth_initiator</span></span></a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.nsl.NSL_sanity.html#lab34">Responder authentication, from <span class="inlinecode"><span class="id" title="var">NSL_auth_responder</span></span> and <span class="inlinecode"><span class="id" title="var">NSL_auth_responder_simple</span></span></a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.nsl.NSL_sanity.html#lab35">Initiator secrecy, from <span class="inlinecode"><span class="id" title="var">NSL_secrecy_initiator</span></span> and <span class="inlinecode"><span class="id" title="var">NSL_secrecy_initiator_simple</span></span></a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.nsl.NSL_sanity.html#lab36">Responder secrecy, from <span class="inlinecode"><span class="id" title="var">NSL_secrecy_responder</span></span> and <span class="inlinecode"><span class="id" title="var">NSL_secrecy_responder_simple</span></span></a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.nsl.NSL_sanity.html#lab37">Sanity check: a nonce collapse</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_secrecy_initiator.html">Library strandsrocq.Original.Examples.nsl.NSL_secrecy_initiator</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_secrecy_initiator_simple.html">Library strandsrocq.Original.Examples.nsl.NSL_secrecy_initiator_simple</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_secrecy_responder.html">Library strandsrocq.Original.Examples.nsl.NSL_secrecy_responder</a></h2>
+<h2><a href="strandsrocq.Original.Examples.nsl.NSL_secrecy_responder_simple.html">Library strandsrocq.Original.Examples.nsl.NSL_secrecy_responder_simple</a></h2>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuth</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html#lab38">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html#lab39">Protocol Specification</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html#lab40">Protocol Roles</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html#lab41">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html#lab42">Non-injective agreement</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html#lab43">Injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html#lab44">Sanity check: an honest run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuth.html#lab45">Sanity check: a replay attack</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuthDual</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html#lab46">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html#lab47">Protocol specification and roles</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html#lab48">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html#lab49">Non-injective agreement</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html#lab50">Injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html#lab51">Sanity check: an honest run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDual.html#lab52">Sanity check: an impersonation</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html#lab53">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html#lab54">Protocol Specification</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html#lab55">Protocol Roles</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html#lab56">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html#lab57">Non-injective agreement: new proof technique</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html#lab58">Injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html#lab59">Sanity check: an honest run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthDualBProtected.html#lab60">Sanity check: an impersonation</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthFlawed.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuthFlawed</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthFlawed.html#lab61">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthFlawed.html#lab62">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthFlawed.html#lab63">Non-injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthFlawed.html#lab64">The reflection attack</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc.html#lab65">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc.html#lab66">Protocol Specification</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc.html#lab67">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc.html#lab68">Non-injective agreement</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc.html#lab69">Injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEnc.html#lab70">Sanity check: an honest run</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html#lab71">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html#lab72">Protocol Specification</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html#lab73">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html#lab74">Non-injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html#lab75">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html#lab76">Non-injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html#lab77">Sanity check: one honest run of each protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncComposition.html#lab78">Sanity check: a reflection attack without key separation</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB.html#lab79">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB.html#lab80">Protocol Specification</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB.html#lab81">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB.html#lab82">Non-injective agreement</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB.html#lab83">Injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthMaximalEncWithB.html#lab84">Sanity check: an honest run</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthUntyped.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuthUntyped</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthUntyped.html#lab85">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthUntyped.html#lab86">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthUntyped.html#lab87">Injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthUntyped.html#lab88">Sanity check: an honest run</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthUntyped.html#lab89">Sanity check: a key leak</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthWithB.html">Library strandsrocq.Original.Examples.simple_auth.SimpleAuthWithB</a></h2>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthWithB.html#lab90">Example: A Simple Unilateral Authentication Protocol</a>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthWithB.html#lab91">Proof of Security</a>
+<ul class="doclist">
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthWithB.html#lab92">Injective agreement</a>
+
+</li>
+</ul>
+
+</li>
+<li><a href="strandsrocq.Original.Examples.simple_auth.SimpleAuthWithB.html#lab93">Sanity check: an honest run</a>
+
+</li>
+</ul>
+<h2><a href="strandsrocq.Original.Instances.DefaultInstances.html">Library strandsrocq.Original.Instances.DefaultInstances</a></h2>
+<h2><a href="strandsrocq.Original.Instances.EmbeddedTraceStrands.html">Library strandsrocq.Original.Instances.EmbeddedTraceStrands</a></h2>
+<h2><a href="strandsrocq.Original.Instances.Penetrator.html">Library strandsrocq.Original.Instances.Penetrator</a></h2>
+<h2><a href="strandsrocq.Original.Instances.UTermTacticsTests.html">Library strandsrocq.Original.Instances.UTermTacticsTests</a></h2>
+<h2><a href="strandsrocq.Original.Instances.UTerms.html">Library strandsrocq.Original.Instances.UTerms</a></h2>
+<h2><a href="strandsrocq.Original.Instances.UTermsTactics.html">Library strandsrocq.Original.Instances.UTermsTactics</a></h2>
+</div>
+</main>
+</body>
+</html>

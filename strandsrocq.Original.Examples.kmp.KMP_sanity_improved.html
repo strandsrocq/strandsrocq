@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrandsRocq Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="brand" href="index.html">StrandsRocq</a>
+  <a href="toc.html">Contents</a>
+  <a href="identifiers.html">Index</a>
+  <a href="https://github.com/strandsrocq/strandsrocq">GitHub</a>
+</nav>
+<main class="coqdoc-page">
+<h1 class="libtitle">Library strandsrocq.Original.Examples.kmp.KMP_sanity_improved</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Lia</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Lists.List</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="module">Stdlib.Lists.List.ListNotations</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">ListSet</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.Original.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Instances.DefaultInstances.html#"><span class="id" title="library">DefaultInstances</span></a>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.Original.Instances</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Instances.Penetrator.html#"><span class="id" title="library">Penetrator</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_policies.html#"><span class="id" title="library">KMP_policies</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_protocol.html#"><span class="id" title="library">KMP_protocol</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_policy_examples.html#"><span class="id" title="library">KMP_policy_examples</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#"><span class="id" title="library">KMP_runs</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_closure_improved.html#"><span class="id" title="library">KMP_closure_improved</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_secrecy_closure_improved.html#"><span class="id" title="library">KMP_secrecy_closure_improved</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_policy_examples_improved.html#"><span class="id" title="library">KMP_policy_examples_improved</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab28"></a><h1 class="section">The honest run</h1>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="k0_never_in_the_clear_improved" class="idref" href="#k0_never_in_the_clear_improved"><span class="id" title="lemma">k0_never_in_the_clear_improved</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <a id="n:1" class="idref" href="#n:1"><span class="id" title="binder">n</span></a>, <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_node_of"><span class="id" title="definition">is_node_of</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#n:1"><span class="id" title="variable">n</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#C"><span class="id" title="definition">C</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="strandsrocq.Original.Instances.UTerms.html#fefab2250b6eaa8d3854c26980b3dc3d"><span class="id" title="notation">#</span></a><a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#k0"><span class="id" title="abbreviation">k0</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;&gt;'_x"><span class="id" title="notation">≠</span></a> <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.uns_term"><span class="id" title="definition">uns_term</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#n:1"><span class="id" title="variable">n</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="k1_never_in_the_clear_improved" class="idref" href="#k1_never_in_the_clear_improved"><span class="id" title="lemma">k1_never_in_the_clear_improved</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <a id="n:2" class="idref" href="#n:2"><span class="id" title="binder">n</span></a>, <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_node_of"><span class="id" title="definition">is_node_of</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#n:2"><span class="id" title="variable">n</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#C"><span class="id" title="definition">C</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="strandsrocq.Original.Instances.UTerms.html#fefab2250b6eaa8d3854c26980b3dc3d"><span class="id" title="notation">#</span></a><a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#k1"><span class="id" title="abbreviation">k1</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;&gt;'_x"><span class="id" title="notation">≠</span></a> <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.uns_term"><span class="id" title="definition">uns_term</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#n:2"><span class="id" title="variable">n</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab29"></a><h1 class="section">The type confusion run</h1>
+
+<div class="paragraph"> </div>
+
+ <span class="inlinecode"><span class="id" title="var">k1</span></span> on the bundle where <span class="inlinecode"><span class="id" title="var">k0</span></span> leaks.  Compare <span class="inlinecode"><span class="id" title="var">secrecy_unavailable_for_k1</span></span>. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a id="k1_never_in_the_clear_on_the_attack" class="idref" href="#k1_never_in_the_clear_on_the_attack"><span class="id" title="lemma">k1_never_in_the_clear_on_the_attack</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <a id="n:3" class="idref" href="#n:3"><span class="id" title="binder">n</span></a>, <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_node_of"><span class="id" title="definition">is_node_of</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#n:3"><span class="id" title="variable">n</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#C'"><span class="id" title="definition">C'</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="strandsrocq.Original.Instances.UTerms.html#fefab2250b6eaa8d3854c26980b3dc3d"><span class="id" title="notation">#</span></a><a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#k1"><span class="id" title="abbreviation">k1</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;&gt;'_x"><span class="id" title="notation">≠</span></a> <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.uns_term"><span class="id" title="definition">uns_term</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#n:3"><span class="id" title="variable">n</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab30"></a><h1 class="section">The key injection run</h1>
+
+<div class="paragraph"> </div>
+
+ The device key stays secret although the penetrator got a handle of its own. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a id="k2_never_in_the_clear" class="idref" href="#k2_never_in_the_clear"><span class="id" title="lemma">k2_never_in_the_clear</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <a id="n:4" class="idref" href="#n:4"><span class="id" title="binder">n</span></a>, <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_node_of"><span class="id" title="definition">is_node_of</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#n:4"><span class="id" title="variable">n</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#C''"><span class="id" title="definition">C''</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="strandsrocq.Original.Instances.UTerms.html#fefab2250b6eaa8d3854c26980b3dc3d"><span class="id" title="notation">#</span></a><a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_runs.html#k2"><span class="id" title="abbreviation">k2</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;&gt;'_x"><span class="id" title="notation">≠</span></a> <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.uns_term"><span class="id" title="definition">uns_term</span></a> <a class="idref" href="strandsrocq.Original.Examples.kmp.KMP_sanity_improved.html#n:4"><span class="id" title="variable">n</span></a>.<br/>
+</div>
+</main>
+</body>
+</html>

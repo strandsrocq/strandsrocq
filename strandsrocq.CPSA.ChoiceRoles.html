@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrandsRocq Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="brand" href="index.html">StrandsRocq</a>
+  <a href="toc.html">Contents</a>
+  <a href="identifiers.html">Index</a>
+  <a href="https://github.com/strandsrocq/strandsrocq">GitHub</a>
+</nav>
+<main class="coqdoc-page">
+<h1 class="libtitle">Library strandsrocq.CPSA.ChoiceRoles</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">List</span> <span class="id" title="library">String</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="module">ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">strandsrocq.CPSA</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#"><span class="id" title="library">RoleSyntax</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab3"></a><h1 class="section">CPSA choice expansion for shared-prefix roles</h1>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="ChoiceRoles" class="idref" href="#ChoiceRoles"><span class="id" title="module">ChoiceRoles</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax"><span class="id" title="module">CPSA_Direct_Syntax</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">list_scope</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="ChoiceRoles.trace_tree" class="idref" href="#ChoiceRoles.trace_tree"><span class="id" title="definition, inductive"><span id="ChoiceRoles.trace_tree_rect" class="id"><span id="ChoiceRoles.trace_tree_ind" class="id"><span id="ChoiceRoles.trace_tree_rec" class="id"><span id="ChoiceRoles.trace_tree_sind" class="id">trace_tree</span></span></span></span></span></a> : <span class="id" title="keyword">Type</span> :=<br/>
+| <a id="ChoiceRoles.TLeaf" class="idref" href="#ChoiceRoles.TLeaf"><span class="id" title="constructor">TLeaf</span></a> : <span class="id" title="inductive">string</span> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a><br/>
+| <a id="ChoiceRoles.TChoice" class="idref" href="#ChoiceRoles.TChoice"><span class="id" title="constructor">TChoice</span></a> : <span class="id" title="inductive">string</span> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="ChoiceRoles.trace_role_name" class="idref" href="#ChoiceRoles.trace_role_name"><span class="id" title="definition">trace_role_name</span></a> (<a id="base:3" class="idref" href="#base:3"><span class="id" title="binder">base</span></a> <a id="name:4" class="idref" href="#name:4"><span class="id" title="binder">name</span></a> : <span class="id" title="inductive">string</span>) : <span class="id" title="inductive">string</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">if</span> <span class="id" title="definition">string_dec</span> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#name:4"><span class="id" title="variable">name</span></a> "" <span class="id" title="keyword">then</span> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#base:3"><span class="id" title="variable">base</span></a> <span class="id" title="keyword">else</span> <span class="id" title="definition">String.append</span> (<span class="id" title="definition">String.append</span> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#base:3"><span class="id" title="variable">base</span></a> "-") <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#name:4"><span class="id" title="variable">name</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="ChoiceRoles.trace_node" class="idref" href="#ChoiceRoles.trace_node"><span class="id" title="definition">trace_node</span></a> (<a id="tr:5" class="idref" href="#tr:5"><span class="id" title="binder">tr</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a>) : <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a> :=<br/>
+&nbsp;&nbsp;<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.TLeaf"><span class="id" title="constructor">TLeaf</span></a> "" <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#tr:5"><span class="id" title="variable">tr</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="ChoiceRoles.named_trace_node" class="idref" href="#ChoiceRoles.named_trace_node"><span class="id" title="definition">named_trace_node</span></a> (<a id="name:6" class="idref" href="#name:6"><span class="id" title="binder">name</span></a> : <span class="id" title="inductive">string</span>) (<a id="tr:7" class="idref" href="#tr:7"><span class="id" title="binder">tr</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a>) : <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a> :=<br/>
+&nbsp;&nbsp;<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.TLeaf"><span class="id" title="constructor">TLeaf</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#name:6"><span class="id" title="variable">name</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#tr:7"><span class="id" title="variable">tr</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="ChoiceRoles.trace_choice" class="idref" href="#ChoiceRoles.trace_choice"><span class="id" title="definition">trace_choice</span></a> (<a id="tr:8" class="idref" href="#tr:8"><span class="id" title="binder">tr</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a>) (<a id="branches:9" class="idref" href="#branches:9"><span class="id" title="binder">branches</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a>)<br/>
+&nbsp;&nbsp;: <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a> :=<br/>
+&nbsp;&nbsp;<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.TChoice"><span class="id" title="constructor">TChoice</span></a> "" <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#tr:8"><span class="id" title="variable">tr</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#branches:9"><span class="id" title="variable">branches</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="ChoiceRoles.named_trace_choice" class="idref" href="#ChoiceRoles.named_trace_choice"><span class="id" title="definition">named_trace_choice</span></a><br/>
+&nbsp;&nbsp;(<a id="name:10" class="idref" href="#name:10"><span class="id" title="binder">name</span></a> : <span class="id" title="inductive">string</span>)<br/>
+&nbsp;&nbsp;(<a id="tr:11" class="idref" href="#tr:11"><span class="id" title="binder">tr</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a>)<br/>
+&nbsp;&nbsp;(<a id="branches:12" class="idref" href="#branches:12"><span class="id" title="binder">branches</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a>)<br/>
+&nbsp;&nbsp;: <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a> :=<br/>
+&nbsp;&nbsp;<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.TChoice"><span class="id" title="constructor">TChoice</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#name:10"><span class="id" title="variable">name</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#tr:11"><span class="id" title="variable">tr</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#branches:12"><span class="id" title="variable">branches</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <a id="ChoiceRoles.trace_tree_roles" class="idref" href="#ChoiceRoles.trace_tree_roles"><span class="id" title="definition">trace_tree_roles</span></a><br/>
+&nbsp;&nbsp;(<a id="base:13" class="idref" href="#base:13"><span class="id" title="binder">base</span></a> : <span class="id" title="inductive">string</span>)<br/>
+&nbsp;&nbsp;(<a id="vars:14" class="idref" href="#vars:14"><span class="id" title="binder">vars</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.var_decl"><span class="id" title="record">var_decl</span></a>)<br/>
+&nbsp;&nbsp;(<a id="prefix:15" class="idref" href="#prefix:15"><span class="id" title="binder">prefix</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a>)<br/>
+&nbsp;&nbsp;(<a id="non:16" class="idref" href="#non:16"><span class="id" title="binder">non</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.msg"><span class="id" title="definition">msg</span></a>)<br/>
+&nbsp;&nbsp;(<a id="uniq:17" class="idref" href="#uniq:17"><span class="id" title="binder">uniq</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.packed_tvar"><span class="id" title="record">packed_tvar</span></a>)<br/>
+&nbsp;&nbsp;(<a id="tr:18" class="idref" href="#tr:18"><span class="id" title="binder">tr</span></a> : <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a>)<br/>
+&nbsp;&nbsp;: <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.role"><span class="id" title="record">role</span></a> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#tr:18"><span class="id" title="variable">tr</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.TLeaf"><span class="id" title="constructor">TLeaf</span></a> <span class="id" title="var">name</span> <span class="id" title="var">tr</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">[</span><a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.defrole"><span class="id" title="definition">defrole</span></a> (<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_role_name"><span class="id" title="definition">trace_role_name</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#base:13"><span class="id" title="variable">base</span></a> <span class="id" title="var">name</span>) <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#vars:14"><span class="id" title="variable">vars</span></a> (<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#prefix:15"><span class="id" title="variable">prefix</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#tr:18"><span class="id" title="variable">tr</span></a>) <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#non:16"><span class="id" title="variable">non</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#uniq:17"><span class="id" title="variable">uniq</span></a><span class="id" title="notation">]</span><br/>
+&nbsp;&nbsp;| <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.TChoice"><span class="id" title="constructor">TChoice</span></a> <span class="id" title="var">name</span> <span class="id" title="var">tr</span> <span class="id" title="var">branches</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <a id="base':21" class="idref" href="#base':21"><span class="id" title="binder">base'</span></a> := <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_role_name"><span class="id" title="definition">trace_role_name</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#base:13"><span class="id" title="variable">base</span></a> <span class="id" title="var">name</span> <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <a id="prefix':22" class="idref" href="#prefix':22"><span class="id" title="binder">prefix'</span></a> := <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#prefix:15"><span class="id" title="variable">prefix</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#tr:18"><span class="id" title="variable">tr</span></a> <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">branches</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="notation">[]</span> ⇒ <span class="id" title="notation">[</span><a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.defrole"><span class="id" title="definition">defrole</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#base':21"><span class="id" title="variable">base'</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#vars:14"><span class="id" title="variable">vars</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#prefix':22"><span class="id" title="variable">prefix'</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#non:16"><span class="id" title="variable">non</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#uniq:17"><span class="id" title="variable">uniq</span></a><span class="id" title="notation">]</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="definition">List.concat</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Lists.ListDef.html#map"><span class="id" title="definition">map</span></a> (<a class="idref" href="#ChoiceRoles.trace_tree_roles"><span class="id" title="definition">trace_tree_roles</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#base':21"><span class="id" title="variable">base'</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#vars:14"><span class="id" title="variable">vars</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#prefix':22"><span class="id" title="variable">prefix'</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#non:16"><span class="id" title="variable">non</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#uniq:17"><span class="id" title="variable">uniq</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">branches</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="ChoiceRoles.traces_roles" class="idref" href="#ChoiceRoles.traces_roles"><span class="id" title="definition">traces_roles</span></a><br/>
+&nbsp;&nbsp;(<a id="base:24" class="idref" href="#base:24"><span class="id" title="binder">base</span></a> : <span class="id" title="inductive">string</span>)<br/>
+&nbsp;&nbsp;(<a id="vars:25" class="idref" href="#vars:25"><span class="id" title="binder">vars</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.var_decl"><span class="id" title="record">var_decl</span></a>)<br/>
+&nbsp;&nbsp;(<a id="prefix:26" class="idref" href="#prefix:26"><span class="id" title="binder">prefix</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a>)<br/>
+&nbsp;&nbsp;(<a id="non:27" class="idref" href="#non:27"><span class="id" title="binder">non</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.msg"><span class="id" title="definition">msg</span></a>)<br/>
+&nbsp;&nbsp;(<a id="uniq:28" class="idref" href="#uniq:28"><span class="id" title="binder">uniq</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.packed_tvar"><span class="id" title="record">packed_tvar</span></a>)<br/>
+&nbsp;&nbsp;(<a id="traces:29" class="idref" href="#traces:29"><span class="id" title="binder">traces</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a>)<br/>
+&nbsp;&nbsp;: <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.role"><span class="id" title="record">role</span></a> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#traces:29"><span class="id" title="variable">traces</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="var">branches</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="definition">List.concat</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Lists.ListDef.html#map"><span class="id" title="definition">map</span></a> (<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree_roles"><span class="id" title="definition">trace_tree_roles</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#base:24"><span class="id" title="variable">base</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#vars:25"><span class="id" title="variable">vars</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#prefix:26"><span class="id" title="variable">prefix</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#non:27"><span class="id" title="variable">non</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#uniq:28"><span class="id" title="variable">uniq</span></a>) <span class="id" title="var">branches</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="ChoiceRoles.choice_roles" class="idref" href="#ChoiceRoles.choice_roles"><span class="id" title="definition">choice_roles</span></a><br/>
+&nbsp;&nbsp;(<a id="base:31" class="idref" href="#base:31"><span class="id" title="binder">base</span></a> : <span class="id" title="inductive">string</span>)<br/>
+&nbsp;&nbsp;(<a id="vars:32" class="idref" href="#vars:32"><span class="id" title="binder">vars</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.var_decl"><span class="id" title="record">var_decl</span></a>)<br/>
+&nbsp;&nbsp;(<a id="prefix:33" class="idref" href="#prefix:33"><span class="id" title="binder">prefix</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.event"><span class="id" title="inductive">event</span></a>)<br/>
+&nbsp;&nbsp;(<a id="non:34" class="idref" href="#non:34"><span class="id" title="binder">non</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.msg"><span class="id" title="definition">msg</span></a>)<br/>
+&nbsp;&nbsp;(<a id="uniq:35" class="idref" href="#uniq:35"><span class="id" title="binder">uniq</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.packed_tvar"><span class="id" title="record">packed_tvar</span></a>)<br/>
+&nbsp;&nbsp;(<a id="traces:36" class="idref" href="#traces:36"><span class="id" title="binder">traces</span></a> : <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_tree"><span class="id" title="inductive">trace_tree</span></a>)<br/>
+&nbsp;&nbsp;: <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.role"><span class="id" title="record">role</span></a> :=<br/>
+&nbsp;&nbsp;<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.traces_roles"><span class="id" title="definition">traces_roles</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#base:31"><span class="id" title="variable">base</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#vars:32"><span class="id" title="variable">vars</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#prefix:33"><span class="id" title="variable">prefix</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#non:34"><span class="id" title="variable">non</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#uniq:35"><span class="id" title="variable">uniq</span></a> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#traces:36"><span class="id" title="variable">traces</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="ChoiceRoles.::cpsa_direct_syntax_scope:'DEFROLE'_x_'VARS'_x_'TRACE'_x_'NONORIG'_x_'UNIQORIG'_x" class="idref" href="#ChoiceRoles.::cpsa_direct_syntax_scope:'DEFROLE'_x_'VARS'_x_'TRACE'_x_'NONORIG'_x_'UNIQORIG'_x"><span class="id" title="notation">&quot;</span></a>'DEFROLE' name 'VARS' vars 'TRACE' tr 'NONORIG' no 'UNIQORIG' uo" :=<br/>
+&nbsp;&nbsp;(<a class="idref" href="strandsrocq.CPSA.RoleSyntax.html#CPSA_Direct_Syntax.defrole"><span class="id" title="definition">defrole</span></a> <span class="id" title="var">name</span> <span class="id" title="var">vars</span> <span class="id" title="var">tr</span> <span class="id" title="keyword">no</span> <span class="id" title="var">uo</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">name</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">no</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">uo</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="ChoiceRoles.::cpsa_direct_syntax_scope:'TRACE'_x" class="idref" href="#ChoiceRoles.::cpsa_direct_syntax_scope:'TRACE'_x"><span class="id" title="notation">&quot;</span></a>'TRACE' tr" :=<br/>
+&nbsp;&nbsp;(<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_node"><span class="id" title="definition">trace_node</span></a> <span class="id" title="var">tr</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="ChoiceRoles.::cpsa_direct_syntax_scope:'TRACE'_x_x" class="idref" href="#ChoiceRoles.::cpsa_direct_syntax_scope:'TRACE'_x_x"><span class="id" title="notation">&quot;</span></a>'TRACE' name tr" :=<br/>
+&nbsp;&nbsp;(<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.named_trace_node"><span class="id" title="definition">named_trace_node</span></a> <span class="id" title="var">name</span> <span class="id" title="var">tr</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">name</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="ChoiceRoles.::cpsa_direct_syntax_scope:'TRACE'_x_'THEN'_x" class="idref" href="#ChoiceRoles.::cpsa_direct_syntax_scope:'TRACE'_x_'THEN'_x"><span class="id" title="notation">&quot;</span></a>'TRACE' tr 'THEN' bs" :=<br/>
+&nbsp;&nbsp;(<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.trace_choice"><span class="id" title="definition">trace_choice</span></a> <span class="id" title="var">tr</span> <span class="id" title="var">bs</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">bs</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="ChoiceRoles.::cpsa_direct_syntax_scope:'TRACE'_x_x_'THEN'_x" class="idref" href="#ChoiceRoles.::cpsa_direct_syntax_scope:'TRACE'_x_x_'THEN'_x"><span class="id" title="notation">&quot;</span></a>'TRACE' name tr 'THEN' bs" :=<br/>
+&nbsp;&nbsp;(<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.named_trace_choice"><span class="id" title="definition">named_trace_choice</span></a> <span class="id" title="var">name</span> <span class="id" title="var">tr</span> <span class="id" title="var">bs</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">name</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">tr</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">bs</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="ChoiceRoles.::cpsa_direct_syntax_scope:'CHOICE'_x_'VARS'_x_'NONORIG'_x_'UNIQORIG'_x_'TRACES'_x" class="idref" href="#ChoiceRoles.::cpsa_direct_syntax_scope:'CHOICE'_x_'VARS'_x_'NONORIG'_x_'UNIQORIG'_x_'TRACES'_x"><span class="id" title="notation">&quot;</span></a>'CHOICE' base 'VARS' vars 'NONORIG' no 'UNIQORIG' uo 'TRACES' bs" :=<br/>
+&nbsp;&nbsp;(<a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles.choice_roles"><span class="id" title="definition">choice_roles</span></a> <span class="id" title="var">base</span> <span class="id" title="var">vars</span> <span class="id" title="notation">[]</span> <span class="id" title="keyword">no</span> <span class="id" title="var">uo</span> <span class="id" title="var">bs</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">base</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">vars</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">no</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">uo</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">bs</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 1) : <span class="id" title="var">cpsa_direct_syntax_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="strandsrocq.CPSA.ChoiceRoles.html#ChoiceRoles"><span class="id" title="module">ChoiceRoles</span></a>.<br/>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrandsRocq Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="brand" href="index.html">StrandsRocq</a>
+  <a href="toc.html">Contents</a>
+  <a href="identifiers.html">Index</a>
+  <a href="https://github.com/strandsrocq/strandsrocq">GitHub</a>
+</nav>
+<main class="coqdoc-page">
+<h1 class="libtitle">Library strandsrocq.Common.EmbeddedTraceStrandsFunctor</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Lists.List</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.Strands.html#"><span class="id" title="library">Strands</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="MakeEmbeddedTraceStrands" class="idref" href="#MakeEmbeddedTraceStrands"><span class="id" title="module">MakeEmbeddedTraceStrands</span></a> (<span class="id" title="keyword">Import</span> <span class="id" title="var">T</span> : <a class="idref" href="strandsrocq.Common.Strands.html#TermSig"><span class="id" title="module">TermSig</span></a>) &lt;: <a class="idref" href="strandsrocq.Common.Strands.html#StrandSig"><span class="id" title="module">StrandSig</span></a> <span class="id" title="module">T</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <a id="MakeEmbeddedTraceStrands.ST" class="idref" href="#MakeEmbeddedTraceStrands.ST"><span class="id" title="module">ST</span></a> := <a class="idref" href="strandsrocq.Common.Strands.html#SignedTerms"><span class="id" title="module">SignedTerms</span></a> <span class="id" title="module">T</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Export</span> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#MakeEmbeddedTraceStrands.ST"><span class="id" title="module">ST</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a id="ebf5779338c60a8c5fa45b61baddd8ce" class="idref" href="#ebf5779338c60a8c5fa45b61baddd8ce"><span class="id" title="definition">Σ</span></a> : <span class="id" title="keyword">Set</span> := <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#11c698c8685bb8ab1cf725545c085ac4"><span class="id" title="notation">×</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="strandsrocq.Common.Strands.html#SignedTerms.sT"><span class="id" title="inductive">sT</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a id="MakeEmbeddedTraceStrands.tr" class="idref" href="#MakeEmbeddedTraceStrands.tr"><span class="id" title="definition">tr</span></a> (<a id="s:1" class="idref" href="#s:1"><span class="id" title="binder">s</span></a> : <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#ebf5779338c60a8c5fa45b61baddd8ce"><span class="id" title="definition">Σ</span></a>) := <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#snd"><span class="id" title="definition">snd</span></a> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#s:1"><span class="id" title="variable">s</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a id="4cf1174041b04f4c5d0098593e2faa1b" class="idref" href="#4cf1174041b04f4c5d0098593e2faa1b"><span class="id" title="lemma">Σ_eq_dec</span></a> : <span class="id" title="keyword">∀</span> <a id="s:2" class="idref" href="#s:2"><span class="id" title="binder">s</span></a> <a id="s':3" class="idref" href="#s':3"><span class="id" title="binder">s'</span></a> : <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#ebf5779338c60a8c5fa45b61baddd8ce"><span class="id" title="definition">Σ</span></a>, <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da"><span class="id" title="notation">{</span></a> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#s:2"><span class="id" title="variable">s</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#s':3"><span class="id" title="variable">s'</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da"><span class="id" title="notation">}</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da"><span class="id" title="notation">+</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da"><span class="id" title="notation">{</span></a> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#s:2"><span class="id" title="variable">s</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;&gt;'_x"><span class="id" title="notation">≠</span></a> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#s':3"><span class="id" title="variable">s'</span></a><a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da"><span class="id" title="notation">}</span></a>.<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#MakeEmbeddedTraceStrands"><span class="id" title="module">MakeEmbeddedTraceStrands</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="MakeEmbeddedTraceStrandSpace" class="idref" href="#MakeEmbeddedTraceStrandSpace"><span class="id" title="module">MakeEmbeddedTraceStrandSpace</span></a> (<span class="id" title="keyword">Import</span> <span class="id" title="var">T</span> : <a class="idref" href="strandsrocq.Common.Strands.html#TermSig"><span class="id" title="module">TermSig</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <a id="MakeEmbeddedTraceStrandSpace.EmbeddedTraceStrands" class="idref" href="#MakeEmbeddedTraceStrandSpace.EmbeddedTraceStrands"><span class="id" title="module">EmbeddedTraceStrands</span></a> := <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#MakeEmbeddedTraceStrands"><span class="id" title="module">MakeEmbeddedTraceStrands</span></a> <span class="id" title="module">T</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <a id="MakeEmbeddedTraceStrandSpace.EmbeddedTraceStrandSpace" class="idref" href="#MakeEmbeddedTraceStrandSpace.EmbeddedTraceStrandSpace"><span class="id" title="module">EmbeddedTraceStrandSpace</span></a> := <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpace"><span class="id" title="module">StrandSpace</span></a> <span class="id" title="module">T</span> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#MakeEmbeddedTraceStrandSpace.EmbeddedTraceStrands"><span class="id" title="module">EmbeddedTraceStrands</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Export</span> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#MakeEmbeddedTraceStrandSpace.EmbeddedTraceStrandSpace"><span class="id" title="module">EmbeddedTraceStrandSpace</span></a>.<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="strandsrocq.Common.EmbeddedTraceStrandsFunctor.html#MakeEmbeddedTraceStrandSpace"><span class="id" title="module">MakeEmbeddedTraceStrandSpace</span></a>.<br/>
+</div>
+</main>
+</body>
+</html>

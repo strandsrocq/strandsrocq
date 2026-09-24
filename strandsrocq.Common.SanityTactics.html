@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrandsRocq Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="brand" href="index.html">StrandsRocq</a>
+  <a href="toc.html">Contents</a>
+  <a href="identifiers.html">Index</a>
+  <a href="https://github.com/strandsrocq/strandsrocq">GitHub</a>
+</nav>
+<main class="coqdoc-page">
+<h1 class="libtitle">Library strandsrocq.Common.SanityTactics</h1>
+
+
+<div class="doc">
+  Tactics for sanity checks: building a concrete bundle and discharging, on it,
+  the hypotheses of a protocol guarantee.
+
+<div class="paragraph"> </div>
+
+  <span class="inlinecode"><span class="id" title="var">ind_bundle</span></span> is useful beyond sanity checks: it proves <span class="inlinecode"><span class="id" title="var">IndBundle</span></span>, or
+  <span class="inlinecode"><span class="id" title="var">is_bundle</span></span> via <span class="inlinecode"><span class="id" title="var">IndBundle_sound</span></span>, for any concrete bundle whose three lists
+  are in derivation order.
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Lia</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Lists.List</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="module">Stdlib.Lists.List.ListNotations</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.Strands.html#"><span class="id" title="library">Strands</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.Bundles.html#"><span class="id" title="library">Bundles</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.BundleInductive.html#"><span class="id" title="library">BundleInductive</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.MinimalMPT.html#"><span class="id" title="library">MinimalMPT</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.StrandsTacticsFunctor.html#"><span class="id" title="library">StrandsTacticsFunctor</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="MakeSanityTactics" class="idref" href="#MakeSanityTactics"><span class="id" title="module">MakeSanityTactics</span></a><br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">T</span> : <a class="idref" href="strandsrocq.Common.Strands.html#TermSig"><span class="id" title="module">TermSig</span></a>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">St</span> : <a class="idref" href="strandsrocq.Common.Strands.html#StrandSig"><span class="id" title="module">StrandSig</span></a> <span class="id" title="module">T</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">SSp</span> : <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig"><span class="id" title="module">StrandSpaceSig</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">B</span> : <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig"><span class="id" title="module">BundleSig</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">BI</span> : <a class="idref" href="strandsrocq.Common.BundleInductive.html#BundleInductiveSig"><span class="id" title="module">BundleInductiveSig</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span> <span class="id" title="module">B</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">Import</span> <span class="id" title="var">TT</span> : <a class="idref" href="strandsrocq.Common.StrandsTacticsFunctor.html#TermTacticsSig"><span class="id" title="module">TermTacticsSig</span></a>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <a id="MakeSanityTactics.MPTI" class="idref" href="#MakeSanityTactics.MPTI"><span class="id" title="module">MPTI</span></a> := <a class="idref" href="strandsrocq.Common.MinimalMPT.html#MPT"><span class="id" title="module">MPT</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span> <span class="id" title="module">B</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.SanityTactics.html#MakeSanityTactics.MPTI"><span class="id" title="module">MPTI</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <a id="MakeSanityTactics.STI" class="idref" href="#MakeSanityTactics.STI"><span class="id" title="module">STI</span></a> := <a class="idref" href="strandsrocq.Common.StrandsTacticsFunctor.html#MakeStrandsTactics"><span class="id" title="module">MakeStrandsTactics</span></a> <span class="id" title="module">T</span> <span class="id" title="module">St</span> <span class="id" title="module">SSp</span> <span class="id" title="module">TT</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Import</span> <a class="idref" href="strandsrocq.Common.SanityTactics.html#MakeSanityTactics.STI"><span class="id" title="module">STI</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab1"></a><h2 class="section">Building the bundle</h2>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">indb_in</span>  := <span class="id" title="tactic">simpl</span>; <span class="id" title="tactic">repeat</span> <span class="id" title="tactic">first</span> [ <span class="id" title="tactic">left</span>; <span class="id" title="tactic">reflexivity</span> | <span class="id" title="tactic">right</span> ].<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">indb_nin</span> := <span class="id" title="tactic">simpl</span>; <span class="id" title="keyword">let</span> <span class="id" title="var">H</span> := <span class="id" title="tactic">fresh</span> <span class="id" title="tactic">in</span> <span class="id" title="tactic">intro</span> <span class="id" title="var">H</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="tactic">destruct</span> <span class="id" title="var">H</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">H</span>|<span class="id" title="var">H</span>]);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">solve</span> [ <span class="id" title="tactic">discriminate</span> <span class="id" title="var">H</span> | <span class="id" title="var">now</span> <span class="id" title="tactic">inversion</span> <span class="id" title="var">H</span> | <span class="id" title="var">contradiction</span> ].<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">indb_edge</span> := <span class="id" title="tactic">simpl</span>; <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">indb_pos</span>  := <span class="id" title="tactic">simpl</span>; <span class="id" title="tactic">exact</span> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#I"><span class="id" title="constructor">I</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Each constructor conses onto the head of <span class="inlinecode"><span class="id" title="var">nodes</span></span>, and <span class="inlinecode"><span class="id" title="var">G_pos</span></span>/<span class="inlinecode"><span class="id" title="var">G_neg</span></span> also
+      onto <span class="inlinecode"><span class="id" title="var">intra</span></span>/<span class="inlinecode"><span class="id" title="var">inter</span></span>, so the heads of the three lists determine which one
+      applies, so no search is needed: only case recognition. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">ind_bundle</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">try</span> <span class="id" title="tactic">apply</span> <a class="idref" href="strandsrocq.Common.BundleInductive.html#BundleInductiveSig.IndBundle_sound"><span class="id" title="lemma">IndBundle_sound</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="tactic">first</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="tactic">apply</span> <a class="idref" href="strandsrocq.Common.BundleInductive.html#BundleInductiveSig.G_empty"><span class="id" title="constructor">G_empty</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">eapply</span> <a class="idref" href="strandsrocq.Common.BundleInductive.html#BundleInductiveSig.G_pos_zero"><span class="id" title="constructor">G_pos_zero</span></a>; [ | <span class="id" title="var">indb_nin</span> | <span class="id" title="var">indb_pos</span>  | <span class="id" title="tactic">reflexivity</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">eapply</span> <a class="idref" href="strandsrocq.Common.BundleInductive.html#BundleInductiveSig.G_pos"><span class="id" title="constructor">G_pos</span></a>;      [ | <span class="id" title="var">indb_in</span>  | <span class="id" title="var">indb_nin</span>  | <span class="id" title="var">indb_pos</span>  | <span class="id" title="var">indb_edge</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">eapply</span> <a class="idref" href="strandsrocq.Common.BundleInductive.html#BundleInductiveSig.G_neg_zero"><span class="id" title="constructor">G_neg_zero</span></a>; [ | <span class="id" title="var">indb_in</span>  | <span class="id" title="var">indb_nin</span>  | <span class="id" title="var">indb_edge</span> | <span class="id" title="tactic">reflexivity</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">eapply</span> <a class="idref" href="strandsrocq.Common.BundleInductive.html#BundleInductiveSig.G_neg"><span class="id" title="constructor">G_neg</span></a>;      [ | <span class="id" title="var">indb_in</span>  | <span class="id" title="var">indb_in</span>   | <span class="id" title="var">indb_nin</span>  | <span class="id" title="var">indb_edge</span> | <span class="id" title="var">indb_edge</span> ] ].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab2"></a><h2 class="section">Discharging the guarantee's hypotheses</h2>
+
+<div class="paragraph"> </div>
+
+ A concrete strand belongs to a role.  The role constructor fixes the strand
+      identifier by unification; what is left is its premise, if it has one, which
+      for a typing discipline is a conjunction of memberships and non-memberships. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">solve_role</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">econstructor</span>; <span class="id" title="tactic">repeat</span> <span class="id" title="tactic">split</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="tactic">first</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ (<span class="id" title="keyword">let</span> <span class="id" title="var">H</span> := <span class="id" title="tactic">fresh</span> <span class="id" title="tactic">in</span> <span class="id" title="tactic">intro</span> <span class="id" title="var">H</span>; <span class="id" title="tactic">repeat</span> (<span class="id" title="tactic">destruct</span> <span class="id" title="var">H</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">H</span>|<span class="id" title="var">H</span>]); <span class="id" title="tactic">discriminate</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">solve</span> [ <span class="id" title="tactic">repeat</span> <span class="id" title="tactic">first</span> [ <span class="id" title="tactic">left</span>; <span class="id" title="tactic">reflexivity</span> | <span class="id" title="tactic">right</span> ]; <span class="id" title="tactic">reflexivity</span> ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">easy</span> ].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode"><span class="id" title="var">is_strand_of</span></span> <span class="inlinecode"><span class="id" title="var">s</span></span> <span class="inlinecode"><span class="id" title="var">C</span></span>: the index is bounded by the trace length, so peeling it
+      exhausts the nodes of <span class="inlinecode"><span class="id" title="var">s</span></span>, and <span class="inlinecode"><span class="id" title="var">lia</span></span> closes the overflow case. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">solve_is_strand_of</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">unfold</span> <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_strand_of"><span class="id" title="definition">is_strand_of</span></a>, <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_node_of"><span class="id" title="definition">is_node_of</span></a>; <span class="id" title="tactic">intros</span> <span class="id" title="var">n</span> <span class="id" title="var">Hs</span> <span class="id" title="var">Hlt</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <span class="id" title="var">Hs</span> <span class="id" title="tactic">in</span> <span class="id" title="var">Hlt</span>; <span class="id" title="tactic">simpl</span> <span class="id" title="tactic">in</span> <span class="id" title="var">Hlt</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> (<a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.node_as_pair"><span class="id" title="lemma">node_as_pair</span></a> <span class="id" title="var">n</span>), <span class="id" title="var">Hs</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">remember</span> (<a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.index"><span class="id" title="definition">index</span></a> <span class="id" title="var">n</span>) <span class="id" title="keyword">as</span> <span class="id" title="var">i</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="tactic">destruct</span> <span class="id" title="var">i</span> <span class="id" title="keyword">as</span> [|<span class="id" title="var">i</span>]; [ <span class="id" title="tactic">simpl</span>; <span class="id" title="tactic">tauto</span> | ]);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">lia</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode"><span class="id" title="var">bundle_in_SS</span></span> <span class="inlinecode"><span class="id" title="var">C</span></span> <span class="inlinecode"><span class="id" title="var">SSp</span></span>: one case per node, closed by <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> on the <span class="inlinecode"><span class="id" title="var">sanity</span></span>
+      database.  That database is the only per protocol part: the example declares
+      its strand space with <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Constructors</span></span> and the strands it exhibits with
+      <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span>, so <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> can use those strands and no others. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">solve_bundle_in_SS</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">unfold</span> <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.bundle_in_SS"><span class="id" title="definition">bundle_in_SS</span></a>; <span class="id" title="tactic">intros</span> <span class="id" title="var">n</span> <span class="id" title="var">Hn</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="tactic">destruct</span> <span class="id" title="var">Hn</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hn</span>|<span class="id" title="var">Hn</span>];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="var">Hn</span>; <span class="id" title="tactic">simpl</span>; <span class="id" title="tactic">eauto</span> <span class="id" title="keyword">with</span> <span class="id" title="var">sanity</span> | ]);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">contradiction</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode"><span class="id" title="var">strandspace_bundle</span></span> requires to prove both <span class="inlinecode"><span class="id" title="var">is_bundle</span></span> and <span class="inlinecode"><span class="id" title="var">bundle_in_SS</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">solve_strandspace_bundle</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">split</span>; [<span class="id" title="var">ind_bundle</span> | <span class="id" title="var">solve_bundle_in_SS</span>].<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">strand_node0_cases</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">H</span> : <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_strand_of"><span class="id" title="definition">is_strand_of</span></a> ?<span class="id" title="var">t</span> ?<span class="id" title="var">C</span> |- <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">assert</span> (<a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_node_of"><span class="id" title="definition">is_node_of</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#e6756e10c36f149b18b4a8741ed83079"><span class="id" title="notation">(</span></a><span class="id" title="var">t</span><a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#e6756e10c36f149b18b4a8741ed83079"><span class="id" title="notation">,</span></a> 0<a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Datatypes.html#e6756e10c36f149b18b4a8741ed83079"><span class="id" title="notation">)</span></a> <span class="id" title="var">C</span>) <span class="id" title="keyword">as</span> <span class="id" title="var">Hn</span> <span class="id" title="tactic">by</span> (<span class="id" title="tactic">apply</span> <span class="id" title="var">H</span>; <span class="id" title="tactic">simpl</span>; [<span class="id" title="tactic">reflexivity</span> | <span class="id" title="var">lia</span>]);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">simpl</span> <span class="id" title="tactic">in</span> <span class="id" title="var">Hn</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="tactic">destruct</span> <span class="id" title="var">Hn</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hn</span>|<span class="id" title="var">Hn</span>]); <span class="id" title="tactic">try</span> <span class="id" title="tactic">discriminate</span>; <span class="id" title="tactic">try</span> <span class="id" title="var">contradiction</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode"><span class="id" title="keyword">∀</span></span> <span class="inlinecode"><span class="id" title="var">s</span>,</span> <span class="inlinecode"><span class="id" title="var">is_strand_of</span></span> <span class="inlinecode"><span class="id" title="var">s</span></span> <span class="inlinecode"><span class="id" title="var">C</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" title="var">Role</span></span> <span class="inlinecode">...</span> <span class="inlinecode"><span class="id" title="var">s</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" title="var">s</span></span> <span class="inlinecode">=</span> <span class="inlinecode"><span class="id" title="var">s0</span></span>: inverting the role makes
+      the trace concrete, so node 0 of <span class="inlinecode"><span class="id" title="var">s</span></span> is a node of <span class="inlinecode"><span class="id" title="var">C</span></span>, and the membership has
+      exactly one disjunct whose trace matches. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">solve_unique_strand</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">s</span> <span class="id" title="var">Hs</span> <span class="id" title="var">Hr</span>; <span class="id" title="tactic">inversion</span> <span class="id" title="var">Hr</span>; <span class="id" title="tactic">subst</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand_node0_cases</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">now</span> <span class="id" title="tactic">inversion</span> <span class="id" title="var">Hn</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode">¬</span> <span class="inlinecode">(<span class="id" title="tactic">∃</span></span> <span class="inlinecode"><span class="id" title="var">s</span>,</span> <span class="inlinecode"><span class="id" title="var">Role</span></span> <span class="inlinecode">...</span> <span class="inlinecode"><span class="id" title="var">s</span></span> <span class="inlinecode">∧</span> <span class="inlinecode"><span class="id" title="var">is_strand_of</span></span> <span class="inlinecode"><span class="id" title="var">s</span></span> <span class="inlinecode"><span class="id" title="var">C</span>)</span>: as for <span class="inlinecode"><span class="id" title="var">solve_unique_strand</span></span>,
+      but no disjunct of the membership has a matching trace. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">solve_no_strand</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">s</span> := <span class="id" title="tactic">fresh</span> "s" <span class="id" title="tactic">in</span> <span class="id" title="keyword">let</span> <span class="id" title="var">Hr</span> := <span class="id" title="tactic">fresh</span> "Hr" <span class="id" title="tactic">in</span> <span class="id" title="keyword">let</span> <span class="id" title="var">Hs</span> := <span class="id" title="tactic">fresh</span> "Hs" <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span> [<span class="id" title="var">s</span> [<span class="id" title="var">Hr</span> <span class="id" title="var">Hs</span>]]; <span class="id" title="tactic">inversion</span> <span class="id" title="var">Hr</span>; <span class="id" title="tactic">subst</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">strand_node0_cases</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode"><span class="id" title="var">originates</span></span> <span class="inlinecode"><span class="id" title="var">t</span></span> <span class="inlinecode"><span class="id" title="var">n</span></span> for a node at index 0: <span class="inlinecode"><span class="id" title="var">index_0_positive_originates</span></span> takes
+      it from the subterm and positivity side conditions, both computed. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">solve_originates</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.index_0_positive_originates"><span class="id" title="lemma">index_0_positive_originates</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" title="tactic">unfold</span> <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.uns_term"><span class="id" title="definition">uns_term</span></a>, <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.term"><span class="id" title="definition">term</span></a>; <span class="id" title="tactic">simpl</span>; <span class="id" title="tactic">intuition</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">unfold</span> <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.is_positive"><span class="id" title="definition">is_positive</span></a>, <a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.term"><span class="id" title="definition">term</span></a>; <span class="id" title="var">now</span> <span class="id" title="tactic">simpl</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">reflexivity</span> ].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Refute <span class="inlinecode"><span class="id" title="var">originates_at_most_once_in</span></span> <span class="inlinecode"><span class="id" title="var">C</span></span> <span class="inlinecode"><span class="id" title="var">t</span></span> by naming the two nodes of <span class="inlinecode"><span class="id" title="var">C</span></span> that
+      both originate <span class="inlinecode"><span class="id" title="var">t</span></span>.  They are given rather than searched for: which two
+      origination points collide is the content of the counterexample. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">refute_at_most_once_in</span> <span class="id" title="var">n1</span> <span class="id" title="var">n2</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| |- <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#63a68285c81db8f9bc456233bb9ed181"><span class="id" title="notation">¬</span></a> <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.originates_at_most_once_in"><span class="id" title="definition">originates_at_most_once_in</span></a> ?<span class="id" title="var">C</span> ?<span class="id" title="var">t</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hamo</span> := <span class="id" title="tactic">fresh</span> "Hamo" <span class="id" title="tactic">in</span> <span class="id" title="tactic">intro</span> <span class="id" title="var">Hamo</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hn1</span> := <span class="id" title="tactic">fresh</span> "Hn" <span class="id" title="tactic">in</span> <span class="id" title="tactic">assert</span> (<a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_node_of"><span class="id" title="definition">is_node_of</span></a> <span class="id" title="var">n1</span> <span class="id" title="var">C</span>) <span class="id" title="keyword">as</span> <span class="id" title="var">Hn1</span> <span class="id" title="tactic">by</span> <span class="id" title="var">indb_in</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hn2</span> := <span class="id" title="tactic">fresh</span> "Hn" <span class="id" title="tactic">in</span> <span class="id" title="tactic">assert</span> (<a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.is_node_of"><span class="id" title="definition">is_node_of</span></a> <span class="id" title="var">n2</span> <span class="id" title="var">C</span>) <span class="id" title="keyword">as</span> <span class="id" title="var">Hn2</span> <span class="id" title="tactic">by</span> <span class="id" title="var">indb_in</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Ho1</span> := <span class="id" title="tactic">fresh</span> "Ho" <span class="id" title="tactic">in</span> <span class="id" title="tactic">assert</span> (<a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.originates"><span class="id" title="definition">originates</span></a> <span class="id" title="var">t</span> <span class="id" title="var">n1</span>) <span class="id" title="keyword">as</span> <span class="id" title="var">Ho1</span> <span class="id" title="tactic">by</span> <span class="id" title="var">solve_originates</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Ho2</span> := <span class="id" title="tactic">fresh</span> "Ho" <span class="id" title="tactic">in</span> <span class="id" title="tactic">assert</span> (<a class="idref" href="strandsrocq.Common.Strands.html#StrandSpaceSig.originates"><span class="id" title="definition">originates</span></a> <span class="id" title="var">t</span> <span class="id" title="var">n2</span>) <span class="id" title="keyword">as</span> <span class="id" title="var">Ho2</span> <span class="id" title="tactic">by</span> <span class="id" title="var">solve_originates</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">specialize</span> (<span class="id" title="var">Hamo</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">Hn1</span> <span class="id" title="var">Hn2</span> <span class="id" title="var">Ho1</span> <span class="id" title="var">Ho2</span>); <span class="id" title="tactic">discriminate</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Turn an origination hypothesis into the minimal-position fact it implies,
+      and reduce it.  Once the node is concrete <span class="inlinecode"><span class="id" title="var">tr</span></span> <span class="inlinecode">(<span class="id" title="var">strand</span></span> <span class="inlinecode"><span class="id" title="var">n</span>)</span> computes, so
+      <span class="inlinecode"><span class="id" title="var">eq_refl</span></span> is the witness that <span class="inlinecode"><span class="id" title="var">originates_then_mpt</span></span> asks for. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">origin_to_mpt</span> <span class="id" title="var">H</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hm</span> := <span class="id" title="tactic">fresh</span> "Hm" <span class="id" title="tactic">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">specialize</span> (<a class="idref" href="strandsrocq.Common.MinimalMPT.html#MPT.originates_then_mpt"><span class="id" title="lemma">originates_then_mpt</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#eq_refl"><span class="id" title="constructor">eq_refl</span></a> <span class="id" title="var">H</span>) <span class="id" title="keyword">as</span> <span class="id" title="var">Hm</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">simpl</span> <span class="id" title="tactic">in</span> <span class="id" title="var">Hm</span>; <span class="id" title="var">simplify_prop</span> <span class="id" title="tactic">in</span> <span class="id" title="var">Hm</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode"><span class="id" title="var">originates_at_most_once_in</span></span> <span class="inlinecode"><span class="id" title="var">C</span></span> <span class="inlinecode"><span class="id" title="var">t</span></span>: the two memberships generate the cross
+      product of the nodes of <span class="inlinecode"><span class="id" title="var">C</span></span>, the diagonal closes by <span class="inlinecode"><span class="id" title="tactic">reflexivity</span></span>, and every
+      mixed case dies because one of the two nodes cannot originate <span class="inlinecode"><span class="id" title="var">t</span></span>. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">solve_at_most_once_in</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">unfold</span> <a class="idref" href="strandsrocq.Common.Bundles.html#BundleSig.originates_at_most_once_in"><span class="id" title="definition">originates_at_most_once_in</span></a>; <span class="id" title="tactic">intros</span> <span class="id" title="var">n</span> <span class="id" title="var">n'</span> <span class="id" title="var">Hin</span> <span class="id" title="var">Hin'</span> <span class="id" title="var">Ho</span> <span class="id" title="var">Ho'</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="tactic">destruct</span> <span class="id" title="var">Hin</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hn</span>|<span class="id" title="var">Hin</span>]); <span class="id" title="tactic">try</span> <span class="id" title="var">easy</span>; <span class="id" title="tactic">subst</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">try</span> <span class="id" title="var">origin_to_mpt</span> <span class="id" title="var">Ho</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="tactic">destruct</span> <span class="id" title="var">Hin'</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hn'</span>|<span class="id" title="var">Hin'</span>]); <span class="id" title="tactic">try</span> <span class="id" title="var">easy</span>; <span class="id" title="tactic">subst</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">try</span> <span class="id" title="tactic">reflexivity</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">try</span> <span class="id" title="var">origin_to_mpt</span> <span class="id" title="var">Ho'</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="strandsrocq.Common.SanityTactics.html#MakeSanityTactics"><span class="id" title="module">MakeSanityTactics</span></a>.<br/>
+</div>
+</main>
+</body>
+</html>
