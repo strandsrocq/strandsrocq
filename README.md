@@ -31,6 +31,7 @@ The process requires about 15 seconds on a machine with an Apple M4 Pro processo
 # Documentation
 
 - Our [CSF 2025 paper](https://arxiv.org/abs/2502.12848) explains the ideas and design principles behind StrandsRocq, and includes some examples;
+- The [documentation of the current version](https://strandsrocq.github.io/strandsrocq/) shows the statements and comments of every module, with identifiers linked to their definitions;
 - An [online tutorial](https://strandsrocq.vercel.app/) walks through the SimpleAuth protocol of the CSF 2025 paper in the browser, running the code of the `csf25` version.
 
 ## Generating the documentation
@@ -40,6 +41,7 @@ To generate HTML documentation, run the following script, which builds the proje
 $ bash scripts/generate-docs.sh
 ```
 The generated pages are written to `docs/coqdoc-noproofs/`. Open `docs/coqdoc-noproofs/index.html` in a browser to browse them. The documentation covers all the modules in `Common/`, `CPSA/`, and `Original/`, rendered without proof bodies and with identifiers linked to their definitions.
+Maintainers publish it online with `bash scripts/publish-docs.sh --push`, which commits the pages to the `gh-pages` branch served by GitHub Pages.
 
 # Citing our work
 
@@ -102,7 +104,7 @@ The project is structured as follows:
         - `nsl/` and `ns_original/` cover the Needham-Schroeder-Lowe and original Needham-Schroeder protocols, and `nsl/NSL_sanity.v` holds the NSL witnesses;
         - `kmp/` is the key management policies case study: `KMP_policy_examples.v` and `KMP_policy_examples_improved.v` exhibit policies and their closures, `KMP_runs.v` the witness bundles, and `KMP_sanity.v` and `KMP_sanity_improved.v` what the two closure definitions prove about them.
 
-* `scripts/` contains `generate-docs.sh`, described above.
+* `scripts/` contains `generate-docs.sh` and `publish-docs.sh`, described above.
 
 * `docs/coqdoc-assets/` contains the style of the generated documentation.
 
